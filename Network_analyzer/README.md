@@ -1,23 +1,3 @@
-<<<<<<< HEAD
-python .\sink.py --port 8000 --ingest-path /api/ingest --current-path /api/current
-python .\run.py --server-ip 192.168.1.11 --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest"
-
-Invoke-WebRequest "http://192.168.1.10:8080" -OutFile $env:TEMP\test.html
->>
->> # Loop pra gerar bastante tráfego:
->> while ($true) {
->>   Invoke-WebRequest "http://192.168.1.11:8080" -OutFile $env:TEMP\test.html | Out-Null
->>   Start-Sleep -Milliseconds 200
->> }
-
-
-python -m http.server 8080 --bind 0.0.0.0
->> # (opcional) abrir a porta no firewall
->> netsh advfirewall firewall add rule name="Python HTTP 8080" dir=in action=allow protocol=TCP localport=8080
-
-https://npcap.com/ <- necesario para utilizar scapy no windows
-
-=======
 # Documentação do `run.py`
 
 Este documento detalha o funcionamento do script `run.py`, um produtor de dados de tráfego de rede. Ele captura pacotes, agrega informações em janelas de tempo e envia os dados em formato JSON.
@@ -256,4 +236,3 @@ Ao fazer isso, o script run.py em execução no servidor-alvo começará a captu
 Comandos Úteis
 Para identificar o nome da sua interface de rede no Windows, use o PowerShell:
 Get-NetAdapter | Select Name, Status
->>>>>>> cae83d1d7f04b5f7d6c849d1449b244f7f70508e
