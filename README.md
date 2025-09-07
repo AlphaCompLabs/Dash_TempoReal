@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+<<<<<<<
 Ei integrante da equipe, escreva a especificação da sua aplicação aqui lindão/lindona, bom trabalho!
 =======
 Teste do servidor em http://127.0.0.1:8000 
