@@ -4,7 +4,7 @@ pip install -r .\requirements.txt
 
 2° Passo Teste do Servidor:
 - IP Servidor Test: http://127.0.0.1:8000 
-- Iniciar o uvicorn: python -m uvicorn BackEnd.main:app --reload
+- Iniciar o uvicorn: python -m uvicorn main:app --reload
 - // Colar no Console depois de escrever (allow pasting):
 - const ws = new WebSocket("ws://127.0.0.1:8000/ws");
 
