@@ -1,6 +1,7 @@
 Teste do servidor em http://127.0.0.1:8000 
 
-Iniciar o uvicorn: python -m uvicorn main:app --reload
+Iniciar o uvicorn: python -m uvicorn BackEnd.main:app --reload
+
 
 // Colar no Console depois de escrever (allow pasting):
 
