@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 📊 Dashboard Análise de Tráfego em Tempo Real 
 
 O presente trabalho tem como objetivo realizar a captura de tráfego em um servidor. Ele servirá para processar os dados, que poderão ser vizualizados dinamicamente, da seguinte forma:
@@ -289,3 +290,31 @@ Para identificar o nome da sua interface de rede no Windows, use o PowerShell:
 Get-NetAdapter | Select Name, Status
 >>>>>>> cae83d1d7f04b5f7d6c849d1449b244f7f70508e
 >>>>>>> redes
+=======
+Backend 
+1° Passo Baixar dependencias do requirements.txt
+pip install -r .\requirements.txt
+
+2° Passo Teste do Servidor:
+- IP Servidor Test: http://127.0.0.1:8000
+- Antes de iniciar o uvicorn, garante que você está no "Back-End_API\BackEnd" (cd BackEnd)
+- Iniciar o uvicorn: python -m uvicorn main:app --reload --port 8000
+- // Colar no Console depois de escrever (allow pasting):
+- const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+ws.onmessage = function(event) {
+    console.log("Mensagem recebida do servidor:", JSON.parse(event.data));
+};
+
+ws.onopen = function() {
+    console.log("Conexão WebSocket estabelecida com sucesso!");
+};
+
+ws.onerror = function(error) {
+    console.error("Erro na conexão WebSocket:", error);
+};
+
+console.log("Tentando conectar ao WebSocket...");
+
+//
+>>>>>>> origin/backend
