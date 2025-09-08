@@ -1,13 +1,24 @@
-Backend 
-1° Passo Baixar dependencias do requirements.txt
-pip install -r .\requirements.txt
+# Backend Websocket Integrado com o Network Analyzer 
 
-2° Passo Teste do Servidor:
-- IP Servidor Test: http://127.0.0.1:8000
-- Antes de iniciar o uvicorn, garante que você está no "Back-End_API\BackEnd" (cd BackEnd)
-- Iniciar o uvicorn: python -m uvicorn main:app --reload --port 8000
-- // Colar no Console depois de escrever (allow pasting):
-- const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+## 1° Passo Baixar dependencias do requirements.txt
+```bash
+pip install -r .\requirements.txt
+```
+
+## 2° Passo: Inicializar o Servidor:
+- IP Servidor: http://127.0.0.1:8000
+#### OBS: Antes de iniciar o uvicorn, garanta que você está dentro da pasta BackEnd
+```bash
+cd .\BackEnd\
+```
+#### Iniciar o uvicorn 
+```bash
+python -m uvicorn main:app --reload --port 8000
+```
+
+## 3° Passo: Colar no Console código abaixo:
+```js
+const ws = new WebSocket("ws://127.0.0.1:8000/ws");
 
 ws.onmessage = function(event) {
     console.log("Mensagem recebida do servidor:", JSON.parse(event.data));
@@ -22,5 +33,4 @@ ws.onerror = function(error) {
 };
 
 console.log("Tentando conectar ao WebSocket...");
-
-//
+```
