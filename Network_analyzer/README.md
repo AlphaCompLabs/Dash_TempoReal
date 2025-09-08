@@ -22,7 +22,7 @@ pip instal Scapy
 pip instal cap
 ```
 
-- 4° Passo: Identificar com a sua interface
+- 4° Passo: Identificar qual a sua interface
 ```bash
 Get-NetAdapter | Select Name, Status    
 ```
