@@ -16,7 +16,7 @@ cd .\BackEnd\
 python -m uvicorn main:app --reload --port 8000
 ```
 
-## 3° Passo: Colar no Console código abaixo:
+## 3° Passo: Colar no Console código abaixo após inicializar o Network Analyzer:
 ```js
 const ws = new WebSocket("ws://127.0.0.1:8000/ws");
 
