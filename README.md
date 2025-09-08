@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 # 📊 Dashboard Análise de Tráfego em Tempo Real 
 
 O presente trabalho tem como objetivo realizar a captura de tráfego em um servidor. Ele servirá para processar os dados, que poderão ser vizualizados dinamicamente, da seguinte forma:
@@ -30,7 +28,6 @@ O presente trabalho tem como objetivo realizar a captura de tráfego em um servi
    - `chore:` para manutenção;
    - `test:` para testes.
 =======
-<<<<<<< HEAD
 python .\sink.py --port 8000 --ingest-path /api/ingest --current-path /api/current
 python .\run.py --server-ip 192.168.1.11 --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest"
 
@@ -49,7 +46,6 @@ python -m http.server 8080 --bind 0.0.0.0
 
 https://npcap.com/ <- necesario para utilizar scapy no windows
 
-=======
 # Documentação do `run.py`
 
 Este documento detalha o funcionamento do script `run.py`, um produtor de dados de tráfego de rede. Ele captura pacotes, agrega informações em janelas de tempo e envia os dados em formato JSON.
@@ -288,7 +284,6 @@ Ao fazer isso, o script run.py em execução no servidor-alvo começará a captu
 Comandos Úteis
 Para identificar o nome da sua interface de rede no Windows, use o PowerShell:
 Get-NetAdapter | Select Name, Status
->>>>>>> cae83d1d7f04b5f7d6c849d1449b244f7f70508e
 >>>>>>> redes
 =======
 Backend 
