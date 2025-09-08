@@ -1,13 +1,77 @@
-# Documentação do `run.py`
+# Network Analyzer
 
-Este documento detalha o funcionamento do script `run.py`, um produtor de dados de tráfego de rede. Ele captura pacotes, agrega informações em janelas de tempo e envia os dados em formato JSON.
+Este documento detalha o funcionamento do script `main.py`, um produtor de dados de tráfego de rede. Ele captura pacotes, agrega informações em janelas de tempo e envia os dados em formato JSON.
 
+## Como Utilizar
 
+Para utilizar o `main.py`, você pode executá-lo diretamente via linha de comando, passando os argumentos necessários. Abaixo estão alguns exemplos de uso, baseados no `README.md` fornecido:
 
+### Exemplo 1: Captura de Tráfego e Envio via POST
+Este é um cenário comum onde o `main.py` captura o tráfego de uma interface específica e envia os dados agregados para um endpoint HTTP (como o `sink.py`).
+
+- 1° Passo: Descobrir seu IP
+```bash
+ipconfig
+```
+
+- 2° Passo: Instalar [NPCAP Site](https://npcap.com/#download)
+
+- 3° Passo: Instalar dependências 
+```bash
+pip instal Scapy
+pip instal cap
+```
+
+- 4° Passo: Identificar com a sua interface
+```bash
+Get-NetAdapter | Select Name, Status    
+```
+
+- 5° Passo: executar o comando abaixo
+```bash
+python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest"
+```
+
+### Exemplo 2: Leitura de PCAP e Saída para Arquivo
+
+Para testes ou análise de dados históricos, você pode usar um arquivo PCAP em vez de capturar tráfego ao vivo.
+
+```bash
+python .\main.py --pcap /caminho/para/seu/arquivo.pcap --file saida.json --interval 10
+```
+
+**Explicação:**
+- `--pcap /caminho/para/seu/arquivo.pcap`: Lê os pacotes do arquivo PCAP especificado. Substitua `/caminho/para/seu/arquivo.pcap` pelo caminho real do seu arquivo.
+- `--file saida.json`: Salva o JSON agregado no arquivo `saida.json`. Por padrão, este arquivo será sobrescrito a cada intervalo.
+- `--interval 10`: Define a janela de agregação para 10 segundos.
+
+### Exemplo 3: Geração de Dados Fictícios (Mock) e Saída para STDOUT
+
+Útil para verificar o formato de saída do JSON sem a necessidade de uma interface de rede ou arquivo PCAP.
+
+```bash
+python .\main.py --mock --interval 3
+```
+
+**Explicação:**
+- `--mock`: Ativa a geração de dados fictícios. O script injetará eventos de tráfego simulados.
+- `--interval 3`: Define a janela de agregação para 3 segundos. Os dados serão impressos no console a cada 3 segundos.
+
+### Exemplo 4: Anonimização de IPs
+
+Para fins de privacidade, você pode anonimizar os endereços IP no payload JSON.
+
+```bash
+python .\run.py --iface "eth0" --interval 5 --post "http://localhost:8000/api/ingest" --anon --anon-key "minhachavesecreta"
+```
+
+**Explicação:**
+- `--anon`: Ativa a anonimização dos endereços IP.
+- `--anon-key "minhachavesecreta"`: Fornece uma chave secreta para o processo de anonimização HMAC-SHA1. Se não for fornecida, o script tentará usar a variável de ambiente `ANON_KEY` ou gerará uma aleatoriamente.
 
 ## Funcionalidade
 
-O `run.py` é um script versátil para monitoramento de tráfego de rede. Suas principais funcionalidades são:
+O `main.py` é um script versátil para monitoramento de tráfego de rede. Suas principais funcionalidades são:
 
 - **Captura de Pacotes:** Utiliza a biblioteca Scapy para capturar pacotes de rede em uma interface específica. Alternativamente, pode ler pacotes de um arquivo PCAP para fins de teste.
 - **Agregação de Dados:** Agrega os dados dos pacotes capturados em janelas de tempo configuráveis. As informações são agrupadas por endereço IP do cliente, direção do tráfego (entrada/saída) e protocolo.
@@ -23,7 +87,7 @@ O `run.py` é um script versátil para monitoramento de tráfego de rede. Suas p
 
 ## Argumentos da Linha de Comando
 
-O script `run.py` aceita os seguintes argumentos de linha de comando para configurar seu comportamento:
+O script `main.py` aceita os seguintes argumentos de linha de comando para configurar seu comportamento:
 
 | Argumento | Descrição | Tipo | Padrão | Obrigatório |
 |---|---|---|---|---|
@@ -45,78 +109,9 @@ O script `run.py` aceita os seguintes argumentos de linha de comando para config
 | `--anon` | Anonimiza IPs (hash HMAC-SHA1). Usa chave de `ANON_KEY` envvar ou aleatória. | `action` | `False` | Não |
 | `--anon-key` | Chave para HMAC (se não setada, usa `ANON_KEY` do ambiente ou gera aleatória). | `str` | `None` | Não |
 
-
-
-
-## Como Utilizar
-
-Para utilizar o `run.py`, você pode executá-lo diretamente via linha de comando, passando os argumentos necessários. Abaixo estão alguns exemplos de uso, baseados no `README.md` fornecido:
-
-### Exemplo 1: Captura de Tráfego e Envio via POST
-
-Este é um cenário comum onde o `run.py` captura o tráfego de uma interface específica e envia os dados agregados para um endpoint HTTP (como o `sink.py`).
-
-```bash
-python .\run.py --server-ip 192.168.1.11 --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest"
-```
-
-**Explicação:**
-- `--server-ip 192.168.1.11`: Define o IP do servidor para 192.168.1.11. Isso é crucial para que o script determine a direção do tráfego (entrada/saída) em relação a este servidor.
-- `--iface "Ethernet 2"`: Especifica a interface de rede "Ethernet 2" para a captura de pacotes. Você deve substituir isso pela interface de rede correta do seu sistema.
-- `--interval 5`: Define a janela de agregação de dados para 5 segundos. A cada 5 segundos, os dados capturados e agregados serão emitidos.
-- `--post "http://localhost:8000/api/ingest"`: Envia o JSON resultante para a URL `http://localhost:8000/api/ingest` via requisição POST. Este é o endpoint padrão do `sink.py`.
-
-### Exemplo 2: Leitura de PCAP e Saída para Arquivo
-
-Para testes ou análise de dados históricos, você pode usar um arquivo PCAP em vez de capturar tráfego ao vivo.
-
-```bash
-python .\run.py --pcap /caminho/para/seu/arquivo.pcap --file saida.json --interval 10
-```
-
-**Explicação:**
-- `--pcap /caminho/para/seu/arquivo.pcap`: Lê os pacotes do arquivo PCAP especificado. Substitua `/caminho/para/seu/arquivo.pcap` pelo caminho real do seu arquivo.
-- `--file saida.json`: Salva o JSON agregado no arquivo `saida.json`. Por padrão, este arquivo será sobrescrito a cada intervalo.
-- `--interval 10`: Define a janela de agregação para 10 segundos.
-
-### Exemplo 3: Geração de Dados Fictícios (Mock) e Saída para STDOUT
-
-Útil para verificar o formato de saída do JSON sem a necessidade de uma interface de rede ou arquivo PCAP.
-
-```bash
-python .\run.py --mock --interval 3
-```
-
-**Explicação:**
-- `--mock`: Ativa a geração de dados fictícios. O script injetará eventos de tráfego simulados.
-- `--interval 3`: Define a janela de agregação para 3 segundos. Os dados serão impressos no console a cada 3 segundos.
-
-### Exemplo 4: Anonimização de IPs
-
-Para fins de privacidade, você pode anonimizar os endereços IP no payload JSON.
-
-```bash
-python .\run.py --iface "eth0" --interval 5 --post "http://localhost:8000/api/ingest" --anon --anon-key "minhachavesecreta"
-```
-
-**Explicação:**
-- `--anon`: Ativa a anonimização dos endereços IP.
-- `--anon-key "minhachavesecreta"`: Fornece uma chave secreta para o processo de anonimização HMAC-SHA1. Se não for fornecida, o script tentará usar a variável de ambiente `ANON_KEY` ou gerará uma aleatoriamente.
-
-### Dependências
-
-Para a funcionalidade de captura de pacotes, o `run.py` depende da biblioteca `scapy`. Em sistemas Windows, pode ser necessário instalar o Npcap para que o Scapy funcione corretamente. O `README.md` menciona:
-
-`https://npcap.com/ <- necesario para utilizar scapy no windows`
-
-Certifique-se de ter o Scapy instalado (`pip install scapy`) e as dependências de captura de pacotes apropriadas para o seu sistema operacional.
-
-
-
-
 ## Estrutura do JSON de Saída
 
-O `run.py` emite um objeto JSON que contém os dados agregados do tráfego de rede. A estrutura básica do JSON é a seguinte:
+O `main.py` emite um objeto JSON que contém os dados agregados do tráfego de rede. A estrutura básica do JSON é a seguinte:
 
 ```json
 {
