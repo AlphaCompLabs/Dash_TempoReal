@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Teste do servidor em http://127.0.0.1:8000 
 
 Iniciar o uvicorn: python -m uvicorn main:app --reload
@@ -5,6 +6,18 @@ Iniciar o uvicorn: python -m uvicorn main:app --reload
 // Colar no Console depois de escrever (allow pasting):
 
 const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+=======
+Backend 
+1° Passo Baixar dependencias do requirements.txt
+pip install -r .\requirements.txt
+
+2° Passo Teste do Servidor:
+- IP Servidor Test: http://127.0.0.1:8000
+- Antes de iniciar o uvicorn, garante que você está no "Back-End_API\BackEnd" (cd BackEnd)
+- Iniciar o uvicorn: python -m uvicorn main:app --reload --port 8000
+- // Colar no Console depois de escrever (allow pasting):
+- const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+>>>>>>> 978d0c8439057ee3d84a0fc42faad530864c837c
 
 ws.onmessage = function(event) {
     console.log("Mensagem recebida do servidor:", JSON.parse(event.data));
@@ -20,4 +33,8 @@ ws.onerror = function(error) {
 
 console.log("Tentando conectar ao WebSocket...");
 
+<<<<<<< HEAD
 //
+=======
+//
+>>>>>>> 978d0c8439057ee3d84a0fc42faad530864c837c
