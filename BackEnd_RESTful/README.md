@@ -48,8 +48,14 @@ Com o ambiente virtual ativado, inicie o servidor da API.
 ```bash
 uvicorn main:app --reload
 ```
-> O backend estará rodando em `http://127.0.0.1:8000` e aguardando dados.
+*(OU)*
 
+```bash
+python -m uvicorn main:app --reload
+```
+
+> O backend estará rodando em `http://127.0.0.1:8000` e aguardando dados.
+---
 **📡 No Terminal 2 - Inicie o Network Analyzer:**
 Navegue até a pasta do `network_analyzer` e execute-o, apontando para a URL do seu backend.
 ```bash
