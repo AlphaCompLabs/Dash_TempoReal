@@ -1,3 +1,38 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+/* 1. A única diretiva necessária para carregar todo o Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* 2. Sua declaração @font-face para a fonte customizada */
+@font-face {
+  font-family: 'saved_by_zero';
+  src: url('assets/fonts/Saved by Zero Rg.woff2') format('woff2'),
+      url('assets/fonts/Saved by Zero Rg.otf') format('opentype'),
+      url('assets/fonts/Saved-by-Zero-Rg.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-primary: #020047;
+  --color-secondary: #79A9BB;
+  --color-accent-light: #ACE5E9;
+
+  --color-dark: #19191B;
+  --color-dark-black: #000000;
+
+  --color-chart-blue-light: #4BB8E1;
+  --color-chart-blue-dark: #0D6282;
+  --color-chart-teal-light: #4BE1C6;
+  --color-chart-teal-dark: #0D8274;
+
+  --font-sans: "Montserrat", sans-serif;
+  --font-saved: "saved_by_zero", sans-serif;
+}
+
+body {
+  margin: 0;
+  /* Aplica o fundo degradê a todo o corpo da página */
+  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-dark));
+  /* Garante que o fundo cubra a altura inteira da tela, mesmo com pouco conteúdo */
+  min-height: 100vh;
+}
