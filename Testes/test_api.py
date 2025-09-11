@@ -1,6 +1,6 @@
 # =====================================================================================
-# TESTES AUTOMATIZADOS PARA A API BACKEND
-# Versão: 1.1.0 
+# TESTE UNITÁRIO AUTOMATIZADO PARA A API BACKEND
+# Versão: 1.1.1 
 #
 # Autor: Equipe Backend/QA - Diogo Freitas, Gustavo Martins e Caio Silveira (DevOps/QA)
 # Descrição: Este script usa pytest e TestClient para validar o comportamento
