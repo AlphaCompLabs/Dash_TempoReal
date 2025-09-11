@@ -40,17 +40,17 @@ class ProtocolInOutData(BaseModel):
 
 class ClientData(BaseModel):
     """Agrega todas as informações de tráfego de um único cliente (IP)."""
-    in_bytes: int = Field(..., description="Total de bytes recebidos do cliente.", example=1024)
-    out_bytes: int = Field(..., description="Total de bytes enviados para o cliente.", example=20480)
+    in_bytes: int = Field(..., description="Total de bytes recebidos do cliente.", json_schema_extra={'example': '1024'})
+    out_bytes: int = Field(..., description="Total de bytes enviados para o cliente.", json_schema_extra={'example': '20480'})
     protocols: Dict[str, ProtocolInOutData]
 
 class TrafficPayload(BaseModel):
     """Define o corpo (payload) completo da requisição POST vinda do analisador de rede."""
-    host: str = Field(..., example="laptop-dev")
-    iface: Optional[str] = Field(None, example="eth0")
-    server_ip: Optional[str] = Field(None, example="192.168.1.10")
-    window_start: int = Field(..., description="Timestamp Unix do início da janela.", example=1725822000)
-    window_end: int = Field(..., description="Timestamp Unix do fim da janela.", example=1725822005)
+    host: str = Field(..., json_schema_extra={'example': 'laptop-dev'})
+    iface: Optional[str] = Field(None, json_schema_extra={'example': 'eth0'})
+    server_ip: Optional[str] = Field(None, json_schema_extra={'example': '192.168.1.10'})
+    window_start: int = Field(..., description="Timestamp Unix do início da janela.", json_schema_extra={'example': '1725822000'})
+    window_end: int = Field(..., description="Timestamp Unix do fim da janela.", json_schema_extra={'example': '1725822005'})
     clients: Dict[str, ClientData]
 
 
