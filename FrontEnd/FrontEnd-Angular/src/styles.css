@@ -1,4 +1,6 @@
 /* 1. A única diretiva necessária para carregar todo o Tailwind CSS v4 */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;700&display=swap');
+
 @import "tailwindcss";
 
 /* 2. Sua declaração @font-face para a fonte customizada */
@@ -17,7 +19,7 @@
   --color-secondary: #79A9BB;
   --color-accent-light: #ACE5E9;
 
-  --color-dark: #19191B;
+  --color-dark: #313131;
   --color-dark-black: #000000;
 
   --color-chart-blue-light: #4BB8E1;
@@ -32,7 +34,7 @@
 body {
   margin: 0;
   /* Aplica o fundo degradê a todo o corpo da página */
-  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-dark));
+  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-dark-black), var(--color-dark-black));
   /* Garante que o fundo cubra a altura inteira da tela, mesmo com pouco conteúdo */
   min-height: 100vh;
 }
