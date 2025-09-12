@@ -38,3 +38,16 @@ body {
   /* Garante que o fundo cubra a altura inteira da tela, mesmo com pouco conteúdo */
   min-height: 100vh;
 }
+
+.footer-decoration {
+  /* Tamanho do container da imagem */
+  width: 250px;
+  height: 64px;
+
+  /* Imagem de fundo */
+  background-image: url('/assets/images/footer_image.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+  opacity: 0.5;
+}
