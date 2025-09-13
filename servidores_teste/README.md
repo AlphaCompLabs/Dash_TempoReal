@@ -1,3 +1,54 @@
+# Como iniciar o servidor FTP
+
+1. Acesse a pasta servidores_teste:
+
+```
+cd servidores_teste
+```
+
+2. Crie o ambiente virtual `venv`:
+
+```
+python -m venv venv
+```
+
+3. Inicie o ambiente virtual:
+
+```
+.\venv\Scripts\activate
+```
+
+4. Baixe a biblioteca `pyftpdlib`:
+
+```
+pip install pyftpdlib
+```
+
+5. Inicie o servidor no terminal Power Shell:
+```
+python ftp_server.py 
+```
+
+6. Após iniciar o servidor ele retornará a seguinte mensagem:
+
+```
+INFO: Servidor FTP iniciado em ftp://0.0.0.0:2121
+```
+
+7. Para acessar o servidor abra o Prompt de Comando do seu servidor e utilize o comando:
+
+```
+ipconfig
+```
+
+8. Identifique o seu IP e acesse o seguinte local por meio do seu **Gerenciador de Arquivos  (A "pasta amarela")**:
+
+```
+ftp://<SEU_IP_AQUI>:2121
+```
+
+### Observação: Caso não seja possível acessar o servidor FTP, será necessário criar uma regra no Firewall.
+
 # Criar uma Regra no Firewall
 
 Para configurar o firewall, você precisa de dizer ao "segurança" que é permitido receber visitantes na porta `2121`. 
