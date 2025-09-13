@@ -1,1 +1,0 @@
-Que foi curioso?
