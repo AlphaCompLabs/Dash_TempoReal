@@ -55,7 +55,7 @@ Para configurar o firewall, você precisa de dizer ao "segurança" que é permit
 
 ## Vamos criar uma regra de entrada no Firewall.
 
-- Abra o **Firewall com Segurança Avançada: ** 
+- Abra o **Firewall com Segurança Avançada:** 
 
 - Clique no menu Iniciar e pesquise por Firewall do Windows Defender com Segurança Avançada. Clique para abrir.
 
