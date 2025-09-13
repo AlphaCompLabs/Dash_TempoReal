@@ -2,7 +2,7 @@
 # LÓGICA DE EMISSÃO DE DADOS - DASHBOARD DE ANÁLISE DE TRÁFEGO
 # Versão: 2.3.1
 #
-# Autor: Equipe Backend - Mayron Malaquias e Pedro Borges
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
 # Descrição: Este script contém a função que envia o payload JSON para diferentes
 #            destinos, como uma API RESTful, um arquivo local ou a saída padrão.
 # =====================================================================================
