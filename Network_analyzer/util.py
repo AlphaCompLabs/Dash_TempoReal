@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 KNOWN_PORTS = {
     80: "HTTP", 443: "HTTPS", 53: "DNS",
-    20: "FTP-DATA", 21: "FTP",
+    20: "FTP-DATA", 21: "FTP", 2121: "FTP",
     123: "NTP", 25: "SMTP", 110: "POP3", 143: "IMAP",
     22: "SSH", 3306: "MySQL", 5432: "Postgres"
 }
