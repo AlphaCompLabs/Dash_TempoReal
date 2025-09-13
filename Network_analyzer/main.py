@@ -1,3 +1,16 @@
+# =====================================================================================
+# CAPTURA E PROCESSAMENTO - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Backend - Mayron Malaquias e Pedro Borges
+# Descrição: Este script orquestra a captura de pacotes de rede e o envio de
+#            dados agregados para um servidor backend, permitindo a visualização
+#            em tempo real de métricas de tráfego.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
 import os
 import sys
 import time
@@ -5,16 +18,14 @@ import signal
 import logging
 import threading
 
-# Importa todas as funções e classes dos outros módulos que criamos.
+# Importa as classes e funções dos módulos auxiliares do projeto
 from cli import parse_args
 from Logging import setup_logging
-from util import validate_url
-from util import anon_hasher
+from util import validate_url, anon_hasher, hostname, now_ts
 from Aggregator import Aggregator
 from captura import Sniffer
-from util import hostname
-from util import now_ts
 from emissao import emit_json
+
 
 def main():
     """
@@ -22,41 +33,33 @@ def main():
     """
     # 1. INICIALIZAÇÃO E CONFIGURAÇÃO
     # ----------------------------------------------------------------
-    
+
     # Processa os argumentos da linha de comando (ex: --iface, --post, etc.).
     args = parse_args()
     # Configura o sistema de logging com base nos argumentos.
     setup_logging(args.log_level, args.log_file)
 
     # --- Validação dos Argumentos ---
-    # Garante que o intervalo não seja muito baixo para evitar uso excessivo de CPU.
     if args.interval < 1.0:
         logging.warning("--interval muito baixo (%.2fs). Ajustando para 1s.", args.interval)
         args.interval = 1.0
 
-    # Valida se a URL de POST é bem-formada antes de tentar usá-la.
     if args.post and not validate_url(args.post):
         logging.error("URL inválida para --post: %r", args.post)
-        return 2  # Retorna um código de erro para o sistema operacional.
+        return 2
 
-    # Alerta o usuário sobre uma configuração que pode não gerar dados.
     if args.no_capture and not args.mock and not args.pcap:
         logging.warning("--no-capture ativo sem --mock ou --pcap. Não haverá dados a emitir.")
 
     # --- Configuração da Anonimização ---
     anon_func = None
     if args.anon:
-        # Define a chave de anonimização com uma ordem de prioridade:
-        # 1. Argumento --anon-key.
-        # 2. Variável de ambiente ANON_KEY.
-        # 3. Uma chave aleatória segura como último recurso.
         key = (args.anon_key or os.environ.get("ANON_KEY") or os.urandom(32)).encode("utf-8", "ignore")
-        # Cria a função de hashing que será passada para o Aggregator.
         anon_func = anon_hasher(key)
 
     # 2. CRIAÇÃO DOS OBJETOS PRINCIPAIS
     # ----------------------------------------------------------------
-    
+
     window_s = int(args.interval)
     # Instancia o agregador com as configurações definidas.
     aggr = Aggregator(window_s=window_s, max_clients=max(0, args.max_clients), anon=anon_func)
@@ -65,19 +68,17 @@ def main():
     sniffer = None
     if not args.no_capture:
         sniffer = Sniffer(aggr, server_ip=args.server_ip, iface=args.iface, bpf=args.bpf, pcap=args.pcap)
-        sniffer.start()  # O sniffer rodará em uma thread separada.
+        sniffer.start()
 
     # 3. CONFIGURAÇÃO DE ENCERRAMENTO SEGURO (GRACEFUL SHUTDOWN)
     # ----------------------------------------------------------------
-    
-    stop = threading.Event()  # Cria um "evento" que servirá como sinal de parada para o loop principal.
 
-    # Define uma função que será chamada quando o programa receber um sinal de interrupção (Ctrl+C).
+    stop = threading.Event()
+
     def _sig(_s, _f):
         logging.info("Sinal de parada recebido. Encerrando...")
-        stop.set()  # "Ativa" o evento de parada.
+        stop.set()
 
-    # Associa os sinais SIGINT (Ctrl+C) e SIGTERM (sinal de término padrão) à nossa função _sig.
     signal.signal(signal.SIGINT, _sig)
     signal.signal(signal.SIGTERM, _sig)
     
@@ -90,11 +91,9 @@ def main():
 
     # 4. LOOP PRINCIPAL
     # ----------------------------------------------------------------
-    
+
     try:
-        # O loop continua enquanto o evento "stop" não for ativado.
         while not stop.is_set():
-            # Se o modo --mock estiver ativo, injeta dados de teste no agregador.
             if args.mock:
                 now = now_ts()
                 aggr.add(now+1, "10.0.0.2", "in", 1500, "HTTP")
@@ -116,25 +115,18 @@ def main():
                 file_append=bool(args.file and args.file_append)
             )
             if rc != 0:
-                # Se a emissão falhar, apenas loga um aviso e continua. Isso torna o programa resiliente.
                 logging.warning("Falha na emissão da janela (rc=%d). Continuando.", rc)
 
-            # Espera o tempo definido pelo intervalo antes de iniciar a próxima iteração.
-            # Isso garante que um snapshot seja gerado a cada `window_s` segundos.
             time.sleep(window_s)
             
     finally:
-        # O bloco `finally` é SEMPRE executado, não importa como o loop `try` termine (normalmente ou por erro).
-        # Isso garante que a thread do sniffer seja parada de forma limpa.
         if sniffer:
             logging.info("Parando a captura de pacotes...")
             sniffer.stop()
             
     logging.info("Programa encerrado.")
-    return 0  # Retorna código de sucesso.
+    return 0
 
 
-# Ponto de entrada padrão para um script Python.
 if __name__ == "__main__":
-    # Chama a função principal e usa seu código de retorno (0 para sucesso) para sair do programa.
     sys.exit(main())
