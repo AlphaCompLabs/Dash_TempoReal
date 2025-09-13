@@ -57,7 +57,7 @@ Para utilizar o `run.py`, você pode executá-lo diretamente via linha de comand
 Este é um cenário comum onde o `run.py` captura o tráfego de uma interface específica e envia os dados agregados para um endpoint HTTP (como o `sink.py`).
 
 ```bash
-python .\run.py --server-ip 192.168.1.11 --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest"
+python .\main.py --server-ip (insira seu ip) --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest"
 ```
 
 **Explicação:**
