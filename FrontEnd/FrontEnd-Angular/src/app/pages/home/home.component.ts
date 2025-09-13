@@ -6,6 +6,7 @@ import { MainChartComponent } from '../../components/main-chart/main-chart.compo
 @Component({
   selector: 'app-home',
   standalone: true, 
+  imports: [SidebarComponent],
   imports: [SidebarComponent,
       FooterComponent,
       MainChartComponent
