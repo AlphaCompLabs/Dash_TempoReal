@@ -66,7 +66,7 @@ ftp://<ENDEREÇO_IP_DO_SERVIDOR>:2121
 ```
 4. **Para gerar tráfego, faça o download do ficheiro:**
 
-- Arrastar e Soltar: Arraste o ficheiro ``NETVISION.zip`` para a sua Área de Trabalho.
+- **Arrastar e Soltar**: Arraste o ficheiro ``NETVISION.zip`` para a sua Área de Trabalho.
 
 - **Copiar e Colar**: Copie o ficheiro e cole-o numa pasta local.
 
