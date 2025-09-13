@@ -1,6 +1,6 @@
 # =====================================================================================
 # SERVIDOR FTP DE TESTE
-# Versão: 1.1.0
+# Versão: 1.1.1
 #
 # Autor: Equipe DevOps/QA - Caio Silveira, Diogo Freitas(Backend/API)
 # Descrição: Este script inicia um servidor FTP simples para o cenário de teste do
@@ -12,7 +12,7 @@
 # =====================================================================================
 
 import os
-import sys # Importado para sair do programa com um código de erro
+import sys
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
@@ -41,15 +41,15 @@ def preparar_ambiente_ftp():
                 f.write(os.urandom(tamanho_ficheiro_mb * 1024 * 1024))
             print("INFO: Ficheiro de teste criado com sucesso.")
         
-        return True # Retorna sucesso
+        return True
 
     except PermissionError:
         print(f"ERRO CRÍTICO: Sem permissão para criar o diretório ou o ficheiro em '{os.path.abspath(FTP_DIRECTORY)}'.")
         print("DICA: Tente executar o script como administrador.")
-        return False # Retorna falha
+        return False
     except Exception as e:
         print(f"ERRO CRÍTICO: Ocorreu um erro inesperado ao preparar o ambiente: {e}")
-        return False # Retorna falha
+        return False
 
 def iniciar_servidor_ftp():
     """
@@ -61,6 +61,10 @@ def iniciar_servidor_ftp():
     manipulador = FTPHandler
     manipulador.authorizer = autorizador
     manipulador.banner = "Servidor FTP de Teste para Projeto Dashboard. Bem-vindo!"
+
+    # Aumenta o timeout de inatividade da conexão para 1 hora (3600 segundos).
+    # O padrão é de 300 segundos (5 minutos).
+    manipulador.timeout = 3600
 
     endereco = (FTP_HOST, FTP_PORT)
     servidor = FTPServer(endereco, manipulador)
@@ -74,7 +78,7 @@ def iniciar_servidor_ftp():
         servidor.serve_forever()
     
     except OSError as e:
-        if e.errno == 10048: # Código de erro para "endereço já em uso" no Windows
+        if e.errno == 10048:
             print(f"ERRO CRÍTICO: A porta {FTP_PORT} já está a ser utilizada por outro programa.")
             print("DICA: Verifique se não há outro servidor a rodar e tente novamente.")
         else:
@@ -87,6 +91,5 @@ if __name__ == "__main__":
     if preparar_ambiente_ftp():
         iniciar_servidor_ftp()
     else:
-        # Se a preparação falhar, encerra o programa com um código de erro.
         sys.exit(1)
 
