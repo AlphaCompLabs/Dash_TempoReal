@@ -18,7 +18,7 @@ import subprocess
 import urllib.parse
 
 # --- 1. Configurações do Servidor ---
-HTTP_HOST = "26.185.28.93"
+HTTP_HOST = "0.0.0.0"
 HTTP_PORT = 8001
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INDEX_FILE = os.path.join(BASE_DIR, "index.html")
