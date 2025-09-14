@@ -1,2 +1,23 @@
-<app-header></app-header>
-<router-outlet></router-outlet>
+<div class="app-container">
+
+  <!-- 
+    ✅ CORREÇÃO: O WelcomeComponent é chamado aqui, na estrutura principal.
+    Ele usará 'position: fixed' para flutuar à esquerda.
+  -->
+  <app-welcome></app-welcome>
+
+  <!-- 
+    ✅ CORREÇÃO: Criamos um <main> para agrupar o conteúdo da página.
+    Este container será empurrado para o lado para não ficar atrás do painel.
+  -->
+  <main class="main-content">
+    
+    <!-- Seu header continua aqui, agora dentro do conteúdo principal. -->
+    <app-header></app-header>
+    
+    <!-- Suas páginas continuarão sendo carregadas aqui. -->
+    <router-outlet></router-outlet>
+    
+  </main>
+
+</div>
