@@ -1,8 +1,3 @@
-Entendi 👍
-O problema no seu README é que você usou **quebra de bloco de código incorreta**: abriu um bloco \`\`\`\`markdown mas não fechou corretamente, e ainda colocou sequências ANSI (`\033[0;32m`) que não são renderizadas no GitHub/Markdown.
-
-Aqui está a versão corrigida e limpa para você colar:
-
 ````markdown
 # Servidor HTTP de Teste
 
