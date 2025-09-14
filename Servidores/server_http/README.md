@@ -40,23 +40,31 @@ python server_http.py
 
 ---
 
-## 🔥 Configuração firewall
+````markdown
+## Configuração do Firewall (Windows)
 
-Por padrão, o **Windows Defender Firewall** pode bloquear conexões externas ao servidor HTTP em Python. Isso significa que o servidor funcionará normalmente em `http://127.0.0.1:8000`, mas outros dispositivos da rede não conseguirão acessá-lo.
+Por padrão, o **Windows Defender Firewall** pode bloquear conexões externas ao servidor HTTP em Python.  
+Isso significa que o servidor funcionará normalmente em `http://127.0.0.1:8000`, mas outros dispositivos da rede não conseguirão acessá-lo.
 
 ### 🔎 Sintomas comuns
 
 * No navegador de outro computador:
 
-  ```
-  ERR_CONNECTION_TIMED_OUT
-  ```
+```bash
+\033[0;32mERR_CONNECTION_TIMED_OUT\033[0m
+````
 
-  ou
+ou
 
-  ```
-  ERR_CONNECTION_REFUSED
-  ```
+```bash
+\033[0;32mERR_CONNECTION_REFUSED\033[0m
+```
+
+* No terminal de outro dispositivo (exemplo com `curl`):
+
+```bash
+\033[0;32mcurl: (7) Failed to connect to 192.168.x.x port 8000: Connection refused\033[0m
+```
 
 ### ✅ Solução: liberar a porta no firewall
 
@@ -82,3 +90,5 @@ Na primeira execução, o Windows pode exibir um aviso:
 > Clique em **Permitir acesso** para liberar a porta no seu perfil de rede (Privada ou Pública).
 
 Se você clicar em **Cancelar**, apenas `localhost` funcionará, e acessos externos continuarão bloqueados.
+
+```
