@@ -1,4 +1,4 @@
-# Servidor HTTP de Teste
+# Servidor HTTP
 
 ## Versão
 1.1.0
@@ -44,7 +44,7 @@ python server_http.py
 ## Configuração do Firewall (Windows)
 
 Por padrão, o **Windows Defender Firewall** pode bloquear conexões externas ao servidor HTTP em Python.
-Isso significa que o servidor funcionará normalmente em `http://127.0.0.1:8000`, mas outros dispositivos da rede não conseguirão acessá-lo.
+Isso significa que o servidor funcionará normalmente em `http://127.0.0.1:8001`, mas outros dispositivos da rede não conseguirão acessá-lo.
 
 ### 🔎 Sintomas comuns
 
@@ -69,18 +69,18 @@ curl: (7) Failed to connect to 192.168.x.x port 8000: Connection refused
 ### ✅ Solução: liberar a porta no firewall
 
 Para permitir conexões externas, você precisa liberar a porta no firewall.  
-Execute **um dos comandos abaixo** como administrador (substitua `8000` pela porta do seu servidor):
+Execute **um dos comandos abaixo** como administrador (substitua `8001` pela porta do seu servidor):
 
 #### 🔹 PowerShell (recomendado)
 
 ```powershell
-New-NetFirewallRule -DisplayName "Python HTTP Server" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+New-NetFirewallRule -DisplayName "Python HTTP Server" -Direction Inbound -Protocol TCP -LocalPort 8001 -Action Allow
 ````
 
 #### 🔹 CMD (Prompt de Comando)
 
 ```cmd
-netsh advfirewall firewall add rule name="Python HTTP Server" dir=in action=allow protocol=TCP localport=8000
+netsh advfirewall firewall add rule name="Python HTTP Server" dir=in action=allow protocol=TCP localport=8001
 ```
 
 ---
