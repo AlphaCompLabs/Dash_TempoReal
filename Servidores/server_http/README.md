@@ -63,7 +63,7 @@ ERR_CONNECTION_REFUSED
 * No terminal de outro dispositivo (exemplo com `curl`):
 
 ```
-curl: (7) Failed to connect to 192.168.x.x port 8000: Connection refused
+curl: (7) Failed to connect to 192.168.x.x port 8001: Connection refused
 ```
 
 ### ✅ Solução: liberar a porta no firewall
