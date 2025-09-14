@@ -1,8 +1,7 @@
-````markdown
 # Servidor HTTP de Teste
 
 ## Versão
-1.0.0
+1.1.0
 
 ## Autor
 Equipe DevOps/QA - Caio Silveira
@@ -67,10 +66,6 @@ ERR_CONNECTION_REFUSED
 curl: (7) Failed to connect to 192.168.x.x port 8000: Connection refused
 ```
 
-Perfeito 👌
-Segue a versão ajustada com **exemplos tanto para PowerShell quanto para CMD** na parte do firewall:
-
-````markdown
 ### ✅ Solução: liberar a porta no firewall
 
 Para permitir conexões externas, você precisa liberar a porta no firewall.  
@@ -105,11 +100,6 @@ Remove-NetFirewallRule -DisplayName "Python HTTP Server"
 ```cmd
 netsh advfirewall firewall delete rule name="Python HTTP Server"
 ```
-Assim você cobre os dois casos (quem usa PowerShell e quem ainda prefere o CMD).  
-
-Quer que eu já aplique essa versão revisada no seu README inteiro?
-```
-
 
 ### ⚠️ Observação
 
@@ -119,12 +109,3 @@ Na primeira execução, o Windows pode exibir um aviso:
 > Clique em **Permitir acesso** para liberar a porta no seu perfil de rede (Privada ou Pública).
 
 Se você clicar em **Cancelar**, apenas `localhost` funcionará, e acessos externos continuarão bloqueados.
-
-```
-
----
-
-👉 Agora os blocos de código ficam certinhos no GitHub e não aparecem aquelas sequências estranhas (`\033[0;32m`).  
-
-Quer que eu também deixe os erros (`ERR_CONNECTION_REFUSED` etc.) destacados em **vermelho** usando Markdown em vez das sequências ANSI?
-```
