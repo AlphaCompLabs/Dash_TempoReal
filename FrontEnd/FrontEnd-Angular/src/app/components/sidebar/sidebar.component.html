@@ -25,7 +25,7 @@
       
       <div class="relative z-10 w-full h-full flex flex-col items-center justify-center">
         <span class="font-sans text-secondary text-sm">DOWNLOAD</span>
-        <span class="font-sans font-bold text-3xl text-white">36<span class="text-xl ml-1">Mb</span></span>
+        <span class="font-sans font-bold text-3xl text-white">{{ totalDownload }}<span class="text-xl ml-1"></span></span>
       </div>
     </div>
 
@@ -34,7 +34,7 @@
       
       <div class="relative z-10 w-full h-full flex flex-col items-center justify-center">
         <span class="font-sans text-secondary text-sm">UPLOAD</span>
-        <span class="font-sans font-bold text-3xl text-white">45<span class="text-xl ml-1">Mb</span></span>
+        <span class="font-sans font-bold text-3xl text-white">{{ totalUpload }}<span class="text-xl ml-1"></span></span>
       </div>
     </div>
 
@@ -44,12 +44,12 @@
 
     <div class="info-box bg-dark p-3 rounded-md">
       <h3 class="font-sans font-light text-xs text-accent-light">Clientes (IPs) Conectados:</h3>
-      <p class="font-sans text-lg font-bold text-white">04 CLIENTES (IPs)</p>
+      <p class="font-sans text-lg font-bold text-white">{{ activeClients }} CLIENTES (IPs)</p>
     </div>
 
     <div class="info-box bg-dark p-3 rounded-md">
       <h3 class="font-sans font-light text-xs text-accent-light">Top Talker:</h3>
-      <p class="font-sans text-lg font-bold text-white">192.168.1.100</p>
+      <p class="font-sans text-lg font-bold text-white">{{ topTalker }}</p>
     </div>
     
   </div>

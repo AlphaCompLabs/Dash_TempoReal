@@ -33,7 +33,7 @@ def preparar_ambiente_ftp():
             print(f"INFO: Diretório '{FTP_DIRECTORY}' criado.")
 
         caminho_ficheiro = os.path.join(FTP_DIRECTORY, "NETVISION.zip")
-        tamanho_ficheiro_mb = 10
+        tamanho_ficheiro_mb = 100
 
         if not os.path.exists(caminho_ficheiro):
             print(f"INFO: Criando ficheiro de teste de {tamanho_ficheiro_mb}MB em '{caminho_ficheiro}'...")

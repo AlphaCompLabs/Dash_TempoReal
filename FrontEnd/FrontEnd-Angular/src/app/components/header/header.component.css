@@ -11,3 +11,10 @@
 .light-theme .moon-icon {
   display: none;
 }
+.dark-mode-active .sun-icon {
+  display: block; /* Mostra o ícone do sol */
+}
+
+.dark-mode-active .moon-icon {
+  display: none; /* Esconde o ícone da lua */
+}

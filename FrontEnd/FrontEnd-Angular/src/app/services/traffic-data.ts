@@ -1,107 +1,84 @@
-// import { Injectable } from '@angular/core';
-// import { BehaviorSubject, Observable, interval } from 'rxjs';
-// import { map, tap, catchError } from 'rxjs/operators';
-// import { TrafficClient, ChartDataItem } from '../models/traffic.models';
+/**
+ * =========================================================================
+ * SERVIÇO DE DADOS DE TRÁFEGO (TRAFFIC DATA SERVICE)
+ * Versão: 2.0.0
+ *
+ * Descrição: Este serviço é o único responsável por comunicar com a API
+ * Backend. Ele busca os dados de tráfego periodicamente e disponibiliza-os
+ * de forma reativa para qualquer componente que precise deles.
+ * =========================================================================
+ */
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class TrafficData {
-//   private trafficDataSubject = new BehaviorSubject<TrafficClient[]>([]);
-//   private lastUpdateSubject = new BehaviorSubject<Date>(new Date()); // Horário de atualização
-//   private isLoadinSubject = new BehaviorSubject<boolean>(false);
-//   private errorSubject = new BehaviorSubject<string | null>(null);
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, timer, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model';
 
-//   trafficData$ = this.trafficDataSubject.asObservable();
-//   lastUpdate$ = this.lastUpdateSubject.asObservable();
-//   isLoading$ = this.isLoadinSubject.asObservable();
-//   error$ = this.errorSubject.asObservable();
+@Injectable({
+  providedIn: 'root'
+})
+export class TrafficDataService {
+  // --- A URL base da vossa API Backend ---
+  private readonly API_BASE_URL = 'http://127.0.0.1:8000';
 
-//   private serverIP = '192.168.1.100';
+  // --- Estado Reativo (Reactive State) ---
+  // BehaviorSubjects para guardar o estado atual dos dados, do carregamento e dos erros.
+  private trafficDataSubject = new BehaviorSubject<ClientTrafficSummary[]>([]);
+  private isLoadingSubject = new BehaviorSubject<boolean>(true); // Começa como true
+  private errorSubject = new BehaviorSubject<string | null>(null);
 
-//   constructor() {
-//     this.startDataPolling();
-//   }
+  // --- Observables Públicos ---
+  // Os componentes da aplicação irão "inscrever-se" (subscribe) a estes Observables
+  // para receberem atualizações automáticas. O '$' é uma convenção para Observables.
+  public trafficData$: Observable<ClientTrafficSummary[]> = this.trafficDataSubject.asObservable();
+  public isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
+  public error$: Observable<string | null> = this.errorSubject.asObservable();
 
-//   private startDataPolling(): void {
-//     interval(5000).subscribe(() => {
-//       this.fetchData();
-//     });
-//   }
+  constructor(private http: HttpClient) {
+    // Inicia a busca de dados assim que o serviço é criado.
+    this.startDataPolling();
+  }
 
-//   private fetchData(): void {
-//     this.isLoadinSubject.next(true);
-//     this.errorSubject.next(null);
+  /**
+   * Inicia o ciclo de "polling" que busca dados da API a cada 5 segundos.
+   */
+  private startDataPolling(): void {
+    timer(0, 5000) // Inicia imediatamente (0) e repete a cada 5000ms
+      .pipe(
+        tap(() => this.isLoadingSubject.next(true)), // Avisa que uma busca começou
+        switchMap(() => // switchMap cancela a requisição anterior se uma nova começar
+          this.http.get<ClientTrafficSummary[]>(`${this.API_BASE_URL}/api/traffic`)
+            .pipe(
+              catchError(error => { // Lida com erros na chamada HTTP
+                console.error('Erro ao buscar dados da API:', error);
+                this.errorSubject.next('Não foi possível carregar os dados do tráfego.');
+                return of([]); // Retorna um array vazio para não quebrar a aplicação
+              })
+            )
+        )
+      )
+      .subscribe(data => {
+        // Quando os dados chegam com sucesso:
+        this.trafficDataSubject.next(data); // Atualiza os dados
+        this.isLoadingSubject.next(false);   // Avisa que a busca terminou
+        this.errorSubject.next(null);        // Limpa qualquer erro anterior
+      });
+  }
 
-//     try {
-//       setTimeout(() => {
-//         const data = this.generateMockData();
-//         this.trafficDataSubject.next(data);
-//         this.lastUpdateSubject.next(new Date());
-//         this.isLoadinSubject.next(false);
-//       }, 100);
-//       } catch (err) {
-//         const errorMessage = err instanceof Error ? err.message: 'Erro ao buscar dados';
-//         this.errorSubject.next(errorMessage);
-//         this.isLoadinSubject.next(false);
-//       }
-//     }
-
-//     private generateMockData(): TrafficClient[] {
-//       const clients: string[] = [
-//         '192.168.1.10', '192.168.1.15', '192.168.1.20',
-//         '192.168.1.25', '192.168.1.30'
-//       ];
-
-//       return clients.map((ip: string): TrafficClient => ({
-//         ip, 
-//         bytes_in: Math.floor(Math.random() * 3000000),
-//         bytes_out: Math.floor(Math.random() * 1500000),
-//         protocols: {
-//           HTTP: {
-//             in: Math.floor(Math.random() * 2000000),
-//             out: Math.floor(Math.random() * 800000)   
-//           },
-//           FTP: {
-//             in: Math.floor(Math.random() * 800000),
-//             out: Math.floor(Math.random() * 4000000)
-//           },
-//           SSH: {
-//             in: Math.floor(Math.random() * 200000),
-//             out: Math.floor(Math.random() * 300000)
-//           }
-//         }
-//       }));
-//     }
-
-//     getServerIP(): string {
-//       return this.serverIP;
-//     }
-
-//     getChartData(): Observable<ChartDataItem[]> {
-//       return this.trafficData$.pipe(
-//         map(data => data.map(client => ({
-//           ip: client.ip,
-//           entrada: client.bytes_in / 1024 / 1024,
-//           saida: clearInterval.bytes_out / 1024 / 1024,
-//           rawData: client 
-//         })))
-//       );
-//     }
-
-//     calculateStats(data: TrafficClient[]) {
-//       try {
-//         const totalBytesIn = data.reduce((sum, client) => sum + client.bytes_in, 0);
-//         const totalBytesOut = data.reduce((sum, client) => sum + client.bytes_out, 0);
-//         const totalBytes = totalBytesIn + totalBytesOut;
-
-//         return {
-//           activeClients: data.length,
-//           totalIn: this.formatBytes(totalBytesIn),
-//           totalOut: this.formatBytes(totalBytesOut),
-//           totalGeneral: this.formatBytes(totalBytes)
-//         }
-//       }
-//     }
-//   }
-// }
+  /**
+   * Busca os dados detalhados por protocolo para um cliente específico.
+   * Esta função é chamada sob demanda (ex: quando um utilizador clica numa barra).
+   * @param ip O endereço IP do cliente a ser detalhado.
+   */
+  public getProtocolDrilldownData(ip: string): Observable<ProtocolDrilldown[]> {
+    return this.http.get<ProtocolDrilldown[]>(`${this.API_BASE_URL}/api/traffic/${ip}/protocols`)
+      .pipe(
+        catchError(error => {
+          console.error(`Erro ao buscar dados de drill down para o IP ${ip}:`, error);
+          this.errorSubject.next(`Não foi possível carregar os detalhes para o IP ${ip}.`);
+          return of([]); // Retorna um array vazio em caso de erro
+        })
+      );
+  }
+}

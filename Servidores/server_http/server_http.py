@@ -1,11 +1,11 @@
 # =====================================================================================
 # SERVIDOR HTTP DE TESTE
-# Versão: 1.0.0
+# Versão: 1.1.0 (Modificado para servir arquivos estáticos)
 #
 # Autor: Equipe DevOps/QA - Caio Silveira
 # Descrição: Este script inicia um servidor HTTP simples para o cenário de teste do
-#            projeto. Ele serve um index.html e permite executar comandos CLI via
-#            query string, gerando tráfego de rede que possa ser monitorizado pelo dashboard.
+#            projeto. Ele serve um index.html e outros arquivos estáticos (vídeos, etc.)
+#            e permite executar comandos CLI via query string.
 #
 # Dependência: Nenhuma (usa apenas a biblioteca padrão do Python)
 # =====================================================================================
@@ -16,14 +16,16 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 import subprocess
 import urllib.parse
+import mimetypes # Importa a biblioteca para detectar o tipo do arquivo
 
 # --- 1. Configurações do Servidor ---
 HTTP_HOST = "0.0.0.0"
 HTTP_PORT = 8001
+# O BASE_DIR agora será o diretório onde o script está. Usaremos ele como a raiz.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INDEX_FILE = os.path.join(BASE_DIR, "index.html")
 
-# --- 2. Preparação do ambiente ---
+# --- 2. Preparação do ambiente (sem alterações) ---
 def preparar_ambiente_http():
     """
     Cria um index.html de teste se não existir.
@@ -54,60 +56,80 @@ def preparar_ambiente_http():
 # --- 3. Classe handler do servidor HTTP ---
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     """
-    Handler HTTP para servir index.html e executar comandos CLI via query string.
+    Handler HTTP para servir arquivos e executar comandos.
     """
 
     def do_GET(self):
         parsed_path = urllib.parse.urlparse(self.path)
         query = urllib.parse.parse_qs(parsed_path.query)
-        path = parsed_path.path
+        # Remove a barra inicial para facilitar a junção de caminhos
+        path = parsed_path.path.lstrip('/')
         print(f"GET de {self.client_address}, path: {path}, query: {query}")
-
-        # --- Servir index.html ---
-        if path == "/" or path == "/index":
-            if os.path.exists(INDEX_FILE):
-                with open(INDEX_FILE, "rb") as f:
-                    content = f.read()
-                self.send_response(200)
-                self.send_header("Content-type", "text/html; charset=utf-8")
-                self.end_headers()
-                self.wfile.write(content)
-                return
-            else:
-                content = "Index não encontrado".encode("utf-8")
-                self.send_response(404)
-                self.send_header("Content-type", "text/plain; charset=utf-8")
-                self.end_headers()
-                self.wfile.write(content)
-                return
-
-        # --- Executar comando CLI via query 'cmd' ---
+        
+        # --- Executar comando CLI via query 'cmd' (prioridade) ---
         if "cmd" in query:
             cmd = query["cmd"][0]
             try:
                 output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, timeout=5)
                 response = output.decode()
+                self.send_response(200)
+                self.send_header("Content-type", "text/plain; charset=utf-8")
             except Exception as e:
                 response = f"Erro ao executar comando: {e}"
+                self.send_response(500) # Erro interno do servidor
+                self.send_header("Content-type", "text/plain; charset=utf-8")
 
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain; charset=utf-8")
             self.end_headers()
             self.wfile.write(response.encode("utf-8"))
             return
 
-        # --- Resposta padrão ---
-        response = f"Você acessou {path} da LAN"
-        self.send_response(200)
+        # --- Servir index.html na raiz ---
+        if path == "" or path == "index.html" or path == "index":
+             filepath = INDEX_FILE
+        else:
+             # --- PONTO CHAVE: SERVIR OUTROS ARQUIVOS ESTÁTICOS ---
+             # Constrói o caminho completo do arquivo no sistema
+             filepath = os.path.join(BASE_DIR, path)
+
+        print(f"DEBUG: Procurando arquivo em: {filepath}")
+
+        # --- Lógica para entregar o arquivo (seja index ou outro) ---
+        if os.path.exists(filepath) and not os.path.isdir(filepath):
+            try:
+                with open(filepath, "rb") as f:
+                    content = f.read()
+                
+                # Detecta o tipo do arquivo (MIME Type)
+                mimetype, _ = mimetypes.guess_type(filepath)
+                if mimetype is None:
+                    mimetype = "application/octet-stream" # Tipo genérico
+
+                self.send_response(200)
+                self.send_header("Content-type", mimetype)
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            except Exception as e:
+                # Se der erro ao ler o arquivo, retorna erro 500
+                response = f"Erro ao ler o arquivo: {e}".encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-type", "text/plain; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(response)
+                return
+        
+        # --- Se o arquivo não for encontrado, retorna 404 ---
+        response = "404 - Arquivo Nao Encontrado".encode("utf-8")
+        self.send_response(404)
         self.send_header("Content-type", "text/plain; charset=utf-8")
         self.end_headers()
-        self.wfile.write(response.encode("utf-8"))
+        self.wfile.write(response)
 
-# --- 4. Servidor multithreaded ---
+# --- 4. Servidor multithreaded (sem alterações) ---
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Servidor HTTP multi-threaded"""
 
-# --- 5. Inicialização do servidor ---
+# --- 5. Inicialização do servidor (sem alterações) ---
 def iniciar_servidor_http():
     """
     Configura e inicia o servidor HTTP multithreaded.
@@ -126,7 +148,7 @@ def iniciar_servidor_http():
     except Exception as e:
         print(f"ERRO CRÍTICO: Ocorreu um erro inesperado no servidor: {e}")
 
-# --- 6. Entrada principal ---
+# --- 6. Entrada principal (sem alterações) ---
 if __name__ == "__main__":
     if preparar_ambiente_http():
         iniciar_servidor_http()

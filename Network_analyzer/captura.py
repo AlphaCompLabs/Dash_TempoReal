@@ -53,6 +53,10 @@ class Sniffer:
         # --- Define a função de callback, que será executada para cada pacote capturado ---
         def _cb(pkt):
             try:
+
+                # ADICIONE ESTA LINHA PARA DEPURAR
+                print(f"DEBUG: Pacote capturado -> {pkt.summary()}")
+
                 # Reimporta para garantir o escopo, embora não seja estritamente necessário.
                 from scapy.all import IP, TCP, UDP, ICMP  # noqa
                 
