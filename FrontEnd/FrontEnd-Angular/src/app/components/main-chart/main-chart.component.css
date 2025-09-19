@@ -1,0 +1,37 @@
+.chart-tooltip {
+  /* Posicionamento e Aparência */
+  position: fixed;
+  background-color: rgba(45, 55, 72, 0.95);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family:  'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center; /* Alinha o texto no centro */
+  
+  /* Comportamento e Camadas */
+  z-index: 9999;
+  pointer-events: none;
+  
+  /* Animação suave */
+  transition: opacity 0.2s ease;
+
+  /* ✅ CORREÇÃO AQUI: Adicionado translateX(-50%) para centralizar o balão */
+  transform: translateX(-50%) translateY(-115%);
+  
+  /* Permite quebras de linha (para mostrar Download e Upload) */
+  white-space: pre-line;
+}
+
+/* A "seta" do balão de fala (sem alterações) */
+.chart-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(45, 55, 72, 0.95) transparent transparent transparent;
+}

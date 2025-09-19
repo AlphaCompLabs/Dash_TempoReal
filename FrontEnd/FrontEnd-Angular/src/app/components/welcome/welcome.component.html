@@ -1,0 +1,71 @@
+<div class="welcome-component">
+
+@if (isPanelOpen) {
+  <div 
+    (click)="togglePanel()" 
+    class="fixed inset-0 bg-black/90 z-30">
+  </div>
+}
+
+  <aside 
+    class="fixed top-0 left-0 h-full w-96 bg-gradient-to-b from-primary to-black text-white z-40 transition-transform duration-300 ease-in-out flex flex-col p-8"
+    [ngClass]="{ '-translate-x-full': !isPanelOpen }">
+
+    <div class="relative z-10 flex flex-col h-full mt-12 justify-center"> 
+      
+      <div class="flex flex-col items-center justify-center mb-6 gap-4">
+        <img src="assets/images/logo_white.png" alt="AlphaCompLabs Logo" class="welcome-logo h-24">
+        <span class="welcome-tittle text-xl text-center font-bold">Dashboard de Redes de Computadores</span>
+      </div>
+      
+      <ul class="welcome-feature-list flex flex-col gap-y-6 rounded-lg p-6 bg-white/5">
+        <li class="flex items-center gap-x-4">
+          <img src="assets/icons/graphic.svg" alt="Ícone de Gráfico" class="h-6 w-6">
+          <p>
+            <span class="font-saved block text-xs text-accent-light">Monitoramento Contínuo</span>
+            <span class= "font-sans font-light text-sm">da performance da sua rede.</span></p>
+        </li>
+        <li class="flex items-center gap-x-4">
+          <img src="assets/icons/click.svg" alt="Ícone de Clique" class="h-6 w-6">
+          <p><span class="font-saved block text-xs text-accent-light">Vá além do IP.</span> 
+          <span class= "font-sans font-light text-xs">Descubra o protocolo com um clique.</span></p>
+        </li>
+        <li class="flex items-center gap-x-4">
+          <img src="assets/icons/turn.svg" alt="Ícone de Interação" class="h-6 w-6">
+          <p><span class="font-saved block text-xs text-accent-light">Visualização Interativa</span>
+          <span class= "font-sans font-light text-sm">do tráfego de rede.</span></p>
+        </li>
+        <li class="flex items-center gap-x-4">
+          <img src="assets/icons/clock.svg" alt="Ícone de Relógio" class="h-6 w-6">
+          <p><span class="font-saved block text-xs text-accent-light">Atualização do Tráfego</span> 
+          <span class= "font-sans font-light text-sm">de rede a cada 5 segundos!</span></p>
+        </li>
+      </ul>
+      
+      <div class="welcome-acess-link mt-8 text-center">
+          <p class="inline-block bg-primary py-3 px-4 rounded-lg">
+              <span class="block font-sans text-sm">Acesse:</span>
+              <span class="block font-sans font-bold text-lg text-white">http://192.168.1.100:8080</span>
+          </p>
+      </div>
+    </div>
+    
+    <div 
+      class="absolute inset-0 z-0 bg-cover bg-center opacity-10" 
+      style="background-image: url('assets/images/background_effect.png');">
+    </div>
+  </aside>
+
+  <button 
+    (click)="togglePanel()" 
+    class="welcome-toggle-button fixed top-14 z-50 bg-[#01003c] rounded-r-xl px-3 py-4 cursor-pointer transition-all duration-300 ease-in-out group"
+    [ngClass]="isPanelOpen ? 'left-96 -translate-x-6' : 'left-0'">
+      
+      @if(isPanelOpen) {
+        <img src="assets/icons/arrow_left.svg" alt="Fechar Painel" class="h-6 w-6 transition-all group-hover:brightness-150">
+      } @else {
+        <img src="assets/icons/arrow_right.svg" alt="Abrir Painel" class="h-6 w-6 transition-all group-hover:brightness-150">
+      }
+  </button>
+
+</div>
