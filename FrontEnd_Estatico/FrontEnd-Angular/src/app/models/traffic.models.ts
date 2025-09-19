@@ -1,38 +1,33 @@
 // // Arquivo para estruturar dados de tráfego
 
-// export interface ProtocolData {
-//     in: number;
-//     out: number;
-// }
+//Resposta do backend (gráfico principalr)
+export interface ClientTrafficSummary {
+    ip: string;
+    inbound: number;
+    outbound: number;
+}
 
-// // Protocolos de cada cliente
-// export interface ClientProtocols {
-//     HTTP: ProtocolData
-//     FTP: ProtocolData
-//     SSH: ProtocolData
-// }
+// resposta do backend (drilldown por protocolo)
+export interface ProtocolDrilldown {
+    name: string;
+    y: number;
+}
 
-// // Cliente de rede 
-// export interface TrafficClient {
-//     ip: string;
-//     bytes_in: number;
-//     bytes_out: number;
-//     protocols: ClientProtocols
-// }
+// Modelo usando no frontend para gráfico principal
+export interface NetworkClient {
+    ip: string;
+    downloadValue: number;
+    uploadValue: number;
+}
 
-// // Para visualização nos gráficos
-// export interface ChartDataItem {
-//     ip: string;
-//     entrada: number;
-//     saida: number;
-//     rawData: TrafficClient;
-// }
+// Modelo usado no frontend para drilldown
+export interface ProtocolData {
+    protocol: string;
+    downloadValue: number;
+    uploadValue: number;
+}
 
-// // Monitoramento dos dados no gráfico
-// export interface ProtocolChartData {
-//     name: string;
-//     value: number;
-//     entrada: number;
-//     saida: number;
-// }
+
+
+
 
