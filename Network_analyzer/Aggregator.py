@@ -160,4 +160,8 @@ class Aggregator:
                 "byte_count": self._current["byte_count"],
                 "clients": clients_out
             }
+            
+            start_next=self._current["end"]
+            self._current = self._new_window(start_next)
+            
             return payload

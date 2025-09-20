@@ -9,7 +9,7 @@ KNOWN_PORTS = {
     80: "HTTP", 443: "HTTPS", 53: "DNS",
     20: "FTP-DATA", 21: "FTP", 2121: "FTP", "HTTP":8001,
     123: "NTP", 25: "SMTP", 110: "POP3", 143: "IMAP",
-    22: "SSH", 3306: "MySQL", 5432: "Postgres"
+    22: "SSH", 3306: "MySQL", 5432: "Postgres", 8001: "(HTTP) TCP"
 }
 
 def friendly_proto(layer: str, sport: Optional[int], dport: Optional[int]) -> str:
@@ -23,11 +23,15 @@ def friendly_proto(layer: str, sport: Optional[int], dport: Optional[int]) -> st
             return "DNS"
         if sport == 123 or dport == 123:
             return "NTP"
-        for p in (sport, dport):
-            if p in KNOWN_PORTS:
-                return KNOWN_PORTS[p]
         p = dport if dport else sport
-        return f"{layer}:{p}" if p else layer
+        if not p:
+            return layer # Retorna só TCP ou UDP se não houver porta
+
+        # Busca o nome amigável no dicionário. Se não encontrar, usa o nome da camada (ex: "TCP").
+        protocol_name = KNOWN_PORTS.get(p, layer)
+        
+        return f"{protocol_name}:{p}"
+        
     return layer
 
 def validate_url(u: str) -> bool:

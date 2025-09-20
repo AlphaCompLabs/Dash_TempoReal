@@ -20,7 +20,7 @@ import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model
   providedIn: 'root'
 })
 export class TrafficDataService {
-  // --- A URL base da vossa API Backend ---
+  // --- A URL base da vossa API Backend5 ---
   // Mantenha-a num único lugar para facilitar futuras alterações.
   private readonly API_BASE_URL = 'http://localhost:8000';
 
