@@ -103,7 +103,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
     );
   }
 
-  // ▼▼▼ FUNÇÃO CORRIGIDA ▼▼▼
+  // 
   public showTooltip(event: MouseEvent, data: ClientTrafficSummary | ProtocolDrilldown): void {
     this.isTooltipVisible = true;
     
