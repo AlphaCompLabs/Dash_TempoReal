@@ -1,0 +1,13 @@
+/* Lógica para esconder/mostrar os ícones de tema */
+.sun-icon {
+  display: none;
+}
+.moon-icon {
+  display: block;
+}
+.light-theme .sun-icon {
+  display: block;
+}
+.light-theme .moon-icon {
+  display: none;
+}
