@@ -14,7 +14,7 @@
     <div class="relative z-10 flex flex-col h-full mt-12 justify-center"> 
       
       <div class="flex flex-col items-center justify-center mb-6 gap-4">
-        <img src="assets/images/logo_white.png" alt="AlphaCompLabs Logo" class="welcome-logo h-24">
+        <div class="themed-image logo-welcome-eye" role="img" aria-label="Logo da Netvision"></div>
         <span class="welcome-tittle text-xl text-center font-bold">Dashboard de Redes de Computadores</span>
       </div>
       
@@ -45,7 +45,7 @@
       <div class="welcome-acess-link mt-8 text-center">
           <p class="inline-block bg-primary py-3 px-4 rounded-lg">
               <span class="block font-sans text-sm">Acesse:</span>
-              <span class="block font-sans font-bold text-lg text-white">http://192.168.1.100:8080</span>
+              <span class="block font-sans font-bold text-lg text-white">{{ serverAddress }}</span>
           </p>
       </div>
     </div>

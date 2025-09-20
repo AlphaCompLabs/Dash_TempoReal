@@ -1,0 +1,48 @@
+/* Estilos base para a sidebar (equivalente ao seu style="..." antigo) */
+:host {
+  display: block; /* Garante que o componente se comporte como um bloco */
+}
+
+.sidebar-component {
+  width: 250px;
+  height: calc(100vh - 90px);
+  background-color: var(--color-dark);
+  
+  /* Gradiente escuro sobre a imagem de fundo para o tema escuro */
+  background-image: 
+    linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)),
+    url('/assets/images/sidebar_image.png'); /* Caminho relativo à pasta 'src' */
+
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: top;
+  transition: background-color 0.3s ease; /* Transição suave */
+}
+
+/* ================================================= */
+/* ✨ VARIAÇÕES PARA O TEMA CLARO (body.light) ✨ */
+/* ================================================= */
+
+/* Quando o body tiver a classe .light, estas regras serão aplicadas */
+body.light .sidebar-component {
+  /* O background-color já muda automaticamente por causa da variável --color-dark */
+
+  /* Trocamos o gradiente escuro por um claro para a imagem ter contraste */
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+    url('/assets/images/sidebar_image.png');
+}
+
+/* Inverte a cor da imagem SVG de branco para preto no tema claro
+*/
+body.light .sidebar-stats-circle img {
+  filter: invert(1);
+}
+
+/*
+  Adiciona uma borda sutil às caixas de informação no tema claro,
+  já que o fundo delas (bg-dark) também ficará branco.
+*/
+body.light .info-box {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}

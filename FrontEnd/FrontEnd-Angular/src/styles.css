@@ -18,6 +18,7 @@
   --color-primary: #020047;
   --color-secondary: #79A9BB;
   --color-accent-light: #ACE5E9;
+  --color-primary-dark: #79A9BB;
 
   --color-dark: #313131;
   --color-dark-black: #000000;
@@ -31,12 +32,35 @@
   --font-saved: "saved_by_zero", sans-serif;
 }
 
+
+
 body {
   margin: 0;
-  /* Aplica o fundo degradê a todo o corpo da página */
+  /* Aplica o fundo degradê a todo o corpo da página (TEMA ESCURO PADRÃO) */
   background-image: linear-gradient(to bottom, var(--color-primary), var(--color-dark-black), var(--color-dark-black));
-  /* Garante que o fundo cubra a altura inteira da tela, mesmo com pouco conteúdo */
   min-height: 100vh;
+  /* Adiciona uma transição suave na troca de cores */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* DEFINIÇÕES PARA O TEMA CLARO */
+body.light {
+  /* Redefinimos as variáveis quando o body tiver a classe .light */
+  --color-primary: #ACE5E9; /* Um cinza bem claro */
+  --color-secondary: #79A9BB;
+  --color-accent-light: #001A4C; /* Um azul vibrante para destaque */
+
+  --color-dark: #79A9BB; /* O fundo dos painéis será branco */
+  --color-dark-black: #212529; /* A cor do texto principal será um preto suave */
+
+  /* Invertemos o fundo do body também */
+  background-image: none; /* Remove o gradiente */
+  background-color: var(--color-primary);
+}
+
+/* Ajuste de texto para o tema claro */
+body.light .text-white {
+  color: var(--color-dark-black); /* Elementos com .text-white ficarão pretos */
 }
 
 .footer-decoration {
@@ -50,4 +74,176 @@ body {
   background-position: left center;
   background-size: contain;
   opacity: 0.5;
+}
+
+/* Crie uma classe base para as imagens que trocam de tema */
+.themed-image {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+/* --- Definições das Imagens --- */
+
+/* Imagem do Header: eye_white.png / eye_blue.png */
+.logo-header-eye {
+  width: 32px;  /* ↔️ Largura (h-8 no Tailwind) */
+  height: 32px; /* ↕️ Altura (h-8 no Tailwind) */
+  background-image: url('assets/images/eye_white.png'); /* 🌙 Imagem Padrão (Dark Mode) */
+}
+body.light .logo-header-eye {
+  background-image: url('assets/images/eye_blue.png'); /* ☀️ Imagem Tema Claro */
+}
+
+/* Imagem do Header: eye_white.png / eye_blue.png */
+.logo-welcome-eye {
+  width: 100px;  /* ↔️ Largura (h-8 no Tailwind) */
+  height: 100px; /* ↕️ Altura (h-8 no Tailwind) */
+  background-image: url('assets/images/eye_white.png'); /* 🌙 Imagem Padrão (Dark Mode) */
+}
+body.light .logo-welcome-eye {
+  background-image: url('assets/images/eye_blue.png'); /* ☀️ Imagem Tema Claro */
+}
+
+
+/* Imagem do Footer: footer_image.png */
+.logo-footer {
+  width: 250px;
+  height: 64px;
+  background-image: url('assets/images/footer_image.png');
+  /* Se você tiver uma versão clara, adicione aqui */
+  /* body.light .logo-footer { background-image: url('assets/images/footer_image_light.png'); } */
+}
+
+.logo-traffic {
+    width: 48px; /* h-12 */
+    height: 48px; /* h-12 */
+    background-image: url('assets/images/logo_network_traffic.png');
+}
+body.light .logo-traffic {
+  background-image: url('assets/images/logo_network_traffic_blue.png'); /* ☀️ Imagem Tema Claro */
+}
+
+/* Em styles.css */
+
+/*
+  Força o texto com a classe .text-white a permanecer branco
+  APENAS dentro do componente de boas-vindas, mesmo no tema claro.
+*/
+body.light .welcome-component .text-white {
+  color: #FFFFFF;
+}
+
+/* Opcional: Se outros textos (como o .text-secondary) também 
+  precisarem ficar brancos, adicione-os aqui também.
+*/
+body.light .welcome-component .text-secondary {
+  color: #a7c0cd; /* Um branco-azulado suave, por exemplo */
+}
+
+body.light .welcome-acess-link .text-white {
+  color: var(--color-dark-black); /* Usa a variável de texto principal do tema claro */
+}
+
+body.light .welcome-acess-link .text-sm {
+  color: #001A4C; /* Usa a cor secundária do tema claro, que tem bom contraste */
+}
+
+/*
+  Define o background-image da sidebar para o TEMA ESCURO (padrão)
+*/
+.sidebar-component {
+  background-image: 
+    linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)), 
+    url('assets/images/sidebar_image.png');
+}
+
+/*
+  SOBRESCREVE o background-image para o TEMA CLARO
+*/
+body.light .sidebar-component {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+    url('assets/images/sidebar_image_dark.png'); /* <-- USA A NOVA IMAGEM CLARA */
+}
+
+/* Estilo padrão do footer para o tema escuro */
+.footer-decoration {
+  background-image: url('/assets/images/footer_image.png');
+  /* ... outros estilos ... */
+}
+
+/* Variação para o tema claro */
+body.light .footer-decoration {
+  background-image: url('/assets/images/footer_image_dark.png'); /* <-- USA A NOVA IMAGEM CLARA */
+}
+
+.footer-decoration {
+  /* Suas propriedades existentes */
+  width: 250px;
+  height: 64px;
+  opacity: 0.5;
+  background-repeat: no-repeat;
+
+  /* Imagem do tema escuro */
+  background-image: url('/assets/images/footer_image.png');
+  
+  /* ✅ AJUSTES AQUI */
+  background-size: 130%;                   /* Exemplo: um pouco maior que o container. Ajuste conforme necessário. */
+  background-position: center;             /* Centraliza a imagem. Tente 'left center' ou 'right center' se preferir. */
+}
+
+body.light .footer-decoration {
+  /* Imagem do tema claro */
+  background-image: url('/assets/images/footer_image_dark.png');
+  
+  /* ✅ MANTENHA OS MESMOS AJUSTES para consistência visual */
+  background-size: 130%;
+  background-position: center;
+}
+
+body.light .welcome-component aside {
+  /* --tw-gradient-to é a variável interna do Tailwind para a cor final do gradiente.
+    Aqui, nós a trocamos de 'preto' para a nossa cor 'primary-dark'.
+  */
+  --tw-gradient-to: var(--color-primary-dark);
+}
+
+/*
+  =================================================
+  AJUSTES DE TEMA PARA O FOOTER (MODO CLARO)
+  =================================================
+*/
+
+/*
+  1. INVERTE A COR DOS LOGOS (de branco para preto)
+  O filtro 'invert(1)' transforma pixels brancos em pretos.
+*/
+body.light .footer-component img {
+  filter: invert(1);
+}
+
+/*
+  2. DEIXA OS TEXTOS PRINCIPAIS (IPs) ESCUROS
+  Usa a variável de cor de texto principal do tema claro.
+*/
+body.light .footer-component .text-secondary {
+  color: var(--color-dark-black); /* <-- ALTERADO AQUI */
+}
+
+/*
+  ======================================================
+  AJUSTES DE TEMA PARA ÍCONES E IMAGENS DO WELCOME-COMPONENT
+  (MODO CLARO)
+  ======================================================
+*/
+
+
+/*
+  2. Força os ÍCONES DA LISTA (gráficos, clique, etc.) a inverter de branco para preto.
+  (Esta regra é mais geral para qualquer <img> dentro da lista .welcome-feature-list)
+*/
+body.light .welcome-component .welcome-feature-list img {
+  filter: invert(1);
 }

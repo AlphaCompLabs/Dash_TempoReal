@@ -11,7 +11,7 @@ import { HeaderComponent } from '../../components/header/header.component';
   standalone: true, 
   imports: [
     CommonModule,
-    HeaderComponent,
+    //HeaderComponent,
     SidebarComponent,
     MainChartComponent,
     FooterComponent

@@ -14,6 +14,7 @@ import threading
 import time # ▶▶▶ ADICIONADO ◀◀◀
 from typing import Dict, List, Optional
 import logging
+import socket
 
 from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, Field
@@ -196,3 +197,24 @@ def get_protocol_drilldown_data(client_ip: str):
         for protocol, data in client_protocols.items()
     ]
     return response_data
+
+# --- 5.3 Função para descobrir o IP local ---
+def get_lan_ip():
+    # Cria um socket temporário para se conectar a um IP externo
+    # Isso força o sistema operacional a revelar qual IP local ele usaria
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Não precisa ser alcançável, é só para o SO escolher uma interface
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1' # Retorna localhost em caso de erro
+    finally:
+        s.close()
+    return IP
+
+# Crie o novo endpoint /api/server-info
+@app.get("/api/server-info")
+def get_server_info():
+    lan_ip = get_lan_ip()
+    return {"server_ip": lan_ip}

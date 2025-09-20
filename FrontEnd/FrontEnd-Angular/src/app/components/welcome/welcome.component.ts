@@ -1,37 +1,47 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-welcome',
-//   imports: [],
-//   templateUrl: './welcome.component.html',
-//   styleUrl: './welcome.component.css'
-// })
-// export class WelcomeComponent {
-
-// }
-
-import { Component } from '@angular/core';
-// ✅ CORREÇÃO: Importamos 'NgClass' do CommonModule para que o [ngClass] funcione.
-import { CommonModule, NgClass } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  // ✅ CORREÇÃO: Adicionamos NgClass na lista de imports.
-  imports: [CommonModule, NgClass],
+  imports: [
+    CommonModule, 
+    HttpClientModule 
+  ],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css'
 })
-export class WelcomeComponent {
+export class WelcomeComponent implements OnInit {
   
-  // ✅ CORREÇÃO: Adicionamos a propriedade 'isPanelOpen' que estava faltando.
-  // O painel começa aberto por padrão.
+  // Controla a visibilidade do painel lateral (começa aberto)
   public isPanelOpen: boolean = true;
+  
+  // Armazena o endereço do servidor que será buscado na API
+  public serverAddress: string = 'Carregando...';
 
-  /**
-   * ✅ CORREÇÃO: Adicionamos a função 'togglePanel' que é chamada pelo botão no HTML.
-   * Alterna o estado do painel entre aberto e fechado.
-   */
+  // Injetamos o HttpClient para fazer chamadas à API
+  constructor(private http: HttpClient) { }
+
+  // Quando o componente inicia, busca as informações do servidor
+  ngOnInit(): void {
+    // URL da sua API (ajuste se necessário)
+    const apiUrl = 'http://localhost:8000/api/server-info';
+
+    this.http.get<{server_ip: string}>(apiUrl).subscribe({
+      next: (data) => {
+        const hostname = data.server_ip;
+        // Monta a URL completa para ser exibida no painel
+        this.serverAddress = `http://${hostname}:8001`;
+      },
+      error: (err) => {
+        console.error("Falha ao buscar IP do servidor:", err);
+        this.serverAddress = "Falha na conexão com a API";
+      }
+    });
+  }
+
+  // Função para abrir/fechar o painel
   togglePanel(): void {
     this.isPanelOpen = !this.isPanelOpen;
   }
