@@ -1,64 +1,84 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {  NetworkClient, ProtocolData } from '../../models/traffic.models';
-import { TrafficService } from '../../services/traffic.service';
+import { Subscription } from 'rxjs';
+
+import { TrafficDataService } from '../../services/traffic.service';
+import { ClientTrafficSummaryFromAPI, ProtocolDrilldownFromAPI } from '../../models/traffic.models';
 
 @Component({
   selector: 'app-main-chart',
   templateUrl: './main-chart.component.html',
-  styleUrl: './main-chart.component.css',
+  styleUrls: ['./main-chart.component.css'],
   standalone: true,
   imports: [CommonModule]
 })
-export class MainChartComponent implements OnInit {
+export class MainChartComponent implements OnInit, OnDestroy {
 
-  public networkClients: NetworkClient[] = [];
+  // Propriedades do Gráfico Principal
+  public networkClients: ClientTrafficSummaryFromAPI[] = [];
   public maxChartValue: number = 25;
   public yAxisLabels: number[] = [];
 
-  public selectedClientForDetail: NetworkClient | null = null;
-  public detailData: ProtocolData[] = [];
+  // Propriedades do Drill Down
+  public selectedClientForDetail: ClientTrafficSummaryFromAPI | null = null;
+  public detailData: ProtocolDrilldownFromAPI[] = [];
   public maxDetailChartValue: number = 30;
   public yAxisDetailLabels: number[] = [];
   public isSelectedClientConnected: boolean = true;
 
-  // Tooltip
+  // Propriedades do Tooltip
   public isTooltipVisible: boolean = false;
   public tooltipText: string = '';
   public tooltipTop: number = 0;
   public tooltipLeft: number = 0;
+  
+  public activeMainFilter: 'all' | 'download' | 'upload' = 'all';
+  public activeDetailFilter: 'all' | 'download' | 'upload' = 'all';
 
-  constructor(private trafficservice: TrafficService) {}
+  private dataSubscription: Subscription | undefined;
+
+  constructor(private trafficService: TrafficDataService) { }
+  
+  // import { TrafficDataService } from '../../services/traffic.service';
+  // constructor(private TrafficDataService: TrafficDataService) { }
 
   ngOnInit(): void {
-    this.fetchClients();
-
-    // Atualiza a cada 5s
-    setInterval(() => {
-      this.fetchClients();
-      this.validateSelectedClient();
-    }, 5000);
+    this.subscribeToTrafficData();
   }
 
-  get hasClients(): boolean {
+  ngOnDestroy(): void {
+    this.dataSubscription?.unsubscribe();
+  }
+
+  public setMainFilter(filter: 'all' | 'download' | 'upload'): void {
+    this.activeMainFilter = this.activeMainFilter === filter ? 'all' : filter;
+  }
+
+  public setDetailFilter(filter: 'all' | 'download' | 'upload'): void {
+    this.activeDetailFilter = this.activeDetailFilter === filter ? 'all' : filter;
+  }
+
+  private subscribeToTrafficData(): void {
+    this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
+      this.networkClients = data;
+      this.setupChartScale();
+      this.validateSelectedClient();
+    });
+  }
+  
+  public get hasClients(): boolean {
     return this.networkClients && this.networkClients.length > 0;
   }
 
-  private fetchClients(): void {
-    this.trafficservice.getClients().subscribe(data => {
-      this.networkClients = data;
-      this.setupChartScale();
-    });
-  }
-
-  public selectClientForDetail(client: NetworkClient): void {
+  public selectClientForDetail(client: ClientTrafficSummaryFromAPI): void {
     this.hideTooltip();
     this.selectedClientForDetail = client;
-    
-    this.trafficservice.getClientProtocols(client.ip).subscribe(data => {
-      this.detailData = data;
+    this.isSelectedClientConnected = true;
+    this.activeDetailFilter = 'all';
+
+    this.trafficService.getProtocolDrilldownData(client.ip).subscribe(protocolData => {
+      this.detailData = protocolData;
       this.setupDetailChartScale();
-      this.isSelectedClientConnected = true;
     });
   }
 
@@ -66,65 +86,68 @@ export class MainChartComponent implements OnInit {
     this.hideTooltip();
     this.selectedClientForDetail = null;
     this.detailData = [];
-    this.isSelectedClientConnected = true;
   }
 
   private validateSelectedClient(): void {
     if (!this.selectedClientForDetail) return;
-    const clientStillExists = this.networkClients.some(
+    this.isSelectedClientConnected = this.networkClients.some(
       client => client.ip === this.selectedClientForDetail!.ip
     );
-    this.isSelectedClientConnected = clientStillExists;
   }
 
-  // Tooltip
-  public showTooltip(event: MouseEvent, data: { downloadValue: number; uploadValue: number; }): void {
+  // ▼▼▼ FUNÇÃO CORRIGIDA ▼▼▼
+  public showTooltip(event: MouseEvent, data: ClientTrafficSummaryFromAPI | ProtocolDrilldownFromAPI): void {
     this.isTooltipVisible = true;
-    this.tooltipText = `Download: ${data.downloadValue} MB\nUpload: ${data.uploadValue} MB`;
+    
+    // CORREÇÃO: Usamos a propriedade 'y', que só existe em ProtocolDrilldownFromAPI,
+    // para diferenciar os tipos de dados de forma segura.
+    if ('y' in data) {
+      // Se 'y' existe, sabemos que 'data' é do tipo ProtocolDrilldownFromAPI
+      const totalMB = (data.y).toFixed(2);
+      this.tooltipText = `Protocolo: ${data.name}\nTráfego Total: ${totalMB} Bytes`;
+    } else {
+      // Caso contrário, é do tipo ClientTrafficSummaryFromAPI
+      const downloadMB = (data.inbound).toFixed(2);
+      const uploadMB = (data.outbound).toFixed(2);
+      this.tooltipText = `Download: ${downloadMB} Bytes\nUpload: ${uploadMB} Bytes`;
+    }
+    
     this.moveTooltip(event);
   }
-  public hideTooltip(): void { this.isTooltipVisible = false; }
-  public moveTooltip(event: MouseEvent): void {
-    this.tooltipLeft = event.clientX;
-    this.tooltipTop = event.clientY;
+
+  public hideTooltip(): void {
+    this.isTooltipVisible = false;
   }
 
-  // Escalas
+  public moveTooltip(event: MouseEvent): void {
+    this.tooltipLeft = event.clientX + 15;
+    this.tooltipTop = event.clientY + 15;
+  }
+
+  // --- Funções de Cálculo (ajustadas para Bytes) ---
+
   private setupChartScale(): void {
     if (!this.hasClients) { this.maxChartValue = 0; this.yAxisLabels = []; return; }
-    const maxValue = Math.max(...this.networkClients.map(c => c.downloadValue + c.uploadValue));
-    this.maxChartValue = Math.ceil(maxValue / 5) * 5 || 5;
+    const maxValue = Math.max(...this.networkClients.map(c => c.inbound + c.outbound));
+    this.maxChartValue = Math.ceil(maxValue / 1000) * 1000 || 1000;
     const step = this.maxChartValue / 5;
-    this.yAxisLabels = Array.from({ length: 6 }, (_, i) => this.maxChartValue - (i * step));
+    this.yAxisLabels = Array.from({ length: 6 }, (_, i) => Math.round(this.maxChartValue - (i * step)));
   }
 
-  calculateTotalHeight = (client: NetworkClient) =>
-    Math.min(((client.downloadValue + client.uploadValue) / this.maxChartValue) * 100, 100);
-
-  calculateDownloadRatio = (client: NetworkClient) =>
-    (client.downloadValue + client.uploadValue === 0) ? 0 :
-    (client.downloadValue / (client.downloadValue + client.uploadValue)) * 100;
-
-  calculateUploadRatio = (client: NetworkClient) =>
-    (client.downloadValue + client.uploadValue === 0) ? 0 :
-    (client.uploadValue / (client.downloadValue + client.uploadValue)) * 100;
+  calculateTotalHeight = (client: ClientTrafficSummaryFromAPI) => Math.min((((client.inbound + client.outbound)) / this.maxChartValue) * 100, 100);
+  calculateDownloadRatio = (client: ClientTrafficSummaryFromAPI) => (client.inbound + client.outbound === 0) ? 0 : (client.inbound / (client.inbound + client.outbound)) * 100;
+  calculateUploadRatio = (client: ClientTrafficSummaryFromAPI) => (client.inbound + client.outbound === 0) ? 0 : (client.outbound / (client.inbound + client.outbound)) * 100;
 
   private setupDetailChartScale(): void {
     if (this.detailData.length === 0) { this.maxDetailChartValue = 0; this.yAxisDetailLabels = []; return; }
-    const maxValue = Math.max(...this.detailData.map(p => p.downloadValue + p.uploadValue));
-    this.maxDetailChartValue = Math.ceil(maxValue / 5) * 5 || 5;
+    const maxValue = Math.max(...this.detailData.map(p => p.y));
+    this.maxDetailChartValue = Math.ceil(maxValue / 1000) * 1000 || 1000;
     const step = this.maxDetailChartValue / 5;
-    this.yAxisDetailLabels = Array.from({ length: 6 }, (_, i) => parseFloat((this.maxDetailChartValue - (i * step)).toFixed(2)));
+    this.yAxisDetailLabels = Array.from({ length: 6 }, (_, i) => Math.round(this.maxDetailChartValue - (i * step)));
   }
 
-  calculateDetailTotalHeight = (protocol: ProtocolData) =>
-    Math.min(((protocol.downloadValue + protocol.uploadValue) / this.maxDetailChartValue) * 100, 100);
-
-  calculateDetailDownloadRatio = (protocol: ProtocolData) =>
-    (protocol.downloadValue + protocol.uploadValue === 0) ? 0 :
-    (protocol.downloadValue / (protocol.downloadValue + protocol.uploadValue)) * 100;
-
-  calculateDetailUploadRatio = (protocol: ProtocolData) =>
-    (protocol.downloadValue + protocol.uploadValue === 0) ? 0 :
-    (protocol.uploadValue / (protocol.downloadValue + protocol.uploadValue)) * 100;
+  calculateDetailTotalHeight = (protocol: ProtocolDrilldownFromAPI) => Math.min(((protocol.y) / this.maxDetailChartValue) * 100, 100);
+  
+  calculateDetailDownloadRatio = (protocol: ProtocolDrilldownFromAPI) => (protocol.y === 0) ? 0 : (protocol.inbound / protocol.y) * 100;
+  calculateDetailUploadRatio = (protocol: ProtocolDrilldownFromAPI) => (protocol.y === 0) ? 0 : (protocol.outbound / protocol.y) * 100;
 }
