@@ -11,7 +11,7 @@
 # --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
 
 import threading
-import time # ▶▶▶ ADICIONADO ◀◀◀
+import time
 from typing import Dict, List, Optional
 import logging
 import socket
@@ -44,7 +44,7 @@ class TrafficPayload(BaseModel):
 
 # --- SEÇÃO 2: ARMAZENAMENTO DE DADOS EM MEMÓRIA --- ▼▼▼ MODIFICADO ▼▼▼
 
-# ▶▶▶ ADICIONADO ◀◀◀: Estrutura para guardar dados do cliente com timestamp
+# Estrutura para guardar dados do cliente com timestamp
 class TimestampedClientData(BaseModel):
     data: ClientData
     last_seen: float = Field(default_factory=time.time)
@@ -100,7 +100,7 @@ class TrafficDataStore:
 # Instancia o data_store. Se seu script de captura envia dados a cada 5 segundos, um timeout de 15 é uma boa escolha.
 data_store = TrafficDataStore(timeout_seconds=15)
 
-# ▶▶▶ ADICIONADO ◀◀◀: Função para a tarefa de limpeza em segundo plano
+# Função para a tarefa de limpeza em segundo plano
 def run_cleanup_task():
     """Função que será executada em uma thread separada para limpeza contínua."""
     while True:
@@ -119,7 +119,7 @@ app = FastAPI(
     contact={ "name": "Equipe Backend", "url": "https://github.com/AlphaCompLabs/Dash_TempoReal" },
 )
 
-# ▶▶▶ ADICIONADO ◀◀◀: Evento de startup para iniciar a tarefa em segundo plano
+# Evento de startup para iniciar a tarefa em segundo plano
 @app.on_event("startup")
 def startup_event():
     cleanup_thread = threading.Thread(target=run_cleanup_task, daemon=True)

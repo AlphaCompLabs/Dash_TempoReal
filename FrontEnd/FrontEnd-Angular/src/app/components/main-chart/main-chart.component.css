@@ -1,37 +1,123 @@
+/**
+ * =====================================================================================
+ * ARQUIVO DE ESTILOS - COMPONENTE MAIN-CHART (main-chart.component.css)
+ * Versão: 1.2.0 (Estrutura e comentários aprimorados)
+ *
+ * Autor: Equipe Frontend
+ * Descrição: Este arquivo contém os estilos específicos para o componente do gráfico
+ * principal (MainChartComponent). A versão 1.2.0 melhora a organização
+ * dos seletores e adiciona comentários detalhados para explicar a
+ * função de cada bloco de estilo, facilitando a manutenção futura.
+ * =====================================================================================
+ */
+
+/* --- SEÇÃO 1: ESTILOS DO TOOLTIP DO GRÁFICO --- */
+
+/**
+ * Define o container principal do tooltip, que aparece ao passar o mouse sobre as barras.
+ * Este elemento é posicionado de forma fixa na tela para flutuar sobre outros conteúdos.
+ */
 .chart-tooltip {
-  /* Posicionamento e Aparência */
+  /* --- 1.1: Posicionamento e Camada --- */
+  /* `fixed` mantém o tooltip visível mesmo com a rolagem da página. */
   position: fixed;
-  background-color: rgba(45, 55, 72, 0.95);
-  color: white;
+  /* `z-index` elevado garante que o tooltip fique acima de todos os outros elementos. */
+  z-index: 9999;
+  /* `transform` é usado para centralizar o tooltip horizontalmente em relação ao cursor
+     e posicioná-lo um pouco acima dele para não obstruir a visão. */
+  transform: translateX(-50%) translateY(-115%);
+
+  /* --- 1.2: Aparência e Box Model --- */
+  background-color: rgba(45, 55, 72, 0.95); /* Fundo escuro com leve transparência */
   padding: 8px 12px;
   border-radius: 6px;
-  font-family:  'Montserrat', sans-serif;
+
+  /* --- 1.3: Tipografia --- */
+  color: white;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: bold;
-  text-align: center; /* Alinha o texto no centro */
-  
-  /* Comportamento e Camadas */
-  z-index: 9999;
-  pointer-events: none;
-  
-  /* Animação suave */
-  transition: opacity 0.2s ease;
-
-  /* ✅ CORREÇÃO AQUI: Adicionado translateX(-50%) para centralizar o balão */
-  transform: translateX(-50%) translateY(-115%);
-  
-  /* Permite quebras de linha (para mostrar Download e Upload) */
+  text-align: center;
+  /* `pre-line` respeita as quebras de linha (\n) no texto, essencial para exibir
+     informações de Download e Upload em linhas separadas. */
   white-space: pre-line;
+
+  /* --- 1.4: Comportamento e Animação --- */
+  /* `pointer-events: none` impede que o próprio tooltip intercepte eventos do mouse,
+     garantindo que os eventos `mouseleave` e `mousemove` da barra do gráfico funcionem corretamente. */
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
-/* A "seta" do balão de fala (sem alterações) */
+/**
+ * Cria o triângulo (seta) na base do tooltip, simulando um "balão de fala".
+ * É um pseudo-elemento posicionado em relação ao container principal do tooltip.
+ */
 .chart-tooltip::after {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 100%;
+  top: 100%; /* Posiciona a seta exatamente abaixo do corpo do tooltip */
+  left: 50%; /* Centraliza a seta horizontalmente */
   transform: translateX(-50%);
+
+  /* A "mágica" para criar um triângulo com bordas. Apenas a borda superior
+     tem cor, as outras são transparentes, formando a ponta da seta. */
   border-width: 6px;
   border-style: solid;
   border-color: rgba(45, 55, 72, 0.95) transparent transparent transparent;
+}
+
+
+/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO --- */
+
+/**
+ * Classe base para os botões de filtro (Download/Upload).
+ * Define a estrutura, transições e comportamento padrão. As cores de fundo
+ * são aplicadas via classes do Tailwind CSS diretamente no HTML para manter a consistência
+ * do design system.
+ */
+.filter-button {
+  /* --- 2.1: Estrutura e Tipografia --- */
+  padding: 4px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+
+  /* --- 2.2: Animação --- */
+  /* Transição aplicada a todas as propriedades para um feedback visual suave. */
+  transition: all 0.2s ease;
+}
+
+/**
+ * Estilo para o estado de :hover.
+ * Reduz a opacidade para fornecer um feedback visual simples de interação.
+ */
+.filter-button:hover {
+  opacity: 0.8;
+}
+
+/**
+ * Classe aplicada dinamicamente quando um filtro está ativo.
+ * Fornece um destaque visual claro para indicar o estado selecionado.
+ */
+.filter-button.active-filter {
+  /* `!important` é usado aqui de forma estratégica para sobrescrever as classes
+     de utilitário do Tailwind (ex: `bg-chart-blue-dark`). Em um sistema híbrido
+     (CSS customizado + Tailwind), isso garante que o estado ativo sempre prevaleça. */
+  background-color: var(--color-accent-light) !important;
+  color: var(--color-primary) !important;
+  font-weight: bold;
+
+  /* `outline` e `outline-offset` criam um anel de foco que não afeta o layout
+     do elemento, melhorando a acessibilidade e o design. */
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+/**
+ * Variação específica para o tema claro (light mode).
+ * Garante que o texto do botão ativo tenha contraste suficiente quando
+ * o tema do site for alterado.
+ */
+body.light .filter-button.active-filter {
+  color: var(--color-dark-black) !important;
 }

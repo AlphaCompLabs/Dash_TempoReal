@@ -21,13 +21,19 @@
       <div class="mainchart-filter flex flex-col items-start gap-1 rounded-lg p-3 dotted-bg">
         <span class="font-sans text-sm text-white">Filtros:</span>
         <div class="flex gap-2">
-          <button class="bg-chart-blue-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">Download</button>
-          <button class="bg-chart-blue-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">Upload</button>
+          <button (click)="setMainFilter('download')"
+                  [ngClass]="{'active-filter': activeMainFilter === 'download'}"
+                  class="filter-button bg-chart-blue-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+            Download
+          </button>
+          <button (click)="setMainFilter('upload')"
+                  [ngClass]="{'active-filter': activeMainFilter === 'upload'}"
+                  class="filter-button bg-chart-blue-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+            Upload
+          </button>
         </div>
       </div>
-    </div>
-
-    <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
+    </div> <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
       @if (hasClients) {
         <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5">
           <span class="ping-element animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
@@ -48,7 +54,8 @@
                   </span>
                 }
               </div>
-              <div class="h-8"></div> </div>
+              <div class="h-8"></div>
+            </div>
 
             <div class="w-full flex flex-col">
               <div class="relative w-full flex-grow border-l-2 border-b-2 border-white/50 px-4">
@@ -112,9 +119,11 @@
       }
     </section>
   }
+
   @if (selectedClientForDetail) {
     <div class="drilldowndetail-component w-full h-full flex flex-col gap-1">
       @if (isSelectedClientConnected) {
+        
         <div class="flex items-center justify-between">
           <button (click)="goBackToMainChart()" class="drilldowndetail-back-button border border-white/50 text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
             &larr; Voltar para o gráfico geral
@@ -122,13 +131,19 @@
           <div class="drilldowndetail-filter flex flex-col items-start gap-1 rounded-lg p-3 dotted-bg">
             <span class="font-sans text-sm text-white">Filtros:</span>
             <div class="flex gap-2">
-              <button class="bg-chart-teal-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">Download</button>
-              <button class="bg-chart-teal-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">Upload</button>
+              <button (click)="setDetailFilter('download')"
+                      [ngClass]="{'active-filter': activeDetailFilter === 'download'}"
+                      class="filter-button bg-chart-teal-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+                Download
+              </button>
+              <button (click)="setDetailFilter('upload')"
+                      [ngClass]="{'active-filter': activeDetailFilter === 'upload'}"
+                      class="filter-button bg-chart-teal-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+                Upload
+              </button>
             </div>
           </div>
-        </div>
-
-        <section class="drilldowndetail-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
+        </div> <section class="drilldowndetail-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
           <div class="drilldowndetail-title text-center">
             <h3 class="font-sans text-lg font-light text-white leading-tight">
               Cliente (IP): <span class="font-bold text-chart-teal-light">{{ selectedClientForDetail.ip }}</span>
@@ -147,32 +162,33 @@
               <div class="flex flex-col">
                 <div class="relative flex-grow w-8 pr-2">
                   @for (label of yAxisDetailLabels; track $index) {
-                  <span class="absolute block right-2 text-xs text-secondary text-right"
-                        [style.bottom.%]="(label / maxDetailChartValue) * 100"
-                        [style.transform]="'translateY(50%)'">{{ label }}</span>
+                    <span class="absolute block right-2 text-xs text-secondary text-right"
+                          [style.bottom.%]="(label / maxDetailChartValue) * 100"
+                          [style.transform]="'translateY(50%)'">{{ label }}</span>
                   }
                 </div>
-                <div class="h-8"></div> </div>
+                <div class="h-8"></div>
+              </div>
 
               <div class="w-full flex flex-col">
                 <div class="relative w-full flex-grow border-l-2 border-b-2 border-white/50">
                   <div class="grid-lines absolute inset-0" style="z-index: 0;">
                     @for (label of yAxisDetailLabels; track $index) {
-                    <div class="absolute left-0 w-full h-px bg-white/10" [style.bottom.%]="(label / maxDetailChartValue) * 100"></div>
+                      <div class="absolute left-0 w-full h-px bg-white/10" [style.bottom.%]="(label / maxDetailChartValue) * 100"></div>
                     }
                   </div>
                   <div class="w-full h-full flex gap-x-6 px-2" style="position: relative; z-index: 10;">
                     @for (protocol of detailData; track protocol.name) {
-                    <div class="grow w-0 flex flex-col justify-end">
-                      <div class="w-full mx-auto flex flex-col rounded-t-md overflow-hidden transition-all duration-200 ease-in-out hover:brightness-125"
-                           [style.height.%]="calculateDetailTotalHeight(protocol)"
-                           (mouseenter)="showTooltip($event, protocol)"
-                           (mouseleave)="hideTooltip()"
-                           (mousemove)="moveTooltip($event)">
-                        <div class="bg-chart-teal-dark" [style.height.%]="calculateDetailDownloadRatio(protocol)"></div>
-                        <div class="bg-chart-teal-light" [style.height.%]="calculateDetailUploadRatio(protocol)"></div>
+                      <div class="grow w-0 flex flex-col justify-end">
+                        <div class="w-full mx-auto flex flex-col rounded-t-md overflow-hidden transition-all duration-200 ease-in-out hover:brightness-125"
+                             [style.height.%]="calculateDetailTotalHeight(protocol)"
+                             (mouseenter)="showTooltip($event, protocol)"
+                             (mouseleave)="hideTooltip()"
+                             (mousemove)="moveTooltip($event)">
+                          <div class="bg-chart-teal-dark" [style.height.%]="calculateDetailDownloadRatio(protocol)"></div>
+                          <div class="bg-chart-teal-light" [style.height.%]="calculateDetailUploadRatio(protocol)"></div>
+                        </div>
                       </div>
-                    </div>
                     }
                   </div>
                 </div>
@@ -180,9 +196,9 @@
                 <div class="h-8 w-full flex flex-col gap-1 px-2 pt-1">
                   <div class="flex gap-x-4">
                     @for (protocol of detailData; track protocol.name) {
-                    <div class="grow w-0 text-center">
-                      <span class="block text-white text-xs truncate">{{ protocol.name }}</span>
-                    </div>
+                      <div class="grow w-0 text-center">
+                        <span class="block text-white text-xs truncate">{{ protocol.name }}</span>
+                      </div>
                     }
                   </div>
                   <span class="text-center mt-1 font-sans font-thin text-chart-teal-light text-xs">Protocolos</span>
@@ -203,26 +219,27 @@
             </div>
           </div>
         </section>
+
       } @else {
         <div class="w-full h-full flex flex-col gap-1">
-            <div class="flex items-center justify-start">
-              <button (click)="goBackToMainChart()" class="drilldowndetail-back-button border border-white/50 text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
-                &larr; Voltar para o gráfico geral
-              </button>
-            </div>
-            <section class="bg-dark p-6 rounded-lg flex flex-col w-full flex-grow relative items-center justify-center text-center" style="height: 500px;">
-              <svg class="w-16 h-16 text-red-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
-              <h3 class="font-sans text-xl font-bold text-white leading-tight">
-                Conexão Perdida
-              </h3>
-              <p class="text-white max-w-sm mt-2">
-                Este cliente <span class="text-chart-teal-light">(IP: {{ selectedClientForDetail.ip }})</span> se desconectou do servidor central.
-              </p>
-            </section>
+          <div class="flex items-center justify-start">
+            <button (click)="goBackToMainChart()" class="drilldowndetail-back-button border border-white/50 text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
+              &larr; Voltar para o gráfico geral
+            </button>
+          </div>
+          <section class="bg-dark p-6 rounded-lg flex flex-col w-full flex-grow relative items-center justify-center text-center" style="height: 500px;">
+            <svg class="w-16 h-16 text-red-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <h3 class="font-sans text-xl font-bold text-white leading-tight">
+              Conexão Perdida
+            </h3>
+            <p class="text-white max-w-sm mt-2">
+              Este cliente <span class="text-chart-teal-light">(IP: {{ selectedClientForDetail.ip }})</span> se desconectou do servidor central.
+            </p>
+          </section>
         </div>
       }
     </div>
   }
-  </div>
+</div>

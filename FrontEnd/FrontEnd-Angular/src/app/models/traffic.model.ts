@@ -1,7 +1,7 @@
 /**
  * =========================================================================
  * MODELOS DE DADOS PARA O FRONTEND - SINCRONIZADOS COM A API
- * Versão: 1.0.0
+ * Versão: 1.1.0
  *
  * Descrição: Este ficheiro define as "interfaces" TypeScript que representam
  * as respostas da nossa API Backend. Usar estas interfaces garante

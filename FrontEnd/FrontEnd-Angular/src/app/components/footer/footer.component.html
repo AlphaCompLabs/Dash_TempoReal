@@ -1,27 +1,30 @@
 <footer class="footer-component bg-dark flex items-center justify-between rounded-md">
 
-    <div class="footer-decorations flex items-center gap-6 pl-0">
-        <div class="themed-image footer-decoration" role="img"></div>
-        <div class="flex items-center gap-3">
-            <a href="https://github.com/AlphaCompLabs/Dash_TempoReal" target="_blank" class="hover:opacity-80 transition-opacity">
-                <img src="assets/icons/git_logo.svg" alt="GitHub" class="h-12 w-12">
-            </a>
-            <a href="https://github.com/AlphaCompLabs" target="_blank" class="hover:opacity-80 transition-opacity">
-                <img src="assets/icons/alpha_logo.svg" alt="Instituição" class="h-14 w-14">
-            </a>
-        </div>
-    </div>
+  <div class="footer-decorations flex items-center gap-6 pl-0">
 
-    <div class="footer-info flex items-center divide-x divide-secondary mr-4">
-    <div class="info-box text-left px-4">
-        <h4 class="font-sans text-xs text-secondary">Servidor FTP:</h4>
-        <p class="font-sans text-base font-bold text-white truncate">{{ ftpAddress }}</p>
+    <div class="themed-image footer-decoration" aria-hidden="true"></div>
+
+    <div class="flex items-center gap-3">
+      <a href="https://github.com/AlphaCompLabs/Dash_TempoReal" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+        <img src="assets/icons/git_logo.svg" alt="Link para o repositório do projeto no GitHub" class="h-12 w-12">
+      </a>
+      <a href="https://github.com/AlphaCompLabs" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+        <img src="assets/icons/alpha_logo.svg" alt="Link para a organização AlphaCompLabs no GitHub" class="h-14 w-14">
+      </a>
     </div>
+  </div>
+
+  <div class="footer-info flex items-center divide-x divide-secondary mr-4">
 
     <div class="info-box text-left px-4">
-        <h4 class="font-sans text-xs text-secondary">Servidor HTTP:</h4>
-        <p class="font-sans text-base font-bold text-white truncate">{{ httpAddress }}</p>
+      <h4 class="font-sans text-xs text-secondary">Servidor FTP:</h4>
+      <p class="font-sans text-base font-bold text-white truncate" title="{{ ftpAddress }}">{{ ftpAddress }}</p>
     </div>
-</div>
+
+    <div class="info-box text-left px-4">
+      <h4 class="font-sans text-xs text-secondary">Servidor HTTP:</h4>
+      <p class="font-sans text-base font-bold text-white truncate" title="{{ httpAddress }}">{{ httpAddress }}</p>
+    </div>
+
+  </div>
 </footer>
-
