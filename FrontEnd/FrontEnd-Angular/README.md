@@ -1,59 +1,33 @@
-# FrontEndAngular
+# 🌐 FrontEnd
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.2.
+Esta parte do projeto é responsável por fornecer a interface visual que mostra o tráfego de rede de clientes. O Front foi construído com [Angular CLI](https://github.com/angular/angular-cli) na versão 20.2.2 e foi diretamente integrado à FastAPI do `BackEnd_RESTful`.
 
-## Development server
-
-To start a local development server, run:
+## ⚙️ Configurando o ambiente
+Para iniciar dentro dessa parte do projeto, é necessário configurar o ambiente:
+1. No terminal, instale as competências:
+```bash
+npm install
+```
+2. Com as dependências devidamente instaladas, rode o projeto:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Após a instalação e inicialização do projeo, em seu navegador entre em: `http://localhost:4200/`. 
 
-## Code scaffolding
+## 🔷 O que é exibido:
+- No gráfico principal, o tráfego por cliente (IP) é separado entre Download e Upload;
+- A função Drill-down detalha os protocolos quando um cliente específico é selecionado;
+- O Top Talker destaca o cliente com maior volume de tráfego;
+- No sidebar as estatísticas são contabilizadas e exibidas.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🔷 Uso dentro da interface
+- Cada barra do gráfico representa um cliente (IP).
+    - Metade superior: tráfego de download;
+    - Métade inferior: tráfego de upload.
+- Tooltips: ao passar o mouse sobre as barras, os valores exatos serão exibidos.
+- Drill-down: ao clicar em qualquer cliente, é possível ver os detalhes por protocolo.
+    - O botão superior permite retornar ao gráfico principal.
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+  
