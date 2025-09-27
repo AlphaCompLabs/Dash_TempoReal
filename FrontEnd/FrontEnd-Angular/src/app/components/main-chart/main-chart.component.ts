@@ -36,6 +36,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
   public yAxisLabels: number[] = [];
   public chartUnit: string = 'Bytes';
   private mainChartDivisor: number = 1;
+  private readonly MAX_CLIENTS_TO_DISPLAY = 10;
 
   // Estado do Gráfico de Detalhe (Drilldown)
   public selectedClientForDetail: ClientTrafficSummary | null = null;
@@ -75,15 +76,32 @@ export class MainChartComponent implements OnInit, OnDestroy {
   // --- SEÇÃO 4: LÓGICA DE DADOS E ASSINATURAS (SUBSCRIPTIONS) ---
 
   /**
-   * Inscreve-se no Observable de dados de tráfego e atualiza a UI a cada nova emissão.
-   */
-  private subscribeToTrafficData(): void {
-    this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
-      this.networkClients = data;
-      this.setupChartScale();
-      this.validateSelectedClientConnection();
-    });
-  }
+ * Inscreve-se no Observable de dados de tráfego e atualiza a UI a cada nova emissão.
+ */
+private subscribeToTrafficData(): void {
+  this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
+    
+    // ✅ INÍCIO DA NOVA LÓGICA
+    
+    // 1. Ordena os clientes pelo tráfego total (download + upload) em ordem decrescente.
+    // Usamos [...data] para criar uma cópia e não modificar o array original.
+    const sortedClients = [...data].sort((a, b) => 
+      (b.inbound + b.outbound) - (a.inbound + a.outbound)
+    );
+
+    // 2. Pega apenas os 10 primeiros clientes da lista ordenada.
+    const topClients = sortedClients.slice(0, this.MAX_CLIENTS_TO_DISPLAY);
+
+    // 3. Atribui a lista processada ao estado do componente.
+    this.networkClients = topClients;
+
+    // ✅ FIM DA NOVA LÓGICA
+
+    // O resto do código continua igual, mas agora trabalhando com a lista limitada.
+    this.setupChartScale();
+    this.validateSelectedClientConnection();
+  });
+}
 
   /**
    * Verifica se o cliente selecionado para detalhe ainda está presente na lista de
@@ -375,3 +393,4 @@ export class MainChartComponent implements OnInit, OnDestroy {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 }
+
