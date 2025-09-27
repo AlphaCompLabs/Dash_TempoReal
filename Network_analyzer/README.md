@@ -9,6 +9,8 @@ Para utilizar o `main.py`, você pode executá-lo diretamente via linha de coman
 ### Exemplo 1: Captura de Tráfego e Envio via POST
 Este é um cenário comum onde o `main.py` captura o tráfego de uma interface específica e envia os dados agregados para um endpoint HTTP (como o `sink.py`).
 
+- Entre no Network_analyzer: **cd Network_analyzer**
+
 - 1°  **Crie um Ambiente Virtual:**
     Abra o terminal na pasta do projeto e execute:
     ```bash
