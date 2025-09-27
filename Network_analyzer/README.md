@@ -49,7 +49,7 @@ Get-NetAdapter | Select Name, Status
 
 - 7° Passo: executar o comando abaixo
 ```bash
-python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest"
+python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "tcp port 8001 or tcp port 2121"
 ```
 
 ### Exemplo 2: Leitura de PCAP e Saída para Arquivo
