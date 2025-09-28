@@ -74,3 +74,5 @@ A suíte de testes atual `(test_api.py)` foca em validar os "contratos" e a lóg
 - **O quê**: Testa como a API se comporta em cenários de erro.
 
 - **Validação** (`test_get_drilldown_for_nonexistent_ip`): Tenta buscar o drill down para um IP que não existe e verifica se a API retorna corretamente um erro `404 Not Found`.
+
+ <img width="1610" height="225" alt="image" src="https://github.com/user-attachments/assets/79334bab-7253-428d-9b37-318003cb3179" />
