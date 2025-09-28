@@ -242,7 +242,7 @@ def get_lan_ip():
         s.close()
     return IP
 
-# Crie o novo endpoint /api/server-info
+# Cria o novo endpoint /api/server-info
 @app.get("/api/server-info")
 def get_server_info():
     lan_ip = get_lan_ip()

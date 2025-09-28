@@ -167,6 +167,40 @@
   animation: one-shot-ping 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* Define a animação (o movimento), que é a mesma para ambas as cores */
+@keyframes ping-once-animation {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/*
+  Esta é uma regra base para ambas as animações, usando o pseudo-elemento ::before
+  para criar o anel que se expande.
+*/
+[class*="ping-"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  /* Aplica a animação definida acima */
+  animation: ping-once-animation 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Define a COR para o ping VERMELHO */
+.ping-red::before {
+  background-color: #ef4444; /* Vermelho (Tailwind red-500) */
+}
+
+/* Define a COR para o ping VERDE */
+.ping-green::before {
+  background-color: #22c55e; /* Verde (Tailwind green-500) */
+}
+
 /*
  * =================================================================
  * SEÇÃO DE AJUSTES PARA O TEMA CLARO (LIGHT MODE)

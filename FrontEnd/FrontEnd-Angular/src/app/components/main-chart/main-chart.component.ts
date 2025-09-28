@@ -37,6 +37,8 @@ export class MainChartComponent implements OnInit, OnDestroy {
   public chartUnit: string = 'Bytes';
   private mainChartDivisor: number = 1;
   private readonly MAX_CLIENTS_TO_DISPLAY = 10;
+  /** Controla o acionamento da animação de 'flash' no indicador de status. */
+  public pingState: 'idle' | 'green' | 'red' = 'idle';
 
   // Estado do Gráfico de Detalhe (Drilldown)
   public selectedClientForDetail: ClientTrafficSummary | null = null;
@@ -82,8 +84,6 @@ export class MainChartComponent implements OnInit, OnDestroy {
 private subscribeToTrafficData(): void {
   this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
     
-    // ✅ INÍCIO DA NOVA LÓGICA
-    
     // 1. Ordena os clientes pelo tráfego total (download + upload) em ordem decrescente.
     // Usamos [...data] para criar uma cópia e não modificar o array original.
     const sortedClients = [...data].sort((a, b) => 
@@ -96,19 +96,34 @@ private subscribeToTrafficData(): void {
     // 3. Atribui a lista processada ao estado do componente.
     this.networkClients = topClients;
 
-    // ✅ FIM DA NOVA LÓGICA
-
     // O resto do código continua igual, mas agora trabalhando com a lista limitada.
     this.setupChartScale();
     this.validateSelectedClientConnection();
 
-    // Dispara a animação de "ping" por 1 segundo
-    this.playPingAnimation = true;
+     // Apenas aciona o flash se a lista de dados recebida NÃO estiver vazia
+     // 1. Verifica se a resposta da API tem dados
+    if (data && data.length > 0) {
+      // Se tem dados, define o estado para 'green'
+      this.pingState = 'green';
+    } else {
+      // Se a resposta é vazia, define o estado para 'red'
+      this.pingState = 'red';
+    }
+    
+    // 2. Agenda a redefinição do estado para 'idle' após a animação
     setTimeout(() => {
-      this.playPingAnimation = false;
+      this.pingState = 'idle';
     }, 1000); // Duração da animação em milissegundos
+
+    // // Dispara a animação de "ping" por 1 segundo
+    // this.playPingAnimation = true;
+    // setTimeout(() => {
+    //   this.playPingAnimation = false;
+    // }, 1000); // Duração da animação em milissegundos
   });
 }
+
+
 
   /**
    * Verifica se o cliente selecionado para detalhe ainda está presente na lista de
