@@ -40,6 +40,7 @@
  * Mudar um valor aqui afeta todos os lugares onde a variável é usada.
  */
 @theme {
+  --color-primary-bar: #020132;
   --color-primary: #020047;
   --color-secondary: #79A9BB;
   --color-accent-light: #ACE5E9;
@@ -70,20 +71,22 @@ body {
 
 body.light {
   /* Redefine as variáveis globais quando o body tem a classe .light */
-  --color-primary: #ACE5E9;
-  --color-secondary: #79A9BB;
-  --color-accent-light: #001A4C;
-  --color-dark: #79A9BB;
-  --color-dark-black: #212529;
+  --color-primary-bar: #bfe8eb;
+  --color-primary: #d4f5f8;
+  --color-secondary: #313131;
+  --color-accent-light: #006d81;
+  --color-accent-light-rgb: 0, 26, 76;
+  --color-dark: #ebebeb;
+  --color-dark-black: #003741;
 
   /* Altera o fundo do body */
-  background-image: none;
-  background-color: var(--color-primary);
+  background-image: linear-gradient(to bottom, var(--color-primary), var(--color-white), var(--color-white), var(--color-white));
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Regra global para o tema claro: textos que eram brancos agora usam a cor principal de texto. */
 body.light .text-white {
-  color: var(--color-dark-black);
+  color: #212529;
 }
 
 /* --- 5. CLASSES DE COMPONENTES REUTILIZÁVEIS --- */
@@ -109,17 +112,17 @@ body.light .logo-header-eye {
 }
 
 .logo-welcome-eye {
-  width: 100px;
-  height: 100px;
-  background-image: url('assets/images/eye_white.png'); /* Padrão (Dark Mode) */
+  width: 140px;
+  height: 140px;
+  background-image: url('assets/images/logo_white.png'); /* Padrão (Dark Mode) */
 }
 body.light .logo-welcome-eye {
-  background-image: url('assets/images/eye_blue.png'); /* Tema Claro */
+  background-image: url('assets/images/logo_blue.png'); /* Tema Claro */
 }
 
 .logo-traffic {
-  width: 48px;
-  height: 48px;
+  width: 80px;
+  height: 80px;
   background-image: url('assets/images/logo_network_traffic.png'); /* Padrão (Dark Mode) */
 }
 body.light .logo-traffic {
@@ -138,26 +141,14 @@ body.light .logo-traffic {
   background-repeat: no-repeat;
   background-size: 130%;
   background-position: center;
-  background-image: url('/assets/images/footer_image.png'); /* Padrão (Dark Mode) */
+  background-image: url('/assets/images/footer_image.svg'); /* Padrão (Dark Mode) */
 }
 body.light .footer-decoration {
-  background-image: url('/assets/images/footer_image_dark.png'); /* Tema Claro */
+  background-image: url('/assets/images/footer_image_dark.svg'); /* Tema Claro */
 }
 
 
 /* --- 6. SOBRESCRITAS ESPECÍFICAS POR COMPONENTE --- */
-
-/* ----- AJUSTES PARA SIDEBAR COMPONENT ----- */
-.sidebar-component {
-  background-image:
-    linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)),
-    url('assets/images/sidebar_image.png');
-}
-body.light .sidebar-component {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
-    url('assets/images/sidebar_image_dark.png');
-}
 
 /* ----- AJUSTES PARA WELCOME COMPONENT (TEMA CLARO) ----- */
 /* Força textos a permanecerem brancos/claros dentro do painel escuro do Welcome, mesmo no tema claro. */

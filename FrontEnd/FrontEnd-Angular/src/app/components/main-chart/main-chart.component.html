@@ -33,15 +33,18 @@
           </button>
         </div>
       </div>
-    </div> <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
-      @if (hasClients) {
-        <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5">
-          <span class="ping-element animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+    </div> 
+    
+    <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
+        <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
+          <span class="ping-element absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"
+            [ngClass]="{'animate-one-shot-ping': playPingAnimation}"></span>
           <span class="relative inline-flex rounded-full h-5 w-5 bg-red-600"></span>
         </div>
 
-        <div class="bg-white/5 w-full h-full flex relative p-6">
-          <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans font-thin text-accent-light text-xs">Tráfego ({{ chartUnit }})</span>
+      @if (hasClients) {
+        <div class="bg-white/5 w-full h-full flex relative p-6 z-10">
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans text-accent-light text-xs">Tráfego ({{ chartUnit }})</span>
 
           <div class="flex-grow flex gap-2">
             <div class="flex flex-col">
@@ -90,7 +93,7 @@
                     </div>
                   }
                 </div>
-                <span class="text-center mt-1 font-sans font-thin text-accent-light text-xs">Clientes (IP)</span>
+                <span class="text-center mt-1 font-sans text-accent-light text-xs">Clientes (IP)</span>
               </div>
             </div>
           </div>
@@ -125,7 +128,7 @@
       @if (isSelectedClientConnected) {
         
         <div class="flex items-center justify-between">
-          <button (click)="goBackToMainChart()" class="drilldowndetail-back-button border border-white/50 text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
+          <button (click)="goBackToMainChart()" class="drilldowndetail-back-button text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
             &larr; Voltar para o gráfico geral
           </button>
           <div class="drilldowndetail-filter flex flex-col items-start gap-1 rounded-lg p-3 dotted-bg">
@@ -146,17 +149,18 @@
         </div> <section class="drilldowndetail-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
           <div class="drilldowndetail-title text-center">
             <h3 class="font-sans text-lg font-light text-white leading-tight">
-              Cliente (IP): <span class="font-bold text-chart-teal-light">{{ selectedClientForDetail.ip }}</span>
+              Cliente (IP): <span class="font-bold text-accent-light">{{ selectedClientForDetail.ip }}</span>
             </h3>
           </div>
 
-          <div class="drilldowndetail-live-indicator absolute top-4 right-4 flex h-5 w-5">
-            <span class="ping-element animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+          <div class="drilldowndetail-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
+            <span class="ping-element absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"
+              [ngClass]="{'animate-one-shot-ping': playPingAnimation}"></span>
             <span class="relative inline-flex rounded-full h-5 w-5 bg-red-600"></span>
           </div>
 
-          <div class="bg-white/5 rounded-lg p-2 w-full h-full flex relative p-6">
-            <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans font-thin text-chart-teal-light text-xs">Tráfego ({{ detailChartUnit }})</span>
+          <div class="bg-white/5 rounded-lg p-2 w-full h-full flex relative p-6 z-10">
+            <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans text-chart-teal-light text-xs">Tráfego ({{ detailChartUnit }})</span>
 
             <div class="flex-grow flex gap-2">
               <div class="flex flex-col">
@@ -201,7 +205,7 @@
                       </div>
                     }
                   </div>
-                  <span class="text-center mt-1 font-sans font-thin text-chart-teal-light text-xs">Protocolos</span>
+                  <span class="text-center mt-1 font-sans text-chart-teal-light text-xs">Protocolos</span>
                 </div>
               </div>
             </div>
@@ -223,7 +227,7 @@
       } @else {
         <div class="w-full h-full flex flex-col gap-1">
           <div class="flex items-center justify-start">
-            <button (click)="goBackToMainChart()" class="drilldowndetail-back-button border border-white/50 text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
+            <button (click)="goBackToMainChart()" class="drilldowndetail-back-button text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
               &larr; Voltar para o gráfico geral
             </button>
           </div>
@@ -235,7 +239,7 @@
               Conexão Perdida
             </h3>
             <p class="text-white max-w-sm mt-2">
-              Este cliente <span class="text-chart-teal-light">(IP: {{ selectedClientForDetail.ip }})</span> se desconectou do servidor central.
+              Este cliente <span class="text-accent-light">(IP: {{ selectedClientForDetail.ip }})</span> se desconectou do servidor central.
             </p>
           </section>
         </div>

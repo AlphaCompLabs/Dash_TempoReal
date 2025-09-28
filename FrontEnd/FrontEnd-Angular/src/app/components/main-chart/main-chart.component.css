@@ -68,56 +68,147 @@
 }
 
 
-/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO --- */
+/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO (LÓGICA AVANÇADA DE TEMAS) --- */
 
 /**
- * Classe base para os botões de filtro (Download/Upload).
- * Define a estrutura, transições e comportamento padrão. As cores de fundo
- * são aplicadas via classes do Tailwind CSS diretamente no HTML para manter a consistência
- * do design system.
+ * Classe base para os botões de filtro.
  */
 .filter-button {
-  /* --- 2.1: Estrutura e Tipografia --- */
   padding: 4px 16px;
   border-radius: 6px;
   font-size: 14px;
-
-  /* --- 2.2: Animação --- */
-  /* Transição aplicada a todas as propriedades para um feedback visual suave. */
   transition: all 0.2s ease;
 }
 
 /**
  * Estilo para o estado de :hover.
- * Reduz a opacidade para fornecer um feedback visual simples de interação.
  */
 .filter-button:hover {
   opacity: 0.8;
 }
 
 /**
- * Classe aplicada dinamicamente quando um filtro está ativo.
- * Fornece um destaque visual claro para indicar o estado selecionado.
+ * Propriedades COMUNS a todos os botões no estado ATIVO.
  */
 .filter-button.active-filter {
-  /* `!important` é usado aqui de forma estratégica para sobrescrever as classes
-     de utilitário do Tailwind (ex: `bg-chart-blue-dark`). Em um sistema híbrido
-     (CSS customizado + Tailwind), isso garante que o estado ativo sempre prevaleça. */
-  background-color: var(--color-accent-light) !important;
-  color: var(--color-primary) !important;
   font-weight: bold;
-
-  /* `outline` e `outline-offset` criam um anel de foco que não afeta o layout
-     do elemento, melhorando a acessibilidade e o design. */
-  outline: 2px solid var(--color-accent-light);
+  outline-width: 3px;
+  outline-style: solid;
   outline-offset: 2px;
 }
 
-/**
- * Variação específica para o tema claro (light mode).
- * Garante que o texto do botão ativo tenha contraste suficiente quando
- * o tema do site for alterado.
+/* * ===============================================================
+ * LÓGICA DE CORES PARA OS 4 ESTADOS DO BOTÃO ATIVO
+ * ===============================================================
  */
-body.light .filter-button.active-filter {
-  color: var(--color-dark-black) !important;
+
+/* --- ESTADO 1: Dark Mode / Gráfico GERAL --- */
+.mainchart-filter .filter-button.active-filter {
+  background-color: var(--color-accent-light) !important;
+  color: var(--color-chart-blue-dark) !important;
+  outline-color: white;
 }
+
+/* --- ESTADO 2: Dark Mode / Gráfico DRILLDOWN --- */
+.drilldowndetail-filter .filter-button.active-filter {
+  background-color: var(--color-accent-light) !important;
+  color: var(--color-chart-teal-dark) !important;
+  outline-color: white;
+}
+
+/* --- ESTADO 3: Light Mode / Gráfico GERAL --- */
+:host-context(body.light) .mainchart-filter .filter-button.active-filter {
+  background-color: #ACE5E9 !important;
+  color: var(--color-chart-blue-dark) !important;
+  outline-color: var(--color-chart-blue-dark);
+}
+
+/* --- ESTADO 4: Light Mode / Gráfico DRILLDOWN --- */
+:host-context(body.light) .drilldowndetail-filter .filter-button.active-filter {
+  background-color: #ACE5E9 !important;
+  color: var(--color-chart-teal-dark) !important;
+  outline-color: var(--color-chart-teal-dark);
+}
+
+
+/* * ===============================================================
+ * REGRA DE EXCEÇÃO (MANTIDA)
+ * ===============================================================
+ */
+
+/**
+ * Garante que o texto dos botões INATIVOS permaneça branco no Light Mode.
+ */
+:host-context(body.light) .filter-button.text-white:not(.active-filter) {
+  color: white !important;
+}
+
+
+/*
+ * =================================================================
+ * SEÇÃO DE ANIMAÇÃO DO INDICADOR DE DADOS
+ * =================================================================
+ */
+
+/* * Define a animação de "ping" que executa apenas uma vez.
+ * É uma cópia da animação 'ping' do Tailwind, mas sem o loop infinito.
+ */
+@keyframes one-shot-ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/*
+ * Classe que podemos adicionar a um elemento para aplicar a animação de disparo único.
+ */
+.animate-one-shot-ping {
+  animation: one-shot-ping 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/*
+ * =================================================================
+ * SEÇÃO DE AJUSTES PARA O TEMA CLARO (LIGHT MODE)
+ * =================================================================
+ */
+
+/**
+ * [CORREÇÃO] Altera o fundo da seção "Descrição" no modo claro
+ * para garantir visibilidade tanto no gráfico GERAL quanto no de DETALHE.
+ */
+:host-context(body.light) .bg-white\/5 {
+  background-color: #e5e5e5; /* Cor escura, similar à da sidebar no modo escuro */
+}
+
+/**
+ * [CORREÇÃO 3] Altera a cor do título "Descrição:" no gráfico de detalhe (drill down)
+ * para garantir o contraste no modo claro.
+ */
+:host-context(body.light) .drilldowndetail-container .text-chart-teal-light {
+  color: var(--color-dark-black);
+}
+
+/*
+ * =================================================================
+ * SEÇÃO DE AJUSTES PARA O TEMA CLARO (LIGHT MODE) NO GRÁFICO
+ * =================================================================
+ */
+
+/**
+ * Altera a cor das linhas de grade do gráfico para garantir o contraste.
+ */
+:host-context(body.light) .grid-lines .bg-white\/10 {
+  background-color: rgba(var(--color-accent-light-rgb), 0.2); /* Preto com 10% de opacidade */
+}
+:host-context(body.light) .grid-lines .bg-white\/30 {
+  background-color: rgba(var(--color-accent-light-rgb), 0.2); /* Preto com 20% de opacidade */
+}
+
+/**
+ * [NOVO] Altera a cor dos eixos X e Y do gráfico (as bordas principais).
+ */
+:host-context(body.light) .border-white\/50 {
+  border-color: rgba(var(--color-accent-light-rgb), 0.2); /* Cor de texto principal do tema claro */
+}
+

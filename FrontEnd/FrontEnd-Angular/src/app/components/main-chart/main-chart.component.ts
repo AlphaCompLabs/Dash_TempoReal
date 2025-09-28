@@ -56,6 +56,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
   // Estado dos Filtros
   public activeMainFilter: 'all' | 'download' | 'upload' = 'all';
   public activeDetailFilter: 'all' | 'download' | 'upload' = 'all';
+  public playPingAnimation: boolean = false;
 
   // Gerenciamento de Inscrição (Subscription) para evitar memory leaks
   private dataSubscription!: Subscription;
@@ -100,6 +101,12 @@ private subscribeToTrafficData(): void {
     // O resto do código continua igual, mas agora trabalhando com a lista limitada.
     this.setupChartScale();
     this.validateSelectedClientConnection();
+
+    // Dispara a animação de "ping" por 1 segundo
+    this.playPingAnimation = true;
+    setTimeout(() => {
+      this.playPingAnimation = false;
+    }, 1000); // Duração da animação em milissegundos
   });
 }
 
@@ -139,6 +146,7 @@ private subscribeToTrafficData(): void {
    */
   public setMainFilter(filter: 'all' | 'download' | 'upload'): void {
     // Se o filtro clicado já estiver ativo, desativa-o (volta para 'all').
+    
     this.activeMainFilter = this.activeMainFilter === filter ? 'all' : filter;
     this.setupChartScale();
   }
@@ -160,7 +168,11 @@ private subscribeToTrafficData(): void {
     this.hideTooltip();
     this.selectedClientForDetail = client;
     this.isSelectedClientConnected = true;
-    this.activeDetailFilter = 'all'; // Reseta o filtro ao entrar na visão de detalhe
+    this.activeDetailFilter = 'all';
+
+    // --- Linhas Modificadas ---
+    this.trafficService.setDrillDownState(true);
+    this.trafficService.setSelectedClient(client); // Linha adicionada
 
     this.trafficService.getProtocolDrilldownData(client.ip).subscribe(protocolData => {
       this.detailData = protocolData;
@@ -168,13 +180,14 @@ private subscribeToTrafficData(): void {
     });
   }
 
-  /**
-   * Retorna da visualização de detalhe para o gráfico principal.
-   */
   public goBackToMainChart(): void {
     this.hideTooltip();
     this.selectedClientForDetail = null;
     this.detailData = [];
+
+    // --- Linhas Modificadas ---
+    this.trafficService.setDrillDownState(false);
+    this.trafficService.setSelectedClient(null); // Linha adicionada
   }
 
   // --- SEÇÃO 6: MÉTODOS PÚBLICOS PARA CONTROLE DO TOOLTIP ---

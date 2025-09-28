@@ -1,6 +1,6 @@
 # =====================================================================================
 # SERVIDOR BACKEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
-# Versão: 2.6.0 (com gerenciamento de estado e timeout de clientes)
+# Versão: 2.7.0 (com endpoint dedicado para o top_protocol)
 #
 # Autor: Equipe Backend - Diogo Freitas e Gustavo Martins
 # Descrição: Este script implementa uma API RESTful com FastAPI. Esta versão
@@ -40,6 +40,10 @@ class TrafficPayload(BaseModel):
     window_start: int
     window_end: int
     clients: Dict[str, ClientData]
+    
+class GlobalProtocolSummary(BaseModel):
+    name: str
+    y: int
 
 
 # --- SEÇÃO 2: ARMAZENAMENTO DE DADOS EM MEMÓRIA --- ▼▼▼ MODIFICADO ▼▼▼
@@ -196,6 +200,31 @@ def get_protocol_drilldown_data(client_ip: str):
         )
         for protocol, data in client_protocols.items()
     ]
+    return response_data
+
+@app.get("/api/traffic/protocols/summary", response_model=List[GlobalProtocolSummary], tags=["Data Consumption"])
+def get_global_protocol_summary():
+    """
+    Agrega o tráfego de todos os clientes por protocolo e retorna um resumo global.
+    """
+    latest_clients = data_store.get_data()
+    protocol_summary: Dict[str, int] = {}
+
+    # 1. Itera sobre cada cliente ativo
+    for client_data in latest_clients.values():
+        # 2. Itera sobre os protocolos de cada cliente
+        for protocol_name, protocol_data in client_data.protocols.items():
+            total_bytes = protocol_data.in_bytes + protocol_data.out_bytes
+            
+            # 3. Soma o tráfego no nosso dicionário de resumo
+            protocol_summary[protocol_name] = protocol_summary.get(protocol_name, 0) + total_bytes
+
+    # 4. Transforma o dicionário no formato de lista que o frontend espera
+    response_data = [
+        GlobalProtocolSummary(name=name, y=total_traffic)
+        for name, total_traffic in protocol_summary.items()
+    ]
+
     return response_data
 
 # --- 5.3 Função para descobrir o IP local ---

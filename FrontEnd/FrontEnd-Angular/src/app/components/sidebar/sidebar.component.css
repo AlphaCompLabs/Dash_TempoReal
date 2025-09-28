@@ -46,3 +46,81 @@ body.light .sidebar-stats-circle img {
 body.light .info-box {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+/*
+ * =================================================================
+ * SEÇÃO DE VARIÁVEIS DE COR PARA OS GRADIENTES DOS GRÁFICOS
+ * =================================================================
+ */
+
+/* Define as cores padrão (Dark Mode) para os gradientes */
+:host {
+  --grad-download-1: var(--color-chart-blue-light);
+  --grad-download-2: var(--color-chart-blue-dark);
+
+  --grad-upload-1: var(--color-chart-blue-light);
+  --grad-upload-2: var(--color-chart-blue-dark);
+}
+
+/* --- Cores para o Estado Padrão --- */
+
+/*
+ * =================================================================
+ * SEÇÃO DE ESTILOS PARA O TEXTO DA PORCENTAGEM (COM 4 ESTADOS)
+ * =================================================================
+ */
+
+/* Propriedade base para a transição suave */
+.progress-percentage {
+  transition: color 0.3s ease-in-out;
+}
+
+/*
+ * =================================================================
+ * ESTILOS PARA O TEXTO DA PORCENTAGEM (COM 4 ESTADOS) - VERSÃO CORRIGIDA
+ * =================================================================
+ */
+
+/* --- ESTADO 1: Geral / Modo Escuro (Padrão) --- */
+.progress-percentage-download, 
+.progress-percentage-upload {
+  color: var(--color-chart-blue-light);
+}
+/* --- ESTADO 2: Geral / Modo Claro --- */
+/* CORRIGIDO: Trocado 'body.light' por ':host-context(body.light)' */
+:host-context(body.light) .progress-percentage-download,
+:host-context(body.light) .progress-percentage-upload {
+  color: var(--color-chart-blue-dark);
+}
+
+/* --- ESTADO 3: Foco (Drill Down) / Modo Escuro --- */
+.sidebar-component.drilldown-active .progress-percentage-download,
+.sidebar-component.drilldown-active .progress-percentage-upload {
+  color: var(--color-chart-teal-light);
+} 
+
+/* --- ESTADO 4: Foco (Drill Down) / Modo Claro --- */
+/* CORRIGIDO: Trocado 'body.light' por ':host-context(body.light)' */
+:host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-download,
+:host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-upload {
+  color: var(--color-chart-teal-dark);
+}
+
+/* Opcional: Ajusta a cor do trilho cinza para o light mode */
+:host-context(body.light) circle.text-gray-700 {
+  color: #c2c1c1; /* Um cinza mais claro */
+}
+
+/*
+ * Quando o modo de detalhe (drill down) está ATIVO,
+ * sobrescreve as variáveis de cor dos gradientes dos círculos.
+ */
+.sidebar-component.drilldown-active {
+  /* Novas cores para os gradientes em modo de foco */
+  /* Usando os tons de verde-azulado (teal) do tema do gráfico */
+  --grad-download-1: var(--color-chart-teal-light);
+  --grad-download-2: var(--color-chart-teal-dark);
+  
+  --grad-upload-1: var(--color-chart-teal-light);
+  --grad-upload-2: var(--color-chart-teal-dark);
+}

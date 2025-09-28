@@ -1,6 +1,6 @@
 <header class="relative flex items-center justify-between py-2 px-4">
 
-  <div class="absolute inset-0 bg-primary brightness-70"></div>
+  <div class="absolute inset-0 bg-primary-bar"></div>
 
   <div class="header-logo relative flex items-center gap-3">
     <div class="themed-image logo-header-eye" role="img" aria-label="Logo da Netvision"></div>
@@ -16,7 +16,7 @@
     (click)="toggleTheme()"
   >
     <img *ngIf="!isLightMode" src="assets/icons/sun_light.svg" alt="Ícone de Sol" class="h-6">
-    <img *ngIf="isLightMode" src="assets/icons/moon_light.svg" alt="Ícone de Lua" class="h-6">
+    <img *ngIf="isLightMode" src="assets/icons/moon_dark.svg" alt="Ícone de Lua" class="h-6">
   </button>
 </div>
 

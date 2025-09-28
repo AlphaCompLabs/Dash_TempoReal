@@ -18,10 +18,16 @@ import { BehaviorSubject, Observable, Subscription, timer, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model';
 
+export interface GlobalProtocolSummary {
+  name: string;
+  y: number; // Total de tráfego (inbound + outbound)
+}
+
 // --- SEÇÃO 1: METADADOS DO SERVIÇO ---
 @Injectable({
   providedIn: 'root'
 })
+
 export class TrafficDataService implements OnDestroy {
 
   // --- SEÇÃO 2: CONSTANTES E CONFIGURAÇÕES ---
@@ -81,6 +87,10 @@ export class TrafficDataService implements OnDestroy {
       );
   }
 
+  public setSelectedClient(client: ClientTrafficSummary | null): void {
+    this.selectedClientData.next(client);
+  }
+
   // --- SEÇÃO 7: LÓGICA PRIVADA (POLLING E FETCHING) ---
 
   /**
@@ -116,4 +126,42 @@ export class TrafficDataService implements OnDestroy {
         this.errorSubject.next(null);        // 3. Limpa qualquer mensagem de erro anterior.
       });
   }
+
+  // --- CÓDIGO NOVO PARA O ESTADO DO DRILL DOWN ---
+
+  // 1. Cria um "armazém" privado para o estado. Inicia como `false` (fechado).
+  private isDrillDownActive = new BehaviorSubject<boolean>(false);
+
+  // 2. Expõe o estado como um Observable público que os componentes podem "ouvir".
+  public isDrillDownActive$ = this.isDrillDownActive.asObservable();
+
+  private readonly selectedClientData = new BehaviorSubject<ClientTrafficSummary | null>(null);
+public readonly selectedClientData$ = this.selectedClientData.asObservable();
+
+  /**
+   * Método público para permitir que outros componentes atualizem o estado.
+   * @param isActive Booleano indicando se o modo de detalhe está ativo.
+   */
+  public setDrillDownState(isActive: boolean): void {
+    this.isDrillDownActive.next(isActive);
+  }
+
+  /**
+   * Busca um resumo global do tráfego por protocolo em toda a rede.
+   * NOTA: Supõe a existência de um novo endpoint no backend.
+   * @returns Um Observable com o resumo dos protocolos.
+   */
+  public getGlobalProtocolSummary(): Observable<GlobalProtocolSummary[]> {
+    const summaryUrl = `${this.API_BASE_URL}/api/traffic/protocols/summary`;
+    return this.http.get<GlobalProtocolSummary[]>(summaryUrl)
+      .pipe(
+        catchError(error => {
+          const errorMessage = `Não foi possível carregar o resumo de protocolos.`;
+          console.error(`Erro ao buscar resumo de protocolos:`, error);
+          // Não emite erro global para não poluir a UI principal
+          return of([]); // Retorna um array vazio em caso de erro
+        })
+      );
+  }
+  
 }

@@ -1,55 +1,110 @@
 <aside 
   class="sidebar-component text-white p-6 rounded-lg flex flex-col justify-center items-center gap-6"
-  [ngStyle]="sidebarStyleObject">
+  [ngStyle]="sidebarStyleObject"
+  [ngClass]="{'drilldown-active': isDrillDownMode}">
 
   <div class="sidebar-tittle text-center">
-    <h2 class="font-sans font-light text-xl text-white">Informações</h2>
-    <h1 class="font-saved text-3xl text-accent-light leading-none">GERAIS</h1>
-    <h2 class="font-sans font-light text-xl text-white">das redes</h2>
+    @if (isDrillDownMode) {
+      <h2 class="font-sans font-light text-xl text-white">Informações do</h2>
+      <h1 class="font-saved text-2xl text-accent-light leading-none">CLIENTE</h1>
+    } @else {
+      <h2 class="font-sans font-light text-xl text-white">Informações</h2>
+      <h1 class="font-saved text-3xl text-accent-light leading-none">GERAIS</h1>
+      <h2 class="font-sans font-light text-xl text-white">das redes</h2>
+    }
   </div>
 
   <div class="sidebar-stats-circle flex flex-col items-center gap-4">
     
     <div class="relative w-40 h-40">
-      <img 
-        src="assets/images/circle_sidebar.svg" 
-        alt="Círculo de estatísticas de download" 
-        class="absolute inset-0"
-        [style.filter]="imageFilterStyle">
+      <svg class="absolute inset-0 -rotate-90" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="downloadGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" [style.stop-color]="'var(--grad-download-1)'" stop-opacity="0.9" />
+            <stop offset="100%" [style.stop-color]="'var(--grad-download-2)'" stop-opacity="0.9" />
+          </linearGradient>
+        </defs>
+        <circle
+          class="text-gray-700"
+          stroke-width="10"
+          stroke="currentColor"
+          fill="transparent"
+          r="54"
+          cx="60"
+          cy="60"
+        />
+        <circle
+          stroke-width="10"
+          stroke="url(#downloadGradient)" fill="transparent"
+          r="54"
+          cx="60"
+          cy="60"
+          [attr.stroke-dasharray]="circumference"
+          [attr.stroke-dashoffset]="downloadStrokeOffset"
+        />
+      </svg>
       
       <div class="relative z-10 w-full h-full flex flex-col items-center justify-center">
         <span class="font-sans text-secondary text-sm">DOWNLOAD</span>
-        <span class="font-sans font-bold text-3xl text-white">{{ totalDownload }}</span>
+        <span class="font-sans font-bold text-white" [style.font-size.px]="downloadFontSize">{{ totalDownload }}</span>
+        <span class="progress-percentage progress-percentage-download font-sans text-xs font-bold">{{ downloadProgress.toFixed(0) }}%</span>
       </div>
     </div>
 
-    <div class="relative w-40 h-40">
-      <img 
-        src="assets/images/circle_sidebar.svg" 
-        alt="Círculo de estatísticas de upload" 
-        class="absolute inset-0"
-        [style.filter]="imageFilterStyle">
+   <div class="relative w-40 h-40">
+      <svg class="absolute inset-0 -rotate-90" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="uploadGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" [style.stop-color]="'var(--grad-upload-1)'" stop-opacity="0.9" />
+            <stop offset="100%" [style.stop-color]="'var(--grad-upload-2)'" stop-opacity="0.9" />
+          </linearGradient>
+        </defs>
+        <circle
+          class="text-gray-700"
+          stroke-width="10"
+          stroke="currentColor"
+          fill="transparent"
+          r="54"
+          cx="60"
+          cy="60"
+        />
+        <circle
+          stroke-width="10"
+          stroke="url(#uploadGradient)" fill="transparent"
+          r="54"
+          cx="60"
+          cy="60"
+          [attr.stroke-dasharray]="circumference"
+          [attr.stroke-dashoffset]="uploadStrokeOffset"
+        />
+      </svg>
       
       <div class="relative z-10 w-full h-full flex flex-col items-center justify-center">
         <span class="font-sans text-secondary text-sm">UPLOAD</span>
-        <span class="font-sans font-bold text-3xl text-white">{{ totalUpload }}</span>
-      </div>
+        <span class="font-sans font-bold text-white" [style.font-size.px]="uploadFontSize">{{ totalUpload }}</span>
+        <span class="progress-percentage progress-percentage-upload font-sans text-xs font-bold">{{ uploadProgress.toFixed(0) }}%</span> </div>
     </div>
 
   </div>
 
   <div class="sidebar-info-box flex flex-col gap-2">
+      @if (!isDrillDownMode) {
+        <div class="info-box bg-dark py-3 px-4 rounded-md">
+          <h3 class="font-sans text-xs text-accent-light">Clientes (IPs) Conectados:</h3>
+          <p class="font-sans text-lg font-bold text-white">{{ activeClients }} CLIENTES (IPs)</p>
+        </div>
+        <div class="info-box bg-dark py-3 px-4 rounded-md">
+          <h3 class="font-sans text-xs text-accent-light">Top Talker:</h3>
+          <p class="font-sans text-lg font-bold text-white">{{ topTalker }}</p>
+        </div>
+      }
 
-    <div class="info-box bg-dark p-3 rounded-md">
-      <h3 class="font-sans font-light text-xs text-accent-light">Clientes (IPs) Conectados:</h3>
-      <p class="font-sans text-lg font-bold text-white">{{ activeClients }} CLIENTES (IPs)</p>
-    </div>
-
-    <div class="info-box bg-dark p-3 rounded-md">
-      <h3 class="font-sans font-light text-xs text-accent-light">Top Talker:</h3>
-      <p class="font-sans text-lg font-bold text-white">{{ topTalker }}</p>
-    </div>
-    
+      @if (isDrillDownMode) {
+        <div class="info-box bg-dark py-3 px-4 rounded-md">
+          <h2 class="font-sans text-xs text-accent-light">Top Protocol:</h2>
+          <p class="font-sans text-light text-lg font-bold text-white">{{ topProtocol }}</p>
+        </div>
+      }
   </div>
 
 </aside>
