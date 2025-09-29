@@ -138,10 +138,6 @@ Estes pré-requisitos são específicos para o ambiente **Windows**. Certifique-
     cd Dash_TempoReal
     ```
     *Dica: A partir de agora, usaremos o símbolo **`~`** para representar o diretório principal do projeto (`Dash_TempoReal`).*
-3.  **Instale as dependências gerais do projeto (Node):**
-    ```bash
-    npm install
-    ```
 
 -----
 
@@ -155,7 +151,12 @@ Este é o primeiro componente a ser executado, pois ele hospeda o endpoint que r
 
 #### Passo 1: Preparação
 
-1.  **Crie um Ambiente Virtual:** (na pasta `~`)
+1. **Acesse o diretório do backend:** (na pasta `~`)
+    ```bash
+    cd ~\Dash_TempoReal\BackEnd_RESTful
+    ```
+
+2.  **Crie um Ambiente Virtual:** (na pasta `~`)
     ```bash
     python -m venv venv
     ```
@@ -183,7 +184,7 @@ uvicorn main:app --reload
 
 O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 1).
 
-**⚠️ AVISO:** Este componente exige um **novo terminal** e a **ativação de um novo ambiente virtual**.
+**⚠️ AVISO:** Este componente exige um **novo terminal** e a **ativação de um novo ambiente virtual**.Se você estiver em um ambiente virtual, digite **`deactivate` para sair.**
 
 #### Passo 1: Configuração
 
@@ -193,8 +194,8 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
     ```
 2.  **Crie um novo Ambiente Virtual** (`venv_analyzer`) e **Ative-o**:
     ```bash
-    python -m venv venv_analyzer
-    .\venv_analyzer\Scripts\activate
+    python -m venv venv
+    .\venv\Scripts\activate
     ```
 3.  **Instale as dependências** (`scapy` e `cap`):
     ```bash
@@ -204,7 +205,10 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
     Você precisará do nome exato da interface (ex: "Wi-Fi") para o próximo passo.
     ```bash
     Get-NetAdapter | Select Name, Status
+    ipconfig
     ```
+    <img width="602" height="461" alt="image" src="https://github.com/user-attachments/assets/9e69198a-20c1-44d7-a9b6-f29e9495fbed" />
+
 
 #### Passo 2: Execução
 
@@ -212,20 +216,20 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
 Execute o comando abaixo, substituindo `<Seu IP>` e `"<Sua interface>"` pelos valores reais.
 
 ```bash
-python ~/Network_analyzer/main.py --server-ip <Seu IP> --iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "tcp port 8001 or tcp port 2121"
+python ./main.py --server-ip <Seu IP(Substitua informações dentro e apague o "<>")> --iface "<Sua interface(Substitua informações dentro e apague o "<>")>" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "tcp port 8001 or tcp port 2121"
 ```
 
 -----
 
 ### 3\. Inicialização do Frontend (Angular)
 
-**⚠️ AVISO:** Este componente exige um **novo terminal** e **não utiliza ambiente virtual Python**. Se você estiver em um ambiente virtual, digite `deactivate` para sair.
+**⚠️ AVISO:** Este componente exige um **novo terminal** e **não utiliza ambiente virtual Python. Se você estiver em um ambiente virtual, digite `deactivate` para sair.**
 
 **🖥️ Terminal 3 (Frontend) - Inicie o Projeto**
 
 1.  **Abra o Terminal 3** e acesse a **raiz do projeto** (`~`):
     ```bash
-    cd ~
+    cd ~\Dash_TempoReal\FrontEnd\FrontEnd-Angular 
     ```
 2.  Execute o seguinte comando:
     ```bash
@@ -244,7 +248,7 @@ Após a inicialização, acesse a aplicação web: **`http://localhost:4200/`**
 
 1.  **Abra o Terminal 4** e acesse a pasta:
     ```bash
-    cd ~/Servidores/server_http
+    cd ~\Dash_TempoReal\Servidores\server_http
     ```
 2.  Execute o seguinte comando:
     ```bash
@@ -261,12 +265,12 @@ Após a inicialização, acesse a aplicação web: **`http://localhost:4200/`**
 
 1.  **Abra o Terminal 5** e acesse a pasta:
     ```bash
-    cd ~/Servidores/server_ftp
+    cd ~\Dash_TempoReal\Servidores\server_ftp
     ```
 2.  **Crie e Ative o Ambiente Virtual** (`venv_ftp`):
     ```bash
-    python -m venv venv_ftp
-    .\venv_ftp\Scripts\activate
+    python -m venv venv
+    .\venv\Scripts\activate
     ```
 3.  **Baixe a biblioteca** `pyftpdlib`:
     ```bash
