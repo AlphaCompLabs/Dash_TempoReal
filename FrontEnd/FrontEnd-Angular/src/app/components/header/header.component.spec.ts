@@ -14,6 +14,7 @@ import { HeaderComponent } from './header.component';
 import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 
+
 const mockThemeService = {
   isLightMode$: new BehaviorSubject<boolean>(false),
   toggleTheme: () => {
@@ -57,7 +58,7 @@ describe('HeaderComponent', () => {
   });
   
   it('should call themeService.toggleTheme when the component toggleTheme method is called', () => {
-    const toggleSpy = spyOn(themeService, 'toggleTheme').and.callThrough();
+    const toggleSpy = jest.spyOn(themeService, 'toggleTheme');
     component.toggleTheme();
     expect(toggleSpy).toHaveBeenCalled();
   });
@@ -68,7 +69,7 @@ describe('HeaderComponent', () => {
 
     // @ts-ignore: Acessamos a propriedade privada para o teste.
     const themeSub: Subscription = component.themeSubscription;
-    const unsubscribeSpy = spyOn(themeSub, 'unsubscribe');
+    const unsubscribeSpy = jest.spyOn(themeSub, 'unsubscribe');
     
     // Agora que o spy está criado, destruímos o componente.
     fixture.destroy();

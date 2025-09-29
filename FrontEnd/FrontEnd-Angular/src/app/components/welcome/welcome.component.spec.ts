@@ -13,6 +13,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+
 // ✅ IMPORTANTE: Importar o módulo real para poder removê-lo
 import { HttpClientModule } from '@angular/common/http'; 
 
@@ -106,8 +107,8 @@ describe('WelcomeComponent', () => {
     fixture.detectChanges();
     tick();
 
-    const serverSubSpy = spyOn(component['serverInfoSubscription'], 'unsubscribe');
-    const themeSubSpy = spyOn(component['themeSubscription'], 'unsubscribe');
+    const serverSubSpy = jest.spyOn(component['serverInfoSubscription'], 'unsubscribe');
+    const themeSubSpy = jest.spyOn(component['themeSubscription'], 'unsubscribe');
     
     httpMock.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
     tick();

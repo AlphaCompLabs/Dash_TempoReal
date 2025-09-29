@@ -20,6 +20,7 @@ import { TrafficDataService } from '../../services/traffic-data';
 import { ThemeService } from '../../services/theme.service';
 import { ClientTrafficSummary, ProtocolDrilldown } from '../../models/traffic.model';
 
+
 // --- SEÇÃO 1: CRIAÇÃO DOS MOCKS E DADOS DE TESTE ---
 
 // --- Dados Mockados ---

@@ -15,6 +15,7 @@ import { MainChartComponent } from './main-chart.component';
 import { TrafficDataService } from '../../services/traffic-data';
 import { ClientTrafficSummary } from '../../models/traffic.model';
 
+
 // --- SEÇÃO 1: CRIAÇÃO DO MOCK DO SERVIÇO E DADOS DE TESTE ---
 
 // O valor do cliente 'top talker' foi aumentado para > 1MB.
@@ -71,9 +72,9 @@ describe('MainChartComponent', () => {
   }));
 
   it('should set main filter, recalculate scale, and toggle correctly', () => {
-    const setupScaleSpy = spyOn(component as any, 'setupChartScale').and.callThrough();
+    const setupScaleSpy = jest.spyOn(component as any, 'setupChartScale');
     fixture.detectChanges(); // Call ngOnInit to initialize data
-    setupScaleSpy.calls.reset(); // Reset spy after initial call in ngOnInit
+    setupScaleSpy.mockClear(); // Reset spy after initial call in ngOnInit
 
     component.setMainFilter('download');
     expect(component.activeMainFilter).toBe('download');

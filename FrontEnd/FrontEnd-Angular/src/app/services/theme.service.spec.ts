@@ -1,13 +1,12 @@
 // =====================================================================================
 // CLIENTE FRONTEND - TESTES UNITÁRIOS AUTOMATIZADOS
 // Serviço: ThemeService (theme.service.spec.ts)
-// Versão: 1.0.0
+// Versão: 2.0.0 (Corrigido para Jest)
 //
 // Autor: Equipe Frontend/QA
-// Descrição: Esta suíte de testes valida o comportamento do ThemeService.
-//            Ela utiliza "spies" para simular o localStorage e o document.body,
-//            garantindo que o serviço carrega o tema inicial corretamente,
-//            alterna entre os modos claro/escuro e persiste o estado.
+// Descrição: Suíte de testes convertida para usar a sintaxe do Jest,
+//            removendo todas as referências ao Jasmine. Utiliza jest.spyOn e jest.fn
+//            para simular dependências externas como localStorage e document.body.
 // =====================================================================================
 
 // --- SEÇÃO 0: IMPORTAÇÕES ---
@@ -17,19 +16,32 @@ import { ThemeService } from './theme.service';
 // --- SEÇÃO 1: DESCRIÇÃO DA SUÍTE DE TESTES ---
 describe('ThemeService', () => {
   let service: ThemeService;
-  let localStorageSpy: jasmine.SpyObj<Storage>;
-  let bodyClassListSpy: jasmine.SpyObj<DOMTokenList>;
+  // Não usamos mais os tipos do Jasmine
+  let setItemSpy: jest.SpyInstance;
+  let bodyClassListSpy: {
+    add: jest.Mock;
+    remove: jest.Mock;
+  };
 
   // --- SEÇÃO 2: CONFIGURAÇÃO DO AMBIENTE DE TESTE (beforeEach) ---
   beforeEach(() => {
-    // 1. CRIAÇÃO DOS SPIES
-    // Criamos um objeto falso que imita o localStorage
-    const getItemSpy = spyOn(localStorage, 'getItem').and.callThrough();
-    const setItemSpy = spyOn(localStorage, 'setItem').and.callThrough();
+    // 1. CRIAÇÃO DOS ESPIÕES (SPIES) COM JEST
     
-    // Criamos um objeto falso que imita o classList do body
-    bodyClassListSpy = jasmine.createSpyObj('DOMTokenList', ['add', 'remove']);
-    // Fazemos com que `document.body.classList` retorne nosso spy
+    // Simula o localStorage em memória para não depender do real
+    let store: { [key: string]: any } = {};
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => store[key]);
+    setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key, value) => {store[key] = value;});
+    jest.spyOn(Storage.prototype, 'clear').mockImplementation(() => {
+      store = {};
+    });
+
+    //  Substitui `jasmine.createSpyObj` por um objeto com `jest.fn()`
+    bodyClassListSpy = {
+      add: jest.fn(),
+      remove: jest.fn(),
+    };
+    
+    // Define a propriedade 'classList' do document.body para retornar nosso espião
     Object.defineProperty(document.body, 'classList', {
       value: bodyClassListSpy,
       writable: true,
@@ -39,8 +51,13 @@ describe('ThemeService', () => {
       providers: [ThemeService]
     });
     
-    // Limpa o localStorage antes de cada teste para garantir isolamento
+    // Limpa o localStorage simulado antes de cada teste
     localStorage.clear();
+  });
+
+  // Adiciona um hook para limpar os mocks após cada teste
+  afterEach(() => {
+    jest.restoreAllMocks(); // Restaura todos os espiões para o estado original
   });
 
   // --- SEÇÃO 3: TESTES UNITÁRIOS ('it' blocks) ---
@@ -51,62 +68,53 @@ describe('ThemeService', () => {
   });
 
   it('should initialize in dark mode by default when no theme is saved', () => {
-    // 1. AÇÃO: Instancia o serviço (o construtor será chamado)
     service = TestBed.inject(ThemeService);
-    let isLight = false;
+    let isLight = true; // Inicia com valor oposto para garantir que a subscrição funcione
     service.isLightMode$.subscribe(value => isLight = value);
 
-    // 2. VERIFICAÇÃO:
     expect(isLight).toBe(false);
-    expect(document.body.classList.remove).toHaveBeenCalledWith('light');
-    expect(localStorage.getItem('theme')).toBe('dark');
+    expect(bodyClassListSpy.remove).toHaveBeenCalledWith('light');
+    // Verifica se a função de salvar foi chamada, em vez de ler o valor
+    expect(setItemSpy).toHaveBeenCalledWith('theme', 'dark');
   });
 
   it('should initialize in light mode when "light" is saved in localStorage', () => {
-    // 1. PREPARAÇÃO: Simula o localStorage com o tema salvo
     localStorage.setItem('theme', 'light');
-
-    // 2. AÇÃO: Instancia o serviço
     service = TestBed.inject(ThemeService);
     let isLight = false;
     service.isLightMode$.subscribe(value => isLight = value);
     
-    // 3. VERIFICAÇÃO:
     expect(isLight).toBe(true);
-    expect(document.body.classList.add).toHaveBeenCalledWith('light');
+    expect(bodyClassListSpy.add).toHaveBeenCalledWith('light');
   });
 
   describe('toggleTheme', () => {
     it('should switch from dark to light mode', () => {
-      // 1. PREPARAÇÃO: Garante que o serviço inicia em modo escuro
       localStorage.setItem('theme', 'dark');
       service = TestBed.inject(ThemeService);
+      
+      service.toggleTheme();
+      
       let isLight = false;
       service.isLightMode$.subscribe(value => isLight = value);
-      
-      // 2. AÇÃO: Chama o método para alternar o tema
-      service.toggleTheme();
 
-      // 3. VERIFICAÇÃO:
       expect(isLight).toBe(true);
-      expect(document.body.classList.add).toHaveBeenCalledWith('light');
-      expect(localStorage.getItem('theme')).toBe('light');
+      expect(bodyClassListSpy.add).toHaveBeenCalledWith('light');
+      expect(setItemSpy).toHaveBeenCalledWith('theme', 'light');
     });
 
     it('should switch from light to dark mode', () => {
-      // 1. PREPARAÇÃO: Garante que o serviço inicia em modo claro
       localStorage.setItem('theme', 'light');
       service = TestBed.inject(ThemeService);
+      
+      service.toggleTheme();
+
       let isLight = true;
       service.isLightMode$.subscribe(value => isLight = value);
 
-      // 2. AÇÃO: Chama o método para alternar o tema
-      service.toggleTheme();
-
-      // 3. VERIFICAÇÃO:
       expect(isLight).toBe(false);
-      expect(document.body.classList.remove).toHaveBeenCalledWith('light');
-      expect(localStorage.getItem('theme')).toBe('dark');
+      expect(bodyClassListSpy.remove).toHaveBeenCalledWith('light');
+      expect(setItemSpy).toHaveBeenCalledWith('theme', 'dark');
     });
   });
 });
