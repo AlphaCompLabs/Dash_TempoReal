@@ -1,16 +1,18 @@
-// =====================================================================================
-// COMPONENTE ANGULAR - SIDEBAR DE ESTATÍSTICAS
-// Versão: 2.1.0 (Estrutura e documentação aprimoradas)
-//
-// Autor: Equipe Frontend
-// Descrição: Este componente renderiza a barra lateral que exibe as estatísticas
-//            de tráfego da rede. Opera em dois modos distintos:
-//            1. MODO GERAL: Mostra os dados agregados de todos os clientes ativos.
-//            2. MODO DE FOCO: Ativado por um "drill down", exibe dados detalhados
-//               de um único cliente selecionado.
-// =====================================================================================
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe Frontend
+ # Data: 2025-09-29
+ # Descrição: Lógica do componente da barra lateral (Sidebar). Responsável por
+ #            exibir as estatísticas de tráfego, operando em modo GERAL
+ #            (todos os clientes) e em modo de FOCO (um cliente específico).
+ # =====================================================================================
+*/
 
-// --- SEÇÃO 0: IMPORTAÇÕES E DEPENDÊNCIAS ---
+// -----------------------------------------------------------------------------------------
+//                                SEÇÃO 1 - IMPORTAÇÕES
+// -----------------------------------------------------------------------------------------
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, combineLatest } from 'rxjs';
@@ -18,7 +20,9 @@ import { TrafficDataService } from '../../services/traffic-data';
 import { ThemeService } from '../../services/theme.service';
 import { ClientTrafficSummary, ProtocolDrilldown } from '../../models/traffic.model';
 
-// --- SEÇÃO 1: METADADOS DO COMPONENTE (@Component) ---
+// -----------------------------------------------------------------------------------------
+//                               SEÇÃO 2 - COMPONENTE
+// -----------------------------------------------------------------------------------------
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -28,9 +32,11 @@ import { ClientTrafficSummary, ProtocolDrilldown } from '../../models/traffic.mo
 })
 export class SidebarComponent implements OnInit, OnDestroy {
 
-  // --- SEÇÃO 2: PROPRIEDADES E ESTADO DO COMPONENTE ---
+  // -----------------------------------------------------------------------------------------
+  //                               SEÇÃO 3 - PROPRIEDADES
+  // -----------------------------------------------------------------------------------------
 
-  // 2.1. Estado Principal (Dados exibidos na UI)
+  // --- Dados Exibidos na UI ---
   public totalDownload: string = '0 Mb';
   public totalUpload: string = '0 Mb';
   public activeClients: number = 0;
@@ -38,51 +44,50 @@ export class SidebarComponent implements OnInit, OnDestroy {
   public topProtocol: string = 'N/A';
   public isDrillDownMode: boolean = false;
 
-  // 2.2. Configurações do Gráfico SVG (Donut Chart)
-  public readonly radius: number = 54; // Raio do círculo do gráfico. `readonly` pois é uma constante.
+  // --- Configurações do Gráfico SVG ---
+  public readonly radius: number = 54;
   public readonly circumference: number = this.radius * 2 * Math.PI;
   public downloadProgress: number = 0;
   public uploadProgress: number = 0;
   public downloadStrokeOffset: number = this.circumference;
   public uploadStrokeOffset: number = this.circumference;
-  public downloadFontSize: number = 30; // Ajustado dinamicamente para caber no gráfico
-  public uploadFontSize: number = 30;   // Ajustado dinamicamente para caber no gráfico
+  public downloadFontSize: number = 30;
+  public uploadFontSize: number = 30;
 
-  // 2.3. Estilos Dinâmicos
+  // --- Estilos Dinâmicos ---
   public sidebarStyleObject: object = {};
 
-  // 2.4. Gerenciamento Interno
+  // --- Gerenciamento Interno ---
   private masterSubscription!: Subscription;
 
-  // --- SEÇÃO 3: CONSTRUTOR E CICLO DE VIDA (LIFECYCLE HOOKS) ---
-
+  // -----------------------------------------------------------------------------------------
+  //                               SEÇÃO 4 - CONSTRUTOR
+  // -----------------------------------------------------------------------------------------
   constructor(
     private trafficService: TrafficDataService,
     private themeService: ThemeService
   ) { }
 
-  /**
-   * Hook executado na inicialização do componente.
-   * Ideal para inicializar lógicas complexas e subscriptions.
-   */
+  // -----------------------------------------------------------------------------------------
+  //                           SEÇÃO 5 - MÉTODOS DE CICLO DE VIDA
+  // -----------------------------------------------------------------------------------------
   ngOnInit(): void {
     this.initializeMainDataSubscription();
   }
 
-  /**
-   * Hook executado na destruição do componente.
-   * Essencial para limpar subscriptions e evitar vazamentos de memória.
-   */
   ngOnDestroy(): void {
     this.masterSubscription?.unsubscribe();
   }
 
-  // --- SEÇÃO 4: ORQUESTRADOR PRINCIPAL DE DADOS ---
+  // -----------------------------------------------------------------------------------------
+  //                             SEÇÃO 6 - MÉTODOS PRIVADOS
+  // -----------------------------------------------------------------------------------------
 
   /**
-   * Centraliza e gerencia todas as fontes de dados reativas (`Observables`).
-   * Utiliza `combineLatest` para garantir que o componente reaja a qualquer
-   * mudança de estado (dados de tráfego, modo de drill down, tema) de forma síncrona.
+   * Inicializa a inscrição principal que reage a todas as fontes de dados relevantes
+   * (tráfego, modo de drilldown, cliente selecionado e tema).
+   * O `combineLatest` garante que o componente seja atualizado de forma síncrona
+   * sempre que qualquer um desses `Observables` emitir um novo valor.
    */
   private initializeMainDataSubscription(): void {
     this.masterSubscription = combineLatest([
@@ -94,44 +99,34 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.isDrillDownMode = isDrillDown;
       this.updateSidebarStyles(isLightMode);
 
-      // Roteia o fluxo de dados para o processador correto com base no modo atual
       if (isDrillDown && selectedClient) {
-        // MODO DE FOCO: Exibe dados de um cliente específico.
         const isClientStillConnected = allClients.some(client => client.ip === selectedClient.ip);
         this.processClientSpecificData(selectedClient, isClientStillConnected);
       } else {
-        // MODO GERAL: Exibe dados agregados de toda a rede.
         this.processGlobalData(allClients);
       }
     });
   }
 
-  // --- SEÇÃO 5: PROCESSADORES DE DADOS (MODO GERAL VS. FOCO) ---
-
   /**
-   * Processa e exibe dados para um único cliente selecionado (Modo de Foco).
+   * Processa e exibe dados para um único cliente selecionado (Modo de Foco/Drilldown).
    * @param client O cliente cujos dados serão exibidos.
    * @param isConnected Flag que indica se o cliente ainda está enviando dados.
    */
   private processClientSpecificData(client: ClientTrafficSummary, isConnected: boolean): void {
     if (!isConnected) {
-        // Se o cliente foi desconectado, reseta os contadores para evitar exibir dados obsoletos.
         this.resetToDefaults();
-        // Mantém o IP no campo "Top Talker" para que o usuário saiba de quem eram os dados.
         this.topTalker = client.ip;
         return;
     }
 
     this.totalDownload = this.formatBytes(client.inbound);
     this.totalUpload = this.formatBytes(client.outbound);
-    this.activeClients = 1; // Em modo de foco, há apenas 1 cliente "ativo" na visão.
+    this.activeClients = 1;
     this.topTalker = client.ip;
 
     this.calculateProportionalProgress(client.inbound, client.outbound);
 
-    // Busca os protocolos específicos deste cliente para exibir o "Top Protocol".
-    // ATENÇÃO: Uma subscrição aninhada pode ser um anti-padrão. Para lógicas mais
-    // complexas, considere refatorar usando operadores RxJS como `switchMap` no orquestrador principal.
     this.trafficService.getProtocolDrilldownData(client.ip).subscribe(protocols => {
       this.calculateTopProtocol(protocols);
     });
@@ -150,7 +145,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     const totalBytesIn = allClients.reduce((sum, c) => sum + c.inbound, 0);
     const totalBytesOut = allClients.reduce((sum, c) => sum + c.outbound, 0);
 
-    // Encontra o cliente com maior tráfego total (inbound + outbound)
     const topTalkerClient = allClients.reduce((top, current) =>
       (current.inbound + current.outbound) > (top.inbound + top.outbound) ? current : top
     );
@@ -159,12 +153,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.totalUpload = this.formatBytes(totalBytesOut);
     this.activeClients = allClients.length;
     this.topTalker = topTalkerClient.ip;
-    this.topProtocol = 'N/A'; // Top Protocol é irrelevante no modo geral.
+    this.topProtocol = 'N/A';
 
     this.calculateProportionalProgress(totalBytesIn, totalBytesOut);
   }
-
-  // --- SEÇÃO 6: MÉTODOS UTILITÁRIOS (CÁLCULO E FORMATAÇÃO) ---
 
   /**
    * Calcula a porcentagem de download e upload em relação ao tráfego total
@@ -183,11 +175,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.uploadProgress = (bytesOut / totalTraffic) * 100;
     }
 
-    // Calcula o "offset" do traço do SVG para representar a porcentagem
     this.downloadStrokeOffset = this.circumference - (this.downloadProgress / 100) * this.circumference;
     this.uploadStrokeOffset = this.circumference - (this.uploadProgress / 100) * this.circumference;
 
-    // Lógica de UI: Reduz o tamanho da fonte se o texto for muito longo para caber no gráfico.
     this.downloadFontSize = this.totalDownload.length >= 8 ? 24 : 30;
     this.uploadFontSize = this.totalUpload.length >= 8 ? 24 : 30;
   }
@@ -201,7 +191,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.topProtocol = 'N/A';
       return;
     }
-    // `reduce` é uma forma eficiente de encontrar o maior valor em um array.
     const top = protocols.reduce((prev, current) => (prev.y > current.y) ? prev : current);
     this.topProtocol = top.name;
   }
@@ -239,15 +228,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  // --- SEÇÃO 7: GERENCIAMENTO DE ESTILOS DINÂMICOS ---
-
   /**
    * Atualiza o objeto de estilo da sidebar com base no tema (claro/escuro).
    * O objeto é vinculado diretamente ao `[ngStyle]` no template.
    * @param isLightMode Booleano que indica se o modo claro está ativo.
    */
   private updateSidebarStyles(isLightMode: boolean): void {
-    // Define um objeto base com estilos comuns para evitar repetição.
     const baseStyles = {
       'width': '250px',
       'height': 'calc(100vh - 90px)',
@@ -258,13 +244,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     if (isLightMode) {
       this.sidebarStyleObject = {
-        ...baseStyles, // Espalha os estilos base
+        ...baseStyles,
         'background-color': '#d4d4d4',
         'background-image': `linear-gradient(rgba(212, 212, 212, 0.5), rgba(212, 212, 212, 0.5)), url('assets/images/sidebar_image_white.svg')`
       };
     } else {
       this.sidebarStyleObject = {
-        ...baseStyles, // Espalha os estilos base
+        ...baseStyles,
         'background-color': "#191919",
         'background-image': `linear-gradient(rgba(25, 25, 25, 0.85), rgba(25, 25, 25, 0.85)), url('assets/images/sidebar_image.png')`
       };

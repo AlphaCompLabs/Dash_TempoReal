@@ -1,23 +1,34 @@
-/**
- * =====================================================================================
- * COMPONENTE DE BOAS-VINDAS (WELCOME)
- * Versão: 2.2.2 (Com gerenciamento de tema para cores dinâmicas)
- * =====================================================================================
- */
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe Frontend
+ # Data: 2025-09-29
+ # Descrição: Lógica do componente de boas-vindas (Welcome). Gerencia a
+ #            exibição e o recolhimento do painel lateral informativo, busca o
+ #            endereço do servidor e reage às mudanças de tema da aplicação.
+ # =====================================================================================
+*/
 
-// --- SEÇÃO 0: IMPORTAÇÕES ---
+// -----------------------------------------------------------------------------------------
+//                                SEÇÃO 1 - IMPORTAÇÕES
+// -----------------------------------------------------------------------------------------
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { ThemeService } from '../../services/theme.service'; // Adicionado ThemeService
+import { ThemeService } from '../../services/theme.service';
 
-// --- SEÇÃO 1: INTERFACES E TIPOS DE DADOS ---
+// -----------------------------------------------------------------------------------------
+//                               SEÇÃO 2 - INTERFACES
+// -----------------------------------------------------------------------------------------
 interface ServerInfoResponse {
   server_ip: string;
 }
 
-// --- SEÇÃO 2: METADADOS DO COMPONENTE ---
+// -----------------------------------------------------------------------------------------
+//                               SEÇÃO 3 - COMPONENTE
+// -----------------------------------------------------------------------------------------
 @Component({
   selector: 'app-welcome',
   standalone: true,
@@ -30,38 +41,69 @@ interface ServerInfoResponse {
 })
 export class WelcomeComponent implements OnInit, OnDestroy {
 
-  // --- SEÇÃO 3: PROPRIEDADES DE ESTADO E CONSTANTES ---
+  // -----------------------------------------------------------------------------------------
+  //                               SEÇÃO 4 - PROPRIEDADES
+  // -----------------------------------------------------------------------------------------
   public isPanelOpen: boolean = true;
   public serverAddress: string = 'Carregando...';
+  public isLightMode: boolean = false;
+
   private readonly API_URL = 'http://localhost:8000/api/server-info';
   private serverInfoSubscription!: Subscription;
+  private themeSubscription!: Subscription;
 
-  // --- Propriedades de Gerenciamento de Tema ---
-  public isLightMode: boolean = false; // Estado atual do tema
-  private themeSubscription!: Subscription; // Inscrição para o ThemeService
-
-  // --- SEÇÃO 4: CICLO DE VIDA (LIFECYCLE HOOKS) ---
-
+  // -----------------------------------------------------------------------------------------
+  //                               SEÇÃO 5 - CONSTRUTOR
+  // -----------------------------------------------------------------------------------------
   constructor(
     private http: HttpClient,
-    private themeService: ThemeService // Injeção do ThemeService
+    private themeService: ThemeService
   ) { }
 
+  // -----------------------------------------------------------------------------------------
+  //                           SEÇÃO 6 - MÉTODOS DE CICLO DE VIDA
+  // -----------------------------------------------------------------------------------------
+
+  /**
+   * Executado na inicialização do componente.
+   * Inicia a busca pelo endereço do servidor e se inscreve nas alterações de tema.
+   */
   ngOnInit(): void {
     this.fetchServerAddress();
-    // Inscreve-se nas mudanças de tema para atualizar isLightMode
     this.themeSubscription = this.themeService.isLightMode$.subscribe(isLight => {
       this.isLightMode = isLight;
     });
   }
 
+  /**
+   * Executado na destruição do componente.
+   * Cancela as inscrições em Observables para evitar vazamentos de memória.
+   */
   ngOnDestroy(): void {
     this.serverInfoSubscription?.unsubscribe();
-    this.themeSubscription?.unsubscribe(); // Cancela a inscrição do tema
+    this.themeSubscription?.unsubscribe();
   }
 
-  // --- SEÇÃO 5: LÓGICA PRIVADA DE DADOS ---
+  // -----------------------------------------------------------------------------------------
+  //                              SEÇÃO 7 - MÉTODOS PÚBLICOS
+  // -----------------------------------------------------------------------------------------
 
+  /**
+   * Alterna a visibilidade do painel lateral, invertendo o estado da propriedade `isPanelOpen`.
+   * Este método é chamado pelo evento de clique no botão do template.
+   */
+  public togglePanel(): void {
+    this.isPanelOpen = !this.isPanelOpen;
+  }
+
+  // -----------------------------------------------------------------------------------------
+  //                             SEÇÃO 8 - MÉTODOS PRIVADOS
+  // -----------------------------------------------------------------------------------------
+
+  /**
+   * Realiza uma requisição HTTP GET para a API backend para obter o endereço IP do servidor.
+   * Atualiza a propriedade `serverAddress` com o resultado ou com uma mensagem de erro.
+   */
   private fetchServerAddress(): void {
     this.serverInfoSubscription = this.http.get<ServerInfoResponse>(this.API_URL).subscribe({
       next: (response) => {
@@ -73,11 +115,5 @@ export class WelcomeComponent implements OnInit, OnDestroy {
         this.serverAddress = "Falha na conexão com a API";
       }
     });
-  }
-
-  // --- SEÇÃO 6: MÉTODOS PÚBLICOS (EVENT HANDLERS) ---
-
-  public togglePanel(): void {
-    this.isPanelOpen = !this.isPanelOpen;
   }
 }
