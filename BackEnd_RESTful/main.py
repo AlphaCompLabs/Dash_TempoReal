@@ -20,6 +20,7 @@ from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from fastapi.middleware.cors import CORSMiddleware
+from functools import lru_cache
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -205,6 +206,7 @@ def get_global_protocol_summary():
 def get_lan_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
+        # Este IP não precisa ser alcançável
         s.connect(('10.255.255.255', 1))
         IP = s.getsockname()[0]
     except Exception:
@@ -213,7 +215,16 @@ def get_lan_ip():
         s.close()
     return IP
 
+# O decorador @lru_cache memoriza o resultado da função.
+# maxsize=1 significa que ele armazenará apenas o resultado mais recente.
+@lru_cache(maxsize=1)
+def get_cached_lan_ip():
+    """Função "cacheada" que chama a lógica original apenas uma vez."""
+    print("Calculando o IP da LAN (executado apenas uma vez)...")
+    return get_lan_ip()
+
 @app.get("/api/server-info")
 def get_server_info():
-    lan_ip = get_lan_ip()
+    # Agora chamamos a versão com cache
+    lan_ip = get_cached_lan_ip()
     return {"server_ip": lan_ip}

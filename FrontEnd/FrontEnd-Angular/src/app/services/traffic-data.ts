@@ -1,7 +1,7 @@
 /**
  * =====================================================================================
  * SERVIÇO DE DADOS DE TRÁFEGO (TRAFFIC DATA SERVICE)
- * Versão: 2.3.0 (Padronização do Código)
+ * Versão: 2.3.1 (Otimizado com Cache)
  *
  * Autor: Equipe Frontend
  * Descrição: Este serviço é a única fonte de verdade para os dados de tráfego
@@ -14,7 +14,8 @@
 // --- SEÇÃO 1: IMPORTAÇÕES ---
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, Subscription, timer, of } from 'rxjs';
+// Importação do 'shareReplay'
+import { BehaviorSubject, Observable, Subscription, timer, of, shareReplay } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model';
 
@@ -22,6 +23,10 @@ import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model
 export interface GlobalProtocolSummary {
   name: string;
   y: number;
+}
+
+interface ServerInfoResponse {
+  server_ip: string;
 }
 
 // --- SEÇÃO 3: METADADOS DO SERVIÇO ---
@@ -36,43 +41,37 @@ export class TrafficDataService implements OnDestroy {
 
   // --- SEÇÃO 5: GERENCIAMENTO DE ESTADO REATIVO ---
 
-  // Subjects Privados: Armazenam o estado interno do serviço.
+  // Subjects Privados
   private readonly trafficDataSubject = new BehaviorSubject<ClientTrafficSummary[]>([]);
   private readonly isLoadingSubject = new BehaviorSubject<boolean>(true);
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
   private readonly isDrillDownActiveSubject = new BehaviorSubject<boolean>(false);
   private readonly selectedClientDataSubject = new BehaviorSubject<ClientTrafficSummary | null>(null);
 
-  // Observables Públicos: Exponhem o estado de forma segura (somente leitura).
+  // Observables Públicos
   public readonly trafficData$: Observable<ClientTrafficSummary[]> = this.trafficDataSubject.asObservable();
   public readonly isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
   public readonly error$: Observable<string | null> = this.errorSubject.asObservable();
   public readonly isDrillDownActive$: Observable<boolean> = this.isDrillDownActiveSubject.asObservable();
   public readonly selectedClientData$: Observable<ClientTrafficSummary | null> = this.selectedClientDataSubject.asObservable();
 
-  // Propriedades internas para gerenciamento.
+  // Propriedades internas
   private pollingSubscription!: Subscription;
+  // Propriedade para guardar o resultado da busca do IP do servidor em cache.
+  private serverInfoCache$: Observable<ServerInfoResponse> | null = null;
+
 
   // --- SEÇÃO 6: CONSTRUTOR E CICLO DE VIDA ---
   constructor(private http: HttpClient) {
     this.startDataPolling();
   }
 
-  /**
-   * Executado na destruição do serviço.
-   * Garante que a inscrição do polling seja cancelada para evitar vazamentos de memória.
-   */
   ngOnDestroy(): void {
     this.pollingSubscription?.unsubscribe();
   }
 
   // --- SEÇÃO 7: MÉTODOS PÚBLICOS (API DO SERVIÇO) ---
 
-  /**
-   * Busca os dados detalhados por protocolo para um cliente específico.
-   * @param ip O endereço IP do cliente a ser detalhado.
-   * @returns Um Observable com os dados de drilldown ou um array vazio em caso de erro.
-   */
   public getProtocolDrilldownData(ip: string): Observable<ProtocolDrilldown[]> {
     const drilldownUrl = `${this.API_BASE_URL}/api/traffic/${ip}/protocols`;
     return this.http.get<ProtocolDrilldown[]>(drilldownUrl).pipe(
@@ -85,18 +84,10 @@ export class TrafficDataService implements OnDestroy {
     );
   }
 
-  /**
-   * Define o cliente atualmente selecionado no estado do serviço.
-   * @param client O objeto do cliente selecionado ou `null` para limpar a seleção.
-   */
   public setSelectedClient(client: ClientTrafficSummary | null): void {
     this.selectedClientDataSubject.next(client);
   }
 
-  /**
-   * Define o estado do modo de detalhe (drilldown).
-   * @param isActive Booleano indicando se o modo de detalhe está ativo.
-   */
   public setDrillDownState(isActive: boolean): void {
     this.isDrillDownActiveSubject.next(isActive);
   }
@@ -105,7 +96,7 @@ export class TrafficDataService implements OnDestroy {
    * Busca um resumo global do tráfego por protocolo em toda a rede.
    * @returns Um Observable com o resumo dos protocolos ou um array vazio em caso de erro.
    */
-  public getGlobalProtocolSummary(): Observable<GlobalProtocolSummary[]> {
+ public getGlobalProtocolSummary(): Observable<GlobalProtocolSummary[]> {
     const summaryUrl = `${this.API_BASE_URL}/api/traffic/protocols/summary`;
     return this.http.get<GlobalProtocolSummary[]>(summaryUrl).pipe(
       catchError(error => {
@@ -116,12 +107,23 @@ export class TrafficDataService implements OnDestroy {
     );
   }
 
+  /**
+   * Busca o IP do servidor com uma estratégia de cache.
+   * A chamada HTTP é feita apenas uma vez e o resultado é reutilizado.
+   * @returns Um Observable com a informação do servidor.
+   */
+  public getServerInfo(): Observable<ServerInfoResponse> {
+    if (!this.serverInfoCache$) {
+      const serverInfoUrl = `${this.API_BASE_URL}/api/server-info`;
+      this.serverInfoCache$ = this.http.get<ServerInfoResponse>(serverInfoUrl).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.serverInfoCache$;
+  }
+
   // --- SEÇÃO 8: LÓGICA PRIVADA (POLLING) ---
 
-  /**
-   * Inicia o ciclo de polling que busca dados da API em intervalos regulares.
-   * Utiliza `timer` e `switchMap` para uma estratégia de polling robusta.
-   */
   private startDataPolling(): void {
     const trafficUrl = `${this.API_BASE_URL}/api/traffic`;
     this.pollingSubscription = timer(0, this.POLLING_INTERVAL_MS).pipe(
@@ -145,4 +147,3 @@ export class TrafficDataService implements OnDestroy {
     });
   }
 }
-
