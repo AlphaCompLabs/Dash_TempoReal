@@ -54,7 +54,7 @@ Após a instalação e inicialização do projeto, em seu navegador entre em: `h
 </pre>
 
 
-## ✨ Funcionalidades
+## 🔷 Funcionalidades
 - ***Gráfico principal***: exibe o tráfego por cliente (IP) separado entre Download e Upload;
 - ***Função Drill-down***: detalhamento dos protocolos por cliente selecionado;
 - ***Top Talker***: destaca o cliente com maior volume de tráfego;
