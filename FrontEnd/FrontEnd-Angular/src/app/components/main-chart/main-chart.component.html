@@ -46,7 +46,7 @@
 
   <!-- Corpo do Gráfico Principal -->
   <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
-    <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5">
+    <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
       <span [ngClass]="{
                 'ping-green': pingState === 'green',
                 'ping-red': pingState === 'red',
@@ -169,8 +169,12 @@
         </h3>
       </div>
       <div class="drilldowndetail-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
-        <span class="ping-element absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" [ngClass]="{'animate-one-shot-ping': playPingAnimation}"></span>
-        <span class="relative inline-flex rounded-full h-5 w-5 bg-red-600"></span>
+        <span [ngClass]="{
+              'ping-green': playPingAnimation && isSelectedClientConnected,
+              'bg-green-500': isSelectedClientConnected,
+              'bg-red-600': !isSelectedClientConnected
+            }"
+            class="relative inline-flex rounded-full h-5 w-5"></span>
       </div>
 
       <!-- Conteúdo do Gráfico Detalhado -->

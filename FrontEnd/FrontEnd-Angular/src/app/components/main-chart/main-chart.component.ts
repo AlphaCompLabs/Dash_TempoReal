@@ -292,6 +292,10 @@ export class MainChartComponent implements OnInit, OnDestroy {
     this.isSelectedClientConnected = this.networkClients.some(
       client => client.ip === this.selectedClientForDetail!.ip
     );
+    if (this.isSelectedClientConnected) {
+      this.playPingAnimation = true;
+      setTimeout(() => { this.playPingAnimation = false; }, 1000); // Reseta após a animação
+    }
     if (!this.isSelectedClientConnected) {
       this.setupDetailChartScale();
     }
