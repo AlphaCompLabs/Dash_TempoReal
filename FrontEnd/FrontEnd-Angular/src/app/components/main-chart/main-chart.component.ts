@@ -58,6 +58,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
   public tooltipText: string = '';
   public tooltipTop: number = 0;
   public tooltipLeft: number = 0;
+  private tooltipContext: ClientTrafficSummary | ProtocolDrilldown | null = null; 
 
   // --- Estado dos Filtros ---
   public activeMainFilter: 'all' | 'download' | 'upload' = 'all';
@@ -154,6 +155,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
    */
   public showTooltip(event: MouseEvent, data: ClientTrafficSummary | ProtocolDrilldown): void {
     this.isTooltipVisible = true;
+    this.tooltipContext = data;
     const isDrilldown = 'y' in data;
     if (isDrilldown) {
       this.tooltipText = `Protocolo: ${data.name}\nTráfego Total: ${this.formatBytes(data.y)}`;
@@ -170,6 +172,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
    */
   public hideTooltip(): void {
     this.isTooltipVisible = false;
+    this.tooltipContext = null;
   }
 
   /**
@@ -263,11 +266,29 @@ export class MainChartComponent implements OnInit, OnDestroy {
    */
   private subscribeToTrafficData(): void {
     this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
+      
       const sortedClients = [...data].sort((a, b) =>
         (b.inbound + b.outbound) - (a.inbound + a.outbound)
       );
+
       const topClients = sortedClients.slice(0, this.MAX_CLIENTS_TO_DISPLAY);
       this.networkClients = topClients;
+      
+      if (this.isTooltipVisible && this.tooltipContext && 'ip' in this.tooltipContext) {
+        
+        // Atribuímos a uma nova constante para garantir o tipo.
+        const tooltipClientContext = this.tooltipContext;
+
+        const clientStillExists = this.networkClients.some(
+          // Usamos a nova constante aqui. Agora não há erro.
+          client => client.ip === tooltipClientContext.ip 
+        );
+        
+        if (!clientStillExists) {
+          this.hideTooltip();
+        }
+      }
+
       this.setupChartScale();
       this.validateSelectedClientConnection();
       if (data && data.length > 0) {
@@ -297,6 +318,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
       setTimeout(() => { this.playPingAnimation = false; }, 1000); // Reseta após a animação
     }
     if (!this.isSelectedClientConnected) {
+      this.hideTooltip();
       this.setupDetailChartScale();
     }
   }
