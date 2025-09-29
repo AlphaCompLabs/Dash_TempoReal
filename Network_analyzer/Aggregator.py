@@ -1,179 +1,179 @@
 # =====================================================================================
-# MÓDULO AGREGADOR DE TRÁFEGO DE REDE
-# Versão: 2.1.0 (Refatorado para snapshot não destrutivo)
+# LÓGICA DE AGREGAÇÃO DE DADOS - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
 #
-# Autor: Equipe de Análise de Rede
-# Descrição: Este módulo fornece a classe `Aggregator`, projetada para coletar e
-#            agregar dados de tráfego de rede em janelas de tempo discretas.
-#            É thread-safe e otimizada para alta performance na ingestão de dados.
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a classe Aggregator, responsável por coletar,
+#            processar e sumarizar dados de tráfego de rede em janelas de tempo,
+#            sendo thread-safe para uso em ambientes concorrentes.
 # =====================================================================================
 
-# --- SEÇÃO 0: IMPORTAÇÕES ---
-import threading
-from collections import defaultdict
-from typing import Dict, Any, Optional, Callable
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
 
-# Supondo que 'util.py' exista no mesmo diretório ou em um caminho acessível.
-from util import now_ts
+# Importações de bibliotecas padrão do Python
+import threading  # Para controle de concorrência (Lock) e garantir que o código seja thread-safe.
+from collections import defaultdict  # Dicionário especial que cria itens padrão para chaves que não existem.
+from typing import Dict, Any, Optional, Callable  # Para anotações de tipo, melhorando a legibilidade.
+from util import now_ts  # Uma função utilitária (não mostrada) que provavelmente retorna o timestamp atual.
 
-# --- SEÇÃO 1: CONSTANTES DE MÓDULO ---
-__VERSION__ = "2.1.0"
+# Define a versão do código. Útil para rastreamento em logs ou payloads.
+__VERSION__ = "2.0.0"
 
-# --- SEÇÃO 2: DEFINIÇÃO DA CLASSE PRINCIPAL ---
 class Aggregator:
     """
-    Agrega dados de tráfego de rede em janelas de tempo.
-
-    Esta classe é thread-safe, permitindo que múltiplos fluxos de dados
+    Uma classe para agregar dados de tráfego de rede em janelas de tempo.
+    É projetada para ser thread-safe, permitindo que múltiplos fluxos de dados
     sejam adicionados simultaneamente sem corromper os dados.
     """
 
     def __init__(self, window_s: int = 5, max_clients: int = 0, anon: Optional[Callable[[str], str]] = None):
         """
-        Inicializa o agregador de dados.
+        Inicializa o agregador.
 
-        :param window_s: O tamanho da janela de tempo em segundos para a agregação.
-        :param max_clients: O número máximo de clientes a serem retornados (top-K por tráfego).
-                            Se 0, todos os clientes são retornados.
+        :param window_s: O tamanho da janela de tempo em segundos para agregar os dados.
+        :param max_clients: O número máximo de clientes a serem retornados no snapshot (top-K por tráfego). 0 para ilimitado.
         :param anon: Uma função opcional para anonimizar o endereço IP do cliente.
         """
-        self.window_s = window_s
-        self.max_clients = max_clients
-        self.anon = anon
-        self.lock = threading.Lock()
-
-        # Calcula o início da janela de tempo atual para garantir alinhamento.
         now = now_ts()
-        start = now - (now % self.window_s)
+        # Calcula o início da janela de tempo atual, arredondando o timestamp para o múltiplo anterior de window_s.
+        start = now - (now % window_s)
+
+        self.window_s = window_s  # Armazena o tamanho da janela.
+        self.lock = threading.Lock()  # Cria um Lock para garantir a segurança em ambientes com múltiplas threads (thread-safety).
+        self.max_clients = max_clients  # Armazena o limite de clientes.
+        self.anon = anon  # Armazena a função de anonimização.
+        
+        # Inicializa a estrutura de dados da janela atual chamando o método auxiliar _new_window.
         self._current = self._new_window(start)
 
-    # --- MÉTODOS PÚBLICOS (API DA CLASSE) ---
-
-    def add(self, ts: float, client_ip: str, direction: str, nbytes: int, proto: str):
-        """
-        Adiciona os dados de um único evento/pacote de rede ao agregador.
-
-        Este é o principal método de ingestão de dados e é otimizado para ser chamado
-        frequentemente e por múltiplas threads.
-        """
-        # O `with self.lock:` garante a execução atômica deste bloco,
-        # prevenindo "race conditions" e garantindo a integridade dos dados.
-        with self.lock:
-            # Verifica se o timestamp atual exige a criação de uma nova janela de tempo.
-            self._maybe_roll(ts)
-
-            ip_key = self.anon(client_ip) if self.anon else client_ip
-            direction_key = "in" if direction == "in" else "out"
-            num_bytes = int(nbytes)
-
-            # Graças ao defaultdict, o cliente e o protocolo são criados se não existirem.
-            client_data = self._current["clients"][ip_key]
-            client_data[direction_key] += num_bytes
-            client_data["proto"][proto][direction_key] += num_bytes
-
-            # Incrementa os contadores globais da janela.
-            self._current["pkt_count"] += 1
-            self._current["byte_count"] += num_bytes
-
-    def snapshot(self, meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        [NÃO DESTRUTIVO] Gera um "snapshot" dos dados agregados na janela atual.
-
-        Este método é apenas para leitura e não avança ou reinicia a janela de tempo.
-
-        :param meta: Metadados adicionais (host, iface, etc.) a serem incluídos.
-        :return: Um dicionário com o resumo completo dos dados da janela atual.
-        """
-        with self.lock:
-            # Chama o método de formatação interna para construir o payload.
-            return self._format_payload(meta or {})
-
-    def get_snapshot_and_roll_window(self, meta: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        [DESTRUTIVO] Gera um snapshot da janela atual e imediatamente avança para a próxima.
-
-        Este método deve ser usado pelo processo que consome os dados periodicamente,
-        garantindo que nenhum dado seja contado duas vezes.
-
-        :param meta: Metadados adicionais (host, iface, etc.) a serem incluídos.
-        :return: Um dicionário com o resumo completo dos dados da janela que acabou de fechar.
-        """
-        with self.lock:
-            payload = self._format_payload(meta or {})
-            # Avança para a próxima janela após gerar o payload.
-            start_next = self._current["end"]
-            self._current = self._new_window(start_next)
-            return payload
-
-    # --- MÉTODOS PRIVADOS (LÓGICA INTERNA) ---
-
-    def _maybe_roll(self, ts: float):
-        """
-        Verifica se o timestamp `ts` pertence a uma janela futura. Se sim,
-        "rola" a janela atual para a próxima.
-        """
-        while ts >= self._current["end"]:
-            start_next = self._current["end"]
-            self._current = self._new_window(start_next)
-
-    def _format_payload(self, meta: Dict[str, Any]) -> Dict[str, Any]:
-        """Formata os dados da janela atual em um payload de saída padronizado."""
-        clients_dict = self._current["clients"]
-        keep = None
-
-        # Lógica para limitar o número de clientes (Top-K)
-        if self.max_clients and len(clients_dict) > self.max_clients:
-            # Ordena os clientes pelo tráfego total (in + out) em ordem decrescente.
-            top_clients = sorted(
-                clients_dict.items(),
-                key=lambda item: item[1]["in"] + item[1]["out"],
-                reverse=True
-            )
-            # Cria um conjunto com os IPs dos top-K clientes para verificação rápida.
-            keep = {ip for ip, _ in top_clients[:self.max_clients]}
-
-        # Formatação dos dados de saída
-        clients_out = {}
-        total_in, total_out = 0, 0
-        for ip, v in clients_dict.items():
-            if keep is not None and ip not in keep:
-                continue
-
-            in_b, out_b = int(v["in"]), int(v["out"])
-            total_in += in_b
-            total_out += out_b
-
-            clients_out[ip] = {
-                "in_bytes": in_b,
-                "out_bytes": out_b,
-                "protocols": {p: {"in": int(pv["in"]), "out": int(pv["out"])} for p, pv in v["proto"].items()}
-            }
-
-        # Montagem do payload final
-        return {
-            "version": __VERSION__,
-            "window_start": self._current["start"],
-            "window_end": self._current["end"],
-            "emitted_at": now_ts(),
-            "host": meta.get("host"),
-            "iface": meta.get("iface"),
-            "server_ip": meta.get("server_ip"),
-            "n_clients": len(clients_out),
-            "total_in": total_in,
-            "total_out": total_out,
-            "pkt_count": self._current["pkt_count"],
-            "byte_count": self._current["byte_count"],
-            "clients": clients_out
-        }
-
     def _new_window(self, start: float) -> Dict[str, Any]:
-        """Cria e retorna a estrutura de dados para uma nova janela de agregação."""
+        """
+        Cria e retorna a estrutura de dados para uma nova janela de agregação vazia.
+
+        :param start: O timestamp de início da nova janela.
+        :return: Um dicionário representando a nova janela.
+        """
         return {
             "start": start,
             "end": start + self.window_s,
+            # Usa defaultdict para que, ao tentar acessar um cliente ou protocolo que ainda não existe,
+            # ele seja criado automaticamente com a estrutura padrão, evitando erros e simplificando o código.
             "clients": defaultdict(lambda: {
                 "in": 0, "out": 0, "proto": defaultdict(lambda: {"in": 0, "out": 0})
             }),
             "pkt_count": 0,
             "byte_count": 0
         }
+
+    def _maybe_roll(self, ts: float):
+        """
+        Verifica se o timestamp `ts` pertence a uma janela futura. Se sim,
+        "rola" a janela atual para a próxima, descartando os dados antigos e criando uma nova.
+        Usa um `while` para o caso de haver um longo período sem dados, pulando janelas vazias.
+        """
+        while ts >= self._current["end"]:
+            # O início da próxima janela é o fim da janela atual.
+            start_next = self._current["end"]
+            # Substitui a janela atual por uma nova e vazia.
+            self._current = self._new_window(start_next)
+
+    def add(self, ts: float, client_ip: str, direction: str, nbytes: int, proto: str):
+        """
+        Adiciona os dados de um único evento/pacote de rede ao agregador.
+        Esta é a principal função de ingestão de dados.
+        """
+        # O `with self.lock:` garante que apenas uma thread possa executar este bloco por vez.
+        # Isso previne "race conditions", onde duas threads tentam modificar os contadores ao mesmo tempo.
+        with self.lock:
+            # Primeiro, verifica se precisamos avançar para uma nova janela de tempo.
+            self._maybe_roll(ts)
+
+            # Aplica a função de anonimização no IP, se ela foi fornecida.
+            ip_key = self.anon(client_ip) if self.anon else client_ip
+
+            # Normaliza a direção para garantir que seja "in" ou "out".
+            d = "in" if direction == "in" else "out"
+            n = int(nbytes)
+
+            # Acessa os dados do cliente. Graças ao defaultdict, se o IP não existir, ele será criado.
+            c = self._current["clients"][ip_key]
+            
+            # Incrementa os contadores de bytes para a direção específica.
+            c[d] += n
+            # Incrementa os contadores de bytes para o protocolo e direção específicos.
+            c["proto"][proto][d] += n
+            
+            # Incrementa os contadores globais da janela.
+            self._current["pkt_count"] += 1
+            self._current["byte_count"] += n
+
+    def snapshot(self, meta: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Gera um "snapshot" (um retrato) dos dados agregados na janela atual,
+        formatado em um payload pronto para ser enviado ou salvo.
+
+        :param meta: Metadados adicionais (host, interface, etc.) a serem incluídos no payload.
+        :return: Um dicionário com o resumo completo dos dados da janela.
+        """
+        # Usa o lock para garantir uma leitura consistente dos dados, impedindo que a janela
+        # seja modificada (por exemplo, por um `add`) enquanto o snapshot é criado.
+        with self.lock:
+            # --- Lógica para limitar o número de clientes (Top-K) ---
+            clients_dict = self._current["clients"]
+            if self.max_clients and len(clients_dict) > self.max_clients:
+                items = []
+                # Calcula o tráfego total (in + out) para cada cliente.
+                for ip, v in clients_dict.items():
+                    total = int(v["in"]) + int(v["out"])
+                    items.append((ip, total))
+                
+                # Ordena os clientes pelo tráfego total em ordem decrescente.
+                items.sort(key=lambda x: x[1], reverse=True)
+                
+                # Cria um conjunto com os IPs dos top-K clientes para uma verificação rápida.
+                keep = set(ip for ip, _ in items[:self.max_clients])
+            else:
+                # Se não houver limite, `keep` é None, e todos os clientes serão incluídos.
+                keep = None
+
+            # --- Formatação dos dados de saída ---
+            clients_out = {}
+            total_in = 0
+            total_out = 0
+            for ip, v in clients_dict.items():
+                # Se a limitação de clientes está ativa, ignora os IPs que não estão na lista `keep`.
+                if keep is not None and ip not in keep:
+                    continue
+
+                in_b = int(v["in"]); out_b = int(v["out"])
+                total_in += in_b; total_out += out_b
+
+                # Monta a estrutura de saída para cada cliente.
+                clients_out[ip] = {
+                    "in_bytes": in_b,
+                    "out_bytes": out_b,
+                    # Converte o defaultdict interno de protocolos para um dicionário normal.
+                    "protocols": {p: {"in": int(pv["in"]), "out": int(pv["out"])} for p, pv in v["proto"].items()}
+                }
+
+            # --- Montagem do payload final ---
+            payload = {
+                "version": __VERSION__,
+                "window_start": self._current["start"],
+                "window_end": self._current["end"],
+                "emitted_at": now_ts(),
+                "host": meta.get("host"),
+                "iface": meta.get("iface"),
+                "server_ip": meta.get("server_ip"),
+                "n_clients": len(clients_out),
+                "total_in": total_in,
+                "total_out": total_out,
+                "pkt_count": self._current["pkt_count"],
+                "byte_count": self._current["byte_count"],
+                "clients": clients_out
+            }
+            
+            start_next=self._current["end"]
+            self._current = self._new_window(start_next)
+            
+            return payload

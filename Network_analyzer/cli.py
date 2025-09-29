@@ -1,82 +1,86 @@
 # =====================================================================================
-# MÓDULO DE INTERFACE DE LINHA DE COMANDO (CLI)
-# Versão: 1.1.0 (Refatorado com grupos de argumentos e constantes)
+# INTERFACE DE LINHA DE COMANDO (CLI) - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
 #
-# Autor: Equipe de Análise de Rede
-# Descrição: Este módulo é responsável por configurar e processar todos os
-#            argumentos da linha de comando para a aplicação, utilizando a
-#            biblioteca `argparse`.
+# Autor: Equipe Redes- Mayron Malaquias e Pedro Borges
+# Descrição: Este script define os argumentos da linha de comando para a aplicação,
+#            permitindo a configuração de captura, agregação e emissão de dados
+#            de forma flexível.
 # =====================================================================================
 
-# --- SEÇÃO 0: IMPORTAÇÕES ---
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importa a biblioteca argparse, que é o padrão do Python para criar
+# interfaces de linha de comando (CLI - Command-Line Interface).
 import argparse
 
-# --- SEÇÃO 1: CONSTANTES DE CONFIGURAÇÃO PADRÃO ---
-DEFAULT_INTERVAL_S = 5.0
-DEFAULT_MAX_CLIENTS = 0
-DEFAULT_POST_TIMEOUT_S = 10.0
-DEFAULT_POST_RETRIES = 2
-DEFAULT_LOG_LEVEL = "INFO"
-
-# --- SEÇÃO 2: FUNÇÃO PRINCIPAL DE PARSING ---
-def parse_args() -> argparse.Namespace:
+# --- SEÇÃO 1: FUNÇÃO DE PARSEAMENTO ---
+def parse_args():
     """
-    Configura e processa os argumentos da linha de comando para a aplicação.
-
-    Utiliza grupos de argumentos (`argument_group`) para uma saída de ajuda (`--help`)
-    mais organizada e legível.
-
-    :return: Um objeto `Namespace` com todos os argumentos fornecidos pelo usuário.
+    Configura e processa os argumentos da linha de comando para o programa.
+    Retorna um objeto com todos os argumentos fornecidos pelo usuário.
     """
-    parser = argparse.ArgumentParser(
-        description="Netvision Producer: captura pacotes, agrega em janelas e envia via JSON.",
-        formatter_class=argparse.RawTextHelpFormatter # Melhora a formatação da ajuda.
+    
+    # Cria o objeto principal "ArgumentParser". A descrição aparecerá na ajuda (-h).
+    ap = argparse.ArgumentParser(
+        description="Producer REAL v2: captura com Scapy, agrega por janela e entrega JSON (stdout/arquivo/POST)."
     )
+    
+    # --- Argumentos de Captura de Rede ---
+    
+    ap.add_argument("--server-ip", required=False,
+                    help="IP do servidor observado (define direção in/out). Recomendado.")
+    
+    ap.add_argument("--iface", help="Interface (ex.: 'Ethernet', 'Wi-Fi', 'eth0').")
+    
+    ap.add_argument("--bpf", help="Filtro BPF (ex.: 'host 192.168.1.11 and (tcp port 8080 or icmp)')")
+    
+    ap.add_argument("--pcap", help="Ler pacotes de um arquivo .pcap em vez de capturar (para testes).")
 
-    # --- Grupo 1: Argumentos de Captura de Rede ---
-    capture_group = parser.add_argument_group("Argumentos de Captura de Rede")
-    capture_group.add_argument("--server-ip", required=False,
-                               help="IP do servidor local para definir a direção do tráfego (in/out).")
-    capture_group.add_argument("--iface", help="Interface de rede para captura (ex: 'eth0', 'Wi-Fi').")
-    capture_group.add_argument("--bpf", help="Filtro BPF para capturar pacotes específicos.")
-    capture_group.add_argument("--pcap", help="Ler pacotes de um arquivo .pcap em vez de capturar ao vivo.")
+    # --- Argumentos de Agregação e Emissão ---
 
-    # --- Grupo 2: Argumentos de Agregação e Emissão ---
-    agg_group = parser.add_argument_group("Argumentos de Agregação e Emissão")
-    agg_group.add_argument("--interval", type=float, default=DEFAULT_INTERVAL_S,
-                           help=f"Tamanho da janela de agregação em segundos (padrão: {DEFAULT_INTERVAL_S}s).")
-    agg_group.add_argument("--max-clients", type=int, default=DEFAULT_MAX_CLIENTS,
-                           help="Manter apenas os N clientes com maior tráfego (0 = ilimitado).")
+    ap.add_argument("--interval", type=float, default=5.0,
+                    help="Tamanho da janela/intervalo de emissão (s).")
+    
+    ap.add_argument("--max-clients", type=int, default=0,
+                    help="Mantém apenas os N clientes com maior tráfego (0 = ilimitado).")
 
-    # --- Grupo 3: Argumentos de Saída (Output) ---
-    output_group = parser.add_argument_group("Argumentos de Saída (Output)")
-    output_group.add_argument("--post", help="URL para onde o JSON será enviado via POST (ex: http://localhost:8000/api/ingest).")
-    output_group.add_argument("--post-timeout", type=float, default=DEFAULT_POST_TIMEOUT_S,
-                              help=f"Timeout para a requisição POST em segundos (padrão: {DEFAULT_POST_TIMEOUT_S}s).")
-    output_group.add_argument("--post-retries", type=int, default=DEFAULT_POST_RETRIES,
-                              help=f"Tentativas extras no POST com backoff exponencial (padrão: {DEFAULT_POST_RETRIES}).")
-    output_group.add_argument("--file", help="Salvar JSON em arquivo (sobrescreve a cada janela por padrão).")
-    output_group.add_argument("--file-append", action="store_true",
-                              help="Se usado, anexa ao arquivo em formato NDJSON (um JSON por linha).")
+    # --- Argumentos de Saída (Output) ---
 
-    # --- Grupo 4: Argumentos de Anonimização ---
-    anon_group = parser.add_argument_group("Argumentos de Anonimização")
-    anon_group.add_argument("--anon", action="store_true",
-                            help="Ativa a anonimização de IPs (hash HMAC-SHA1).")
-    anon_group.add_argument("--anon-key", help="Chave para HMAC (se não informada, usa a variável de ambiente ANON_KEY ou gera uma aleatória).")
+    ap.add_argument("--post", help="URL para POST do JSON (ex.: http://localhost:8000/api/ingest).")
 
-    # --- Grupo 5: Argumentos de Logging e Debug ---
-    log_group = parser.add_argument_group("Argumentos de Logging e Debug")
-    log_group.add_argument("--log-level", default=DEFAULT_LOG_LEVEL,
-                           choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                           help=f"Define o nível de verbosidade do log (padrão: {DEFAULT_LOG_LEVEL}).")
-    log_group.add_argument("--log-file", help="Redireciona a saída do log para um arquivo.")
+    ap.add_argument("--post-timeout", type=float, default=10.0, help="Timeout do POST (s).")
 
-    # --- Grupo 6: Argumentos de Teste e Comportamento ---
-    test_group = parser.add_argument_group("Argumentos de Teste e Comportamento")
-    test_group.add_argument("--mock", action="store_true",
-                            help="Injeta eventos de tráfego fictícios (útil para testes de output).")
-    test_group.add_argument("--no-capture", action="store_true",
-                            help="Desativa a captura de pacotes (útil para rodar apenas com --mock ou --pcap).")
+    ap.add_argument("--post-retries", type=int, default=2, help="Tentativas extras no POST (backoff exponencial).")
 
-    return parser.parse_args()
+    ap.add_argument("--file", help="Salvar JSON em arquivo. Por padrão, sobrescreve a cada janela.")
+    
+    # 'action="store_true"' cria uma flag booleana. Se --file-append for usado, o valor será True.
+    ap.add_argument("--file-append", action="store_true",
+                    help="Se setado, grava NDJSON (1 JSON por linha).")
+
+    # --- Argumentos de Anonimização ---
+
+    ap.add_argument("--anon", action="store_true",
+                    help="Anonimiza IPs (hash HMAC-SHA1). Usa chave de ANON_KEY envvar ou aleatória.")
+    
+    ap.add_argument("--anon-key", help="Chave para HMAC (se não setada, usa ANON_KEY do ambiente ou gera aleatória).")
+
+    # --- Argumentos de Logging e Debug ---
+
+    ap.add_argument("--log-level", default="INFO", choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"],
+                    help="Nível de log.")
+    
+    ap.add_argument("--log-file", help="Arquivo de log (opcional).")
+    
+    # --- Argumentos de Teste e Comportamento ---
+    
+    ap.add_argument("--mock", action="store_true",
+                    help="Injeta eventos fictícios (útil p/ teste).")
+    
+    ap.add_argument("--no-capture", action="store_true",
+                    help="Desliga captura (só mock/PCAP).")
+
+    # Processa os argumentos que foram passados na linha de comando e os retorna
+    # como um objeto simples, onde cada argumento é um atributo (ex: args.iface, args.interval).
+    return ap.parse_args()

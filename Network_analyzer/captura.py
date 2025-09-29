@@ -1,163 +1,164 @@
 # =====================================================================================
-# MÓDULO SNIFFER DE PACOTES DE REDE
-# Versão: 1.1.0 (Refatorado para maior clareza e separação de responsabilidades)
+# CAPTURA DE PACOTES - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
 #
-# Autor: Equipe de Análise de Rede
-# Descrição: Este módulo fornece a classe `Sniffer`, um wrapper em torno do Scapy
-#            para capturar pacotes de rede ao vivo ou de um arquivo PCAP.
-#            A captura é executada em uma thread separada para não bloquear
-#            a aplicação principal e os dados são enviados a um Aggregator.
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a classe Sniffer, que utiliza a biblioteca Scapy
+#            para capturar pacotes de rede e enviar os dados para a classe
+#            Aggregator para processamento.
 # =====================================================================================
 
-# --- SEÇÃO 0: IMPORTAÇÕES ---
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
 
-# Importações da biblioteca padrão
-import logging
-import threading
-from typing import Optional, Any
+# Importações de bibliotecas padrão do Python
+import logging  # Para registrar mensagens de informação, aviso e erro.
+import threading  # Para rodar a captura de pacotes em uma thread separada, sem bloquear o programa principal.
+from typing import Optional
 
-# Importações da aplicação local
-from Aggregator import Aggregator
-from util import friendly_proto
+# Importa as classes do outro arquivo.
+import Aggregator  # A classe que agrega os dados que este Sniffer vai capturar.
+from util import friendly_proto  # Uma função auxiliar para criar um nome de protocolo amigável (ex: "HTTP_80").
 
-# --- SEÇÃO 1: DEFINIÇÃO DA CLASSE PRINCIPAL ---
 class Sniffer:
     """
-    Encapsula a lógica de captura de pacotes de rede usando Scapy.
-
-    Opera em modo "live" (capturando de uma interface) ou "offline" (lendo de
-    um arquivo .pcap) e envia os dados capturados para uma instância de Aggregator.
+    Uma classe que encapsula a lógica de captura de pacotes de rede usando Scapy.
+    Ela pode operar em modo "live" (capturando de uma interface de rede) ou
+    lendo pacotes de um arquivo .pcap.
+    Os dados capturados são enviados para uma instância de Aggregator.
     """
 
-    def __init__(self, aggr: Aggregator, server_ip: Optional[str], iface: Optional[str],
-                 bpf: Optional[str] = None, pcap: Optional[str] = None):
+    def __init__(self, aggr: Aggregator, server_ip: Optional[str], iface: Optional[str], bpf: Optional[str] = None,
+                 pcap: Optional[str] = None):
         """
         Inicializa o Sniffer.
 
         :param aggr: A instância do Aggregator onde os dados serão armazenados.
-        :param server_ip: O IP do servidor local para determinar a direção do tráfego.
-        :param iface: A interface de rede para a captura (ex: "eth0").
-        :param bpf: Um filtro BPF (Berkeley Packet Filter) para a captura.
-        :param pcap: O caminho para um arquivo .pcap para leitura de pacotes.
+        :param server_ip: O IP do servidor local, usado para determinar a direção do tráfego ("in" ou "out").
+        :param iface: A interface de rede a ser usada para a captura (ex: "eth0").
+        :param bpf: Um filtro BPF (Berkeley Packet Filter) para capturar apenas pacotes específicos.
+        :param pcap: O caminho para um arquivo .pcap para ler pacotes em vez de capturar ao vivo.
         """
         self.aggr = aggr
         self.server_ip = server_ip
         self.iface = iface
         self._pcap = pcap
+        
+        # Se um filtro BPF não for fornecido, cria um padrão que captura todo o tráfego de/para o server_ip.
         self._bpf = bpf or (f"host {server_ip}" if server_ip else None)
-
-        self._stop_event = threading.Event()
-        self._thread: Optional[threading.Thread] = None
-        self._scapy: Optional[Any] = self._lazy_import_scapy()
-
-    # --- MÉTODOS PÚBLICOS (CICLO DE VIDA) ---
+        
+        # Cria um "evento" de parada. É um sinalizador seguro para threads que será usado para parar a captura.
+        self._stop = threading.Event()
+        self._thr: Optional[threading.Thread] = None  # Variável para armazenar a thread de captura.
 
     def start(self):
-        """Inicia o processo de captura de pacotes em uma thread de background."""
-        if not self._scapy:
-            logging.warning("Scapy/Npcap indisponível. A captura de pacotes está desativada.")
+        """
+        Inicia o processo de captura de pacotes em uma thread de background.
+        """
+        # A importação do Scapy é feita aqui dentro para que ele seja uma dependência opcional.
+        # Se o Scapy não estiver instalado, o programa pode continuar funcionando sem a captura de pacotes.
+        try:
+            from scapy.all import sniff, IP, TCP, UDP, ICMP, rdpcap  # noqa (ignora avisos do linter)
+        except Exception as e:
+            logging.warning("Scapy/Npcap indisponível: %s. Captura desativada.", e)
             return
 
-        logging.info("Iniciando captura: iface=%r bpf=%r pcap=%r", self.iface, self._bpf, self._pcap)
+        # --- Define a função de callback, que será executada para cada pacote capturado ---
+        def _cb(pkt):
+            try:
 
-        # Escolhe qual método a thread vai executar: ler do pcap ou capturar ao vivo.
-        target_func = self._run_pcap_read if self._pcap else self._run_live_capture
+                # ADICIONE ESTA LINHA PARA DEPURAR
+                print(f"DEBUG: Pacote capturado -> {pkt.summary()}")
 
-        # `daemon=True` garante que a thread não impedirá o programa de finalizar.
-        self._thread = threading.Thread(target=target_func, daemon=True)
-        self._thread.start()
+                # Reimporta para garantir o escopo, embora não seja estritamente necessário.
+                from scapy.all import IP, TCP, UDP, ICMP  # noqa
+                
+                # Extrai informações básicas do pacote.
+                ts = float(pkt.time)  # Timestamp do pacote.
+                nbytes = len(bytes(pkt))  # Tamanho total do pacote em bytes.
+                
+                ip = pkt.getlayer(IP)
+                if not ip:  # Se não for um pacote IP, ignora.
+                    return
+                
+                src, dst = ip.src, ip.dst # IP de origem e destino.
+
+                # Tenta identificar o protocolo da camada de transporte (TCP, UDP, ICMP).
+                layer, sport, dport = "OTHER", None, None # Padrão para protocolos não identificados.
+                if pkt.haslayer(ICMP):
+                    layer = "ICMP"
+                elif pkt.haslayer(TCP):
+                    layer = "TCP"; tcp = pkt.getlayer(TCP); sport, dport = int(tcp.sport), int(tcp.dport)
+                elif pkt.haslayer(UDP):
+                    layer = "UDP"; udp = pkt.getlayer(UDP); sport, dport = int(udp.sport), int(udp.dport)
+                
+                # Usa a função auxiliar para formatar o nome do protocolo (ex: "TCP_443" -> "HTTPS").
+                proto = friendly_proto(layer, sport, dport)
+
+                # --- Determina a direção do tráfego em relação ao servidor ---
+                if self.server_ip:
+                    if src == self.server_ip:
+                        direction, client = "out", dst  # Se a origem é o servidor, é tráfego de SAÍDA.
+                    elif dst == self.server_ip:
+                        direction, client = "in", src   # Se o destino é o servidor, é tráfego de ENTRADA.
+                    else:
+                        return # Pacote não envolve o servidor, ignora.
+                else:
+                    # Se não há um IP de servidor, assume que todo tráfego é de saída.
+                    direction, client = "out", dst
+
+                # Adiciona os dados processados ao agregador.
+                self.aggr.add(ts, client_ip=client, direction=direction, nbytes=nbytes, proto=proto)
+            except Exception as e:
+                # Captura qualquer erro no processamento do pacote para não travar a captura.
+                logging.debug("Callback erro: %s", e)
+
+        # --- Define as funções que serão executadas pela thread ---
+        def _run_live():
+            """Função alvo para a captura ao vivo."""
+            from scapy.all import sniff
+            try:
+                # Monta os argumentos para a função sniff do Scapy.
+                sniff_kwargs = dict(prn=_cb, store=False, stop_filter=lambda p: self._stop.is_set())
+                if self.iface:
+                    sniff_kwargs["iface"] = self.iface
+                if self._bpf:
+                    sniff_kwargs["filter"] = self._bpf
+                
+                # Inicia a captura. Ela continuará até stop_filter retornar True.
+                sniff(**sniff_kwargs)
+            except Exception as e:
+                logging.error("Falha na captura live: %s", e)
+
+        def _run_pcap():
+            """Função alvo para a leitura de um arquivo pcap."""
+            from scapy.all import rdpcap
+            try:
+                pkts = rdpcap(self._pcap) # Lê todos os pacotes do arquivo.
+                for p in pkts:
+                    if self._stop.is_set(): # Verifica se a parada foi solicitada.
+                        break
+                    _cb(p) # Processa cada pacote.
+            except Exception as e:
+                logging.error("Falha ao ler PCAP: %s", e)
+        
+        # Loga a configuração da captura.
+        if self.iface or self._bpf:
+            logging.info("CAPTURE iface=%r bpf=%r pcap=%r", self.iface, self._bpf, self._pcap)
+
+        # Escolhe qual função a thread vai executar: ler do pcap ou capturar ao vivo.
+        target = _run_pcap if self._pcap else _run_live
+        
+        # Cria e inicia a thread. `daemon=True` significa que a thread não impedirá o programa de fechar.
+        self._thr = threading.Thread(target=target, daemon=True)
+        self._thr.start()
 
     def stop(self):
-        """Sinaliza para a thread de captura parar e aguarda sua finalização."""
-        self._stop_event.set()
-        if self._thread and self._thread.is_alive():
-            self._thread.join(timeout=2)
-            logging.info("Captura de pacotes finalizada.")
-
-    # --- MÉTODOS PRIVADOS (LÓGICA INTERNA) ---
-
-    def _lazy_import_scapy(self) -> Optional[Any]:
-        """Tenta importar o Scapy. Permite que o programa funcione mesmo sem ele."""
-        try:
-            from scapy import all as scapy_all
-            return scapy_all
-        except ImportError as e:
-            logging.debug("Falha ao importar Scapy: %s", e)
-            return None
-
-    def _packet_callback(self, pkt: Any):
         """
-        Processa cada pacote capturado pelo Scapy.
-
-        Este método é chamado para cada pacote e é responsável por extrair,
-        processar e enviar os dados para o Aggregator.
+        Sinaliza para a thread de captura parar e aguarda sua finalização.
         """
-        try:
-            if not self._scapy: return
-
-            ts, nbytes = float(pkt.time), len(bytes(pkt))
-            ip_layer = pkt.getlayer(self._scapy.IP)
-
-            if not ip_layer:
-                return
-
-            src, dst = ip_layer.src, ip_layer.dst
-            layer, sport, dport = "OTHER", None, None
-
-            if pkt.haslayer(self._scapy.TCP):
-                layer = "TCP"
-                tcp = pkt.getlayer(self._scapy.TCP)
-                sport, dport = int(tcp.sport), int(tcp.dport)
-            elif pkt.haslayer(self._scapy.UDP):
-                layer = "UDP"
-                udp = pkt.getlayer(self._scapy.UDP)
-                sport, dport = int(udp.sport), int(udp.dport)
-            elif pkt.haslayer(self._scapy.ICMP):
-                layer = "ICMP"
-
-            proto = friendly_proto(layer, sport, dport)
-
-            # Determina a direção do tráfego e o IP do cliente.
-            if self.server_ip:
-                if src == self.server_ip:
-                    direction, client_ip = "out", dst
-                elif dst == self.server_ip:
-                    direction, client_ip = "in", src
-                else:
-                    return  # Pacote não relacionado ao servidor.
-            else:
-                direction, client_ip = "out", dst # Assume saída se não houver IP de servidor.
-
-            self.aggr.add(ts, client_ip=client_ip, direction=direction, nbytes=nbytes, proto=proto)
-
-        except Exception as e:
-            logging.debug("Erro no callback do pacote: %s", e)
-
-    def _run_live_capture(self):
-        """Função alvo da thread para captura de pacotes ao vivo."""
-        if not self._scapy: return
-        try:
-            sniff_kwargs = {
-                "prn": self._packet_callback,
-                "store": False,
-                "stop_filter": lambda p: self._stop_event.is_set()
-            }
-            if self.iface:
-                sniff_kwargs["iface"] = self.iface
-            if self._bpf:
-                sniff_kwargs["filter"] = self._bpf
-
-            self._scapy.sniff(**sniff_kwargs)
-        except Exception as e:
-            logging.error("Falha crítica na thread de captura ao vivo: %s", e)
-
-    def _run_pcap_read(self):
-        """Função alvo da thread para leitura de pacotes de um arquivo .pcap."""
-        if not self._scapy or not self._pcap: return
-        try:
-            for packet in self._scapy.rdpcap(self._pcap):
-                if self._stop_event.is_set():
-                    break
-                self._packet_callback(packet)
-        except Exception as e:
-            logging.error("Falha ao ler o arquivo PCAP '%s': %s", self._pcap, e)
+        # Ativa o evento de parada. A função em execução na thread (sniff ou o loop do pcap) verá isso e irá parar.
+        self._stop.set()
+        
+        # Se a thread existe e está ativa, aguarda até 2 segundos para ela terminar.
+        if self._thr and self._thr.is_alive():
+            self._thr.join(timeout=2)
