@@ -121,11 +121,11 @@ Estes pré-requisitos são específicos para o ambiente **Windows**. Certifique-
 
 | Requisito | Versão Mínima | Observação | Link para Download |
 | :--- | :--- | :--- | :--- |
-| **Python** | 3.6 ou superior | Recomendado que o `pip` seja instalado e adicionado ao PATH. | 🔗 [Download Python](https://www.python.org/downloads/windows/) |
-| **Node.js** e **npm** | Mais recente | Necessário para o Front-end. | 🔗 [Download Node.js](https://nodejs.org/en/download) |
+| **Python** | 3.6 ou superior | Recomendado que o `pip` seja instalado e adicionado ao PATH. | 🔗 [Download Python(LTS)](https://www.python.org/downloads/) |
+| **Node.js** e **npm** | Mais recente | Necessário para o Front-end. | 🔗 [Download Node.js(LTS)](https://nodejs.org/en/download) |
 | **Angular CLI** | v20.2.2 | Instale globalmente com `npm install -g @angular/cli@20.2.2`. | (Instalado via npm) |
-| **Npcap** | - | Essencial para a captura de tráfego de rede (Network Analyzer). | 🔗 [Download Npcap](https://npcap.com/#download) |
-| **Espaço em Disco** | 1 GB livre | Para garantir a instalação de todas as dependências. | - |
+| **Npcap** | Mais recente | Essencial para a captura de tráfego de rede (Network Analyzer). | 🔗 [Download Npcap](https://npcap.com/#download) |
+| **Espaço em Disco** | 5 GB livre | Para garantir a instalação de todas as dependências. | - |
 
 ### 📦 Clonando o Repositório
 
