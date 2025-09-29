@@ -208,7 +208,7 @@
  */
 
 /**
- * [CORREÇÃO] Altera o fundo da seção "Descrição" no modo claro
+ * Altera o fundo da seção "Descrição" no modo claro
  * para garantir visibilidade tanto no gráfico GERAL quanto no de DETALHE.
  */
 :host-context(body.light) .bg-white\/5 {
@@ -216,7 +216,7 @@
 }
 
 /**
- * [CORREÇÃO 3] Altera a cor do título "Descrição:" no gráfico de detalhe (drill down)
+ * Altera a cor do título "Descrição:" no gráfico de detalhe (drill down)
  * para garantir o contraste no modo claro.
  */
 :host-context(body.light) .drilldowndetail-container .text-chart-teal-light {
@@ -240,7 +240,7 @@
 }
 
 /**
- * [NOVO] Altera a cor dos eixos X e Y do gráfico (as bordas principais).
+ * Altera a cor dos eixos X e Y do gráfico (as bordas principais).
  */
 :host-context(body.light) .border-white\/50 {
   border-color: rgba(var(--color-accent-light-rgb), 0.2); /* Cor de texto principal do tema claro */
