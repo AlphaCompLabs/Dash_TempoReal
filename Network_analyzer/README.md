@@ -9,27 +9,47 @@ Para utilizar o `main.py`, você pode executá-lo diretamente via linha de coman
 ### Exemplo 1: Captura de Tráfego e Envio via POST
 Este é um cenário comum onde o `main.py` captura o tráfego de uma interface específica e envia os dados agregados para um endpoint HTTP (como o `sink.py`).
 
-- 1° Passo: Descobrir seu IP
+- Entre no Network_analyzer: **cd Network_analyzer**
+
+- 1°  **Crie um Ambiente Virtual:**
+    Abra o terminal na pasta do projeto e execute:
+    ```bash
+    python -m venv venv
+    ```
+
+- 2°  **Ative o Ambiente Virtual:**
+    - No **Windows**:
+      ```bash
+      .\venv\Scripts\activate
+      ```
+    - No **macOS / Linux**:
+      ```bash
+      source venv/bin/activate
+      ```
+    *(Seu terminal agora deve exibir `(venv)` no início da linha.)*
+
+
+- 3° Passo: Descobrir seu IP
 ```bash
 ipconfig
 ```
 
-- 2° Passo: Instalar [NPCAP Site](https://npcap.com/#download)
+- 4° Passo: Instalar [NPCAP Site](https://npcap.com/#download)
 
-- 3° Passo: Instalar dependências 
+- 5° Passo: Instalar dependências 
 ```bash
-pip instal Scapy
-pip instal cap
+pip install scapy
+pip install cap
 ```
 
-- 4° Passo: Identificar qual a sua interface
+- 6° Passo: Identificar qual a sua interface
 ```bash
 Get-NetAdapter | Select Name, Status    
 ```
 
-- 5° Passo: executar o comando abaixo
+- 7° Passo: executar o comando abaixo
 ```bash
-python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest"
+python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "tcp port 8001 or tcp port 2121"
 ```
 
 ### Exemplo 2: Leitura de PCAP e Saída para Arquivo

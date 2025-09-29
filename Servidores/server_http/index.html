@@ -1,26 +1,81 @@
-<DOCTYPE html>
-
-    <body>
-            <div class="bituca">
-                <img loading="lazy" src ="https://usagif.com/wp-content/uploads/2020/b72nv6/kiss-emoji-9.gif"></img>
-            </div>
-            <p class="msg">Confia bb!<br>Um big beijo e um dia abençoado!</p>
-    </body>
-
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETVISION - Servidor HTTP</title>
     <style>
-    
-    .bituca{
-        text-align: center;
-        margin-top: 150px;
-    }
+        /* Estilos gerais */
+        body {
+            /* Cor de fundo retirada do logo */
+            background-color: #0d2c4f; 
+            color: #ecf0f1; /* Cor de texto clara para contraste */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Ocupa a tela inteira */
+            text-align: center;
+        }
 
-    img{
-        width: 25%;
-    }
-    
-    .msg{
-        text-align: center;
-        color: red;
-    }
+        /* Container principal para centralizar o conteúdo */
+        .container {
+            padding: 50px;
+            border-radius: 15px;
+            background-color: rgba(0, 26, 75); /* Fundo semi-transparente para destacar */
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
 
+        /* Estilo para a imagem do logo */
+        .logo {
+            width: 80%; /* Ajusta o tamanho do logo */
+            max-width: 400px; /* Limita o tamanho máximo */
+            margin-bottom: 30px; /* Espaço abaixo do logo */
+        }
+        
+        /* Mensagem de instrução */
+        .msg {
+            font-size: 1.1em;
+            color: #bdc3c7; /* Cor cinza claro para a mensagem */
+            margin-bottom: 40px;
+        }
+
+        /* Estilo do botão de download */
+        .download-button {
+            display: inline-block;
+            padding: 15px 35px;
+            /* Cor do botão retirada do texto "NETVISION" no logo */
+            background-color: #6ebff5; 
+            color: #0d2c4f; /* Cor do texto do botão (azul escuro) */
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Efeito ao passar o mouse sobre o botão */
+        .download-button:hover {
+            background-color: #98d1f8;
+            transform: scale(1.05); /* Leve aumento de tamanho */
+        }
     </style>
+</head>
+<body>
+    <div class="container">
+        <img src="NETVISION.png" alt="Logo Netvision" class="logo">
+        
+        <p class="msg">
+            Use o botão abaixo para iniciar o download e gerar tráfego de rede para o dashboard.
+        </p>
+        
+        <a href="NETVISION.zip" class="download-button" download>
+            BAIXAR ARQUIVO DE TESTE
+        </a>
+    </div>
+</body>
+</html>

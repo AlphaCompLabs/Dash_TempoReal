@@ -1,37 +1,153 @@
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Estilos para o componente do gráfico principal, incluindo tooltip,
+ #            filtros, animações e ajustes para o tema claro (light mode).
+ # =====================================================================================
+*/
+
+/* --- SEÇÃO 1: ESTILOS DO TOOLTIP DO GRÁFECO --- */
 .chart-tooltip {
-  /* Posicionamento e Aparência */
   position: fixed;
+  z-index: 9999;
+  transform: translateX(-50%) translateY(-115%);
   background-color: rgba(45, 55, 72, 0.95);
-  color: white;
   padding: 8px 12px;
   border-radius: 6px;
-  font-family:  'Montserrat', sans-serif;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: bold;
-  text-align: center; /* Alinha o texto no centro */
-  
-  /* Comportamento e Camadas */
-  z-index: 9999;
-  pointer-events: none;
-  
-  /* Animação suave */
-  transition: opacity 0.2s ease;
-
-  /* ✅ CORREÇÃO AQUI: Adicionado translateX(-50%) para centralizar o balão */
-  transform: translateX(-50%) translateY(-115%);
-  
-  /* Permite quebras de linha (para mostrar Download e Upload) */
+  text-align: center;
   white-space: pre-line;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
-/* A "seta" do balão de fala (sem alterações) */
 .chart-tooltip::after {
   content: '';
   position: absolute;
-  left: 50%;
   top: 100%;
+  left: 50%;
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
   border-color: rgba(45, 55, 72, 0.95) transparent transparent transparent;
+}
+
+
+/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO --- */
+.filter-button {
+  padding: 4px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  opacity: 0.8;
+}
+
+.filter-button.active-filter {
+  font-weight: bold;
+  outline-width: 3px;
+  outline-style: solid;
+  outline-offset: 2px;
+}
+
+/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Geral */
+.mainchart-filter .filter-button.active-filter {
+  background-color: var(--color-accent-light) !important;
+  color: var(--color-chart-blue-dark) !important;
+  outline-color: white;
+}
+
+/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Detalhado */
+.drilldowndetail-filter .filter-button.active-filter {
+  background-color: var(--color-accent-light) !important;
+  color: var(--color-chart-teal-dark) !important;
+  outline-color: white;
+}
+
+/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Geral */
+:host-context(body.light) .mainchart-filter .filter-button.active-filter {
+  background-color: #ACE5E9 !important;
+  color: var(--color-chart-blue-dark) !important;
+  outline-color: var(--color-chart-blue-dark);
+}
+
+/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Detalhado */
+:host-context(body.light) .drilldowndetail-filter .filter-button.active-filter {
+  background-color: #ACE5E9 !important;
+  color: var(--color-chart-teal-dark) !important;
+  outline-color: var(--color-chart-teal-dark);
+}
+
+/* Regra de exceção para botões inativos no Tema Claro */
+:host-context(body.light) .filter-button.text-white:not(.active-filter) {
+  color: white !important;
+}
+
+
+/* --- SEÇÃO 3: ANIMAÇÃO DO INDICADOR "PING" --- */
+@keyframes one-shot-ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-one-shot-ping {
+  animation: one-shot-ping 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes ping-once-animation {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+[class*="ping-"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  animation: ping-once-animation 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ping-red::before {
+  background-color: #ef4444; /* Vermelho (Tailwind red-500) */
+}
+
+.ping-green::before {
+  background-color: #22c55e; /* Verde (Tailwind green-500) */
+}
+
+
+/* --- SEÇÃO 4: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
+:host-context(body.light) .bg-white\/5 {
+  background-color: #e5e5e5;
+}
+
+:host-context(body.light) .drilldowndetail-container .text-chart-teal-light {
+  color: var(--color-dark-black);
+}
+
+:host-context(body.light) .grid-lines .bg-white\/10 {
+  background-color: rgba(var(--color-accent-light-rgb), 0.2);
+}
+
+:host-context(body.light) .grid-lines .bg-white\/30 {
+  background-color: rgba(var(--color-accent-light-rgb), 0.2);
+}
+
+:host-context(body.light) .border-white\/50 {
+  border-color: rgba(var(--color-accent-light-rgb), 0.2);
 }

@@ -1,0 +1,97 @@
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Estilos para o componente da barra lateral (sidebar), incluindo
+ #            a lógica de temas e as cores dinâmicas para os gráficos circulares.
+ # =====================================================================================
+*/
+
+/* --- SEÇÃO 1: ESTILOS DE BASE DO COMPONENTE --- */
+:host {
+  display: block;
+}
+
+.sidebar-component {
+  width: 250px;
+  height: calc(100vh - 90px);
+  background-color: var(--color-dark);
+  background-image:
+    linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)),
+    url('/assets/images/sidebar_image.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: top;
+  transition: background-color 0.3s ease;
+}
+
+
+/* --- SEÇÃO 2: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
+:host-context(body.light) .sidebar-component {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+    url('/assets/images/sidebar_image.png');
+}
+
+:host-context(body.light) .sidebar-stats-circle img {
+  filter: invert(1);
+}
+
+:host-context(body.light) .info-box {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:host-context(body.light) circle.text-gray-700 {
+  color: #c2c1c1;
+}
+
+
+/* --- SEÇÃO 3: VARIÁVEIS DE COR PARA GRADIENTES --- */
+
+/* Cores padrão (Tema Escuro / Visão Geral) */
+:host {
+  --grad-download-1: var(--color-chart-blue-light);
+  --grad-download-2: var(--color-chart-blue-dark);
+  --grad-upload-1: var(--color-chart-blue-light);
+  --grad-upload-2: var(--color-chart-blue-dark);
+}
+
+/* Cores para o modo de detalhe (Drilldown) */
+.sidebar-component.drilldown-active {
+  --grad-download-1: var(--color-chart-teal-light);
+  --grad-download-2: var(--color-chart-teal-dark);
+  --grad-upload-1: var(--color-chart-teal-light);
+  --grad-upload-2: var(--color-chart-teal-dark);
+}
+
+
+/* --- SEÇÃO 4: ESTILOS DO TEXTO DE PORCENTAGEM (4 ESTADOS) --- */
+.progress-percentage {
+  transition: color 0.3s ease-in-out;
+}
+
+/* Estado 1: Geral / Tema Escuro */
+.progress-percentage-download,
+.progress-percentage-upload {
+  color: var(--color-chart-blue-light);
+}
+
+/* Estado 2: Geral / Tema Claro */
+:host-context(body.light) .progress-percentage-download,
+:host-context(body.light) .progress-percentage-upload {
+  color: var(--color-chart-blue-dark);
+}
+
+/* Estado 3: Detalhe / Tema Escuro */
+.sidebar-component.drilldown-active .progress-percentage-download,
+.sidebar-component.drilldown-active .progress-percentage-upload {
+  color: var(--color-chart-teal-light);
+}
+
+/* Estado 4: Detalhe / Tema Claro */
+:host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-download,
+:host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-upload {
+  color: var(--color-chart-teal-dark);
+}

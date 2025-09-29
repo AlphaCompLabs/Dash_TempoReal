@@ -3,7 +3,7 @@
 1. Acesse a pasta servidores_teste:
 
 ```
-cd servidores_teste
+cd Servidores/server_ftp
 ```
 
 2. Crie o ambiente virtual `venv`:

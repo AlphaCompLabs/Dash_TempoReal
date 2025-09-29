@@ -6,6 +6,9 @@ venv/
 # Arquivos compilados do Python
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Outros
 .vscode/
+*.zip
+node_modules

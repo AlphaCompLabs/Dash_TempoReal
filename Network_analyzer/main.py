@@ -1,140 +1,144 @@
+# =====================================================================================
+# PONTO DE ENTRADA PRINCIPAL (MAIN SCRIPT)
+# Versão: 2.1.0 (Refatorado para clareza e separação de responsabilidades)
+#
+# Autor: Equipe de Análise de Rede
+# Descrição: Este script orquestra a inicialização e execução do Netvision Producer.
+#            Ele processa argumentos da CLI, configura logging, inicia a captura
+#            de pacotes e entra em um loop principal para agregar e emitir dados
+#            em intervalos regulares.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES ---
 import os
 import sys
 import time
 import signal
 import logging
 import threading
+import argparse
+from typing import Callable
 
-# Importa todas as funções e classes dos outros módulos que criamos.
+# Importações dos módulos da aplicação (assumindo nomes de arquivo em minúsculo)
 from cli import parse_args
 from Logging import setup_logging
-from util import validate_url
-from util import anon_hasher
 from Aggregator import Aggregator
 from captura import Sniffer
-from util import hostname
-from util import now_ts
 from emissao import emit_json
+from util import validate_url, anon_hasher, hostname, now_ts
 
-def main():
-    """
-    Função principal que orquestra a execução do programa.
-    """
-    # 1. INICIALIZAÇÃO E CONFIGURAÇÃO
-    # ----------------------------------------------------------------
-    
-    # Processa os argumentos da linha de comando (ex: --iface, --post, etc.).
-    args = parse_args()
-    # Configura o sistema de logging com base nos argumentos.
+
+# --- SEÇÃO 1: FUNÇÕES AUXILIARES DE INICIALIZAÇÃO E EXECUÇÃO ---
+
+def _initialize_and_validate(args: "argparse.Namespace") -> "Callable | None":
+    """Configura logging, valida argumentos e prepara a função de anonimização."""
     setup_logging(args.log_level, args.log_file)
 
-    # --- Validação dos Argumentos ---
-    # Garante que o intervalo não seja muito baixo para evitar uso excessivo de CPU.
     if args.interval < 1.0:
-        logging.warning("--interval muito baixo (%.2fs). Ajustando para 1s.", args.interval)
+        logging.warning("--interval muito baixo (%.2fs). Ajustando para 1.0s.", args.interval)
         args.interval = 1.0
 
-    # Valida se a URL de POST é bem-formada antes de tentar usá-la.
     if args.post and not validate_url(args.post):
         logging.error("URL inválida para --post: %r", args.post)
-        return 2  # Retorna um código de erro para o sistema operacional.
+        sys.exit(2)
 
-    # Alerta o usuário sobre uma configuração que pode não gerar dados.
     if args.no_capture and not args.mock and not args.pcap:
         logging.warning("--no-capture ativo sem --mock ou --pcap. Não haverá dados a emitir.")
 
-    # --- Configuração da Anonimização ---
     anon_func = None
     if args.anon:
-        # Define a chave de anonimização com uma ordem de prioridade:
-        # 1. Argumento --anon-key.
-        # 2. Variável de ambiente ANON_KEY.
-        # 3. Uma chave aleatória segura como último recurso.
-        key = (args.anon_key or os.environ.get("ANON_KEY") or os.urandom(32)).encode("utf-8", "ignore")
-        # Cria a função de hashing que será passada para o Aggregator.
+        key_source = args.anon_key or os.environ.get("ANON_KEY")
+        key = (key_source or os.urandom(32)).encode("utf-8", "ignore")
         anon_func = anon_hasher(key)
+        logging.info("Anonimização de IP ativada.")
 
-    # 2. CRIAÇÃO DOS OBJETOS PRINCIPAIS
-    # ----------------------------------------------------------------
-    
-    window_s = int(args.interval)
-    # Instancia o agregador com as configurações definidas.
-    aggr = Aggregator(window_s=window_s, max_clients=max(0, args.max_clients), anon=anon_func)
+    return anon_func
 
-    # Instancia e inicia o sniffer (capturador de pacotes) se a captura não estiver desativada.
+def _setup_shutdown_handler() -> threading.Event:
+    """Configura os signal handlers para um encerramento gracioso (Ctrl+C)."""
+    stop_event = threading.Event()
+    def _handle_signal(sig, frame):
+        logging.info("Sinal de parada (%s) recebido. Encerrando...", signal.Signals(sig).name)
+        stop_event.set()
+    signal.signal(signal.SIGINT, _handle_signal)
+    signal.signal(signal.SIGTERM, _handle_signal)
+    return stop_event
+
+def _run_main_loop(args: "argparse.Namespace", aggr: Aggregator, stop_event: threading.Event):
+    """Executa o loop principal de agregação e emissão de dados."""
+    logging.info("Iniciando loop principal. Pressione Ctrl+C para sair.")
+    meta = {"host": hostname(), "iface": args.iface, "server_ip": args.server_ip}
+
+    while not stop_event.is_set():
+        # A espera é a primeira ação do loop para dar tempo de capturar o primeiro lote de dados.
+        stop_event.wait(timeout=args.interval)
+        if stop_event.is_set():
+            break
+
+        if args.mock:
+            # Injeta dados de teste, se o modo mock estiver ativo.
+            now = now_ts()
+            aggr.add(now, "10.0.0.2", "in", 1500, "HTTP")
+            aggr.add(now, "10.0.0.3", "in", 400, "HTTPS")
+
+        # [CORREÇÃO CRÍTICA] Usa o método que pega o snapshot E avança a janela.
+        payload = aggr.get_snapshot_and_roll_window(meta)
+        if not payload["clients"] and not args.mock:
+            logging.debug("Nenhum cliente na janela. Pulando emissão.")
+            continue
+
+        logging.info("Emitindo janela de %ds com %d clientes.", aggr.window_s, payload["n_clients"])
+        rc = emit_json(
+            payload,
+            to_file=args.file,
+            post_url=args.post,
+            post_timeout=args.post_timeout,
+            post_retries=max(0, args.post_retries),
+            file_append=bool(args.file and args.file_append)
+        )
+        if rc != 0:
+            logging.warning("Falha na emissão da janela (rc=%d). Continuando.", rc)
+
+
+# --- SEÇÃO 2: FUNÇÃO PRINCIPAL (MAIN) ---
+
+def main() -> int:
+    """Função principal que orquestra a execução da aplicação."""
     sniffer = None
-    if not args.no_capture:
-        sniffer = Sniffer(aggr, server_ip=args.server_ip, iface=args.iface, bpf=args.bpf, pcap=args.pcap)
-        sniffer.start()  # O sniffer rodará em uma thread separada.
-
-    # 3. CONFIGURAÇÃO DE ENCERRAMENTO SEGURO (GRACEFUL SHUTDOWN)
-    # ----------------------------------------------------------------
-    
-    stop = threading.Event()  # Cria um "evento" que servirá como sinal de parada para o loop principal.
-
-    # Define uma função que será chamada quando o programa receber um sinal de interrupção (Ctrl+C).
-    def _sig(_s, _f):
-        logging.info("Sinal de parada recebido. Encerrando...")
-        stop.set()  # "Ativa" o evento de parada.
-
-    # Associa os sinais SIGINT (Ctrl+C) e SIGTERM (sinal de término padrão) à nossa função _sig.
-    signal.signal(signal.SIGINT, _sig)
-    signal.signal(signal.SIGTERM, _sig)
-    
-    # Prepara um dicionário de metadados para ser incluído em cada payload.
-    meta = {
-        "host": hostname(),
-        "iface": args.iface,
-        "server_ip": args.server_ip
-    }
-
-    # 4. LOOP PRINCIPAL
-    # ----------------------------------------------------------------
-    
     try:
-        # O loop continua enquanto o evento "stop" não for ativado.
-        while not stop.is_set():
-            # Se o modo --mock estiver ativo, injeta dados de teste no agregador.
-            if args.mock:
-                now = now_ts()
-                aggr.add(now+1, "10.0.0.2", "in", 1500, "HTTP")
-                aggr.add(now+2, "10.0.0.2", "out", 700, "HTTP")
-                aggr.add(now+3, "10.0.0.3", "in", 400, "HTTPS")
-                aggr.add(now+4, "10.0.0.4", "out", 250, "FTP")
-                aggr.add(now+4.2, "10.0.0.3", "out", 180, "DNS")
+        # 1. Preparação
+        args = parse_args()
+        anon_func = _initialize_and_validate(args)
+        stop_event = _setup_shutdown_handler()
 
-            # Pega um "snapshot" dos dados agregados na janela de tempo atual.
-            payload = aggr.snapshot(meta)
-            
-            # Chama a função de emissão para enviar o payload para seus destinos.
-            rc = emit_json(
-                payload,
-                to_file=args.file,
-                post_url=args.post,
-                post_timeout=args.post_timeout,
-                post_retries=max(0, args.post_retries),
-                file_append=bool(args.file and args.file_append)
-            )
-            if rc != 0:
-                # Se a emissão falhar, apenas loga um aviso e continua. Isso torna o programa resiliente.
-                logging.warning("Falha na emissão da janela (rc=%d). Continuando.", rc)
+        # 2. Criação dos Objetos Principais
+        aggr = Aggregator(
+            window_s=int(args.interval),
+            max_clients=max(0, args.max_clients),
+            anon=anon_func
+        )
 
-            # Espera o tempo definido pelo intervalo antes de iniciar a próxima iteração.
-            # Isso garante que um snapshot seja gerado a cada `window_s` segundos.
-            time.sleep(window_s)
-            
+        # 3. Início dos Processos em Background
+        if not args.no_capture:
+            sniffer = Sniffer(aggr, server_ip=args.server_ip, iface=args.iface, bpf=args.bpf, pcap=args.pcap)
+            sniffer.start()
+
+        # 4. Execução do Loop Principal
+        _run_main_loop(args, aggr, stop_event)
+
+    except Exception as e:
+        logging.critical("Erro não tratado no fluxo principal: %s", e, exc_info=True)
+        return 1
     finally:
-        # O bloco `finally` é SEMPRE executado, não importa como o loop `try` termine (normalmente ou por erro).
-        # Isso garante que a thread do sniffer seja parada de forma limpa.
+        # 5. Limpeza e Encerramento
         if sniffer:
             logging.info("Parando a captura de pacotes...")
             sniffer.stop()
-            
+
     logging.info("Programa encerrado.")
-    return 0  # Retorna código de sucesso.
+    return 0
 
 
-# Ponto de entrada padrão para um script Python.
+# --- SEÇÃO 3: PONTO DE ENTRADA (ENTRY POINT) ---
 if __name__ == "__main__":
-    # Chama a função principal e usa seu código de retorno (0 para sucesso) para sair do programa.
     sys.exit(main())
