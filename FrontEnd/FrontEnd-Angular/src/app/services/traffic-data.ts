@@ -1,7 +1,7 @@
 /**
  * =====================================================================================
  * SERVIÇO DE DADOS DE TRÁFEGO (TRAFFIC DATA SERVICE)
- * Versão: 2.1.0 (Aprimorado com tratamento de erro robusto e constantes)
+ * Versão: 2.3.0 (Padronização do Código)
  *
  * Autor: Equipe Frontend
  * Descrição: Este serviço é a única fonte de verdade para os dados de tráfego
@@ -11,63 +11,62 @@
  * =====================================================================================
  */
 
-// --- SEÇÃO 0: IMPORTAÇÕES ---
+// --- SEÇÃO 1: IMPORTAÇÕES ---
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription, timer, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { ClientTrafficSummary, ProtocolDrilldown } from '../models/traffic.model';
 
+// --- SEÇÃO 2: INTERFACES ---
 export interface GlobalProtocolSummary {
   name: string;
-  y: number; // Total de tráfego (inbound + outbound)
+  y: number;
 }
 
-// --- SEÇÃO 1: METADADOS DO SERVIÇO ---
+// --- SEÇÃO 3: METADADOS DO SERVIÇO ---
 @Injectable({
   providedIn: 'root'
 })
-
 export class TrafficDataService implements OnDestroy {
 
-  // --- SEÇÃO 2: CONSTANTES E CONFIGURAÇÕES ---
+  // --- SEÇÃO 4: CONSTANTES E CONFIGURAÇÕES ---
   private readonly API_BASE_URL = 'http://127.0.0.1:8000';
-  private readonly POLLING_INTERVAL_MS = 5000; // Intervalo de busca de dados em milissegundos
+  private readonly POLLING_INTERVAL_MS = 5000;
 
-  // --- SEÇÃO 3: GERENCIAMENTO DE ESTADO REATIVO (STATE MANAGEMENT) ---
+  // --- SEÇÃO 5: GERENCIAMENTO DE ESTADO REATIVO ---
 
-  /** Armazena o último snapshot dos dados de tráfego. */
+  // Subjects Privados: Armazenam o estado interno do serviço.
   private readonly trafficDataSubject = new BehaviorSubject<ClientTrafficSummary[]>([]);
-  /** Armazena o estado de carregamento (true se uma busca está em andamento). */
   private readonly isLoadingSubject = new BehaviorSubject<boolean>(true);
-  /** Armazena a última mensagem de erro ocorrida. */
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
+  private readonly isDrillDownActiveSubject = new BehaviorSubject<boolean>(false);
+  private readonly selectedClientDataSubject = new BehaviorSubject<ClientTrafficSummary | null>(null);
 
-  /** Observable público para os dados de tráfego. Componentes se inscrevem a ele. */
+  // Observables Públicos: Exponhem o estado de forma segura (somente leitura).
   public readonly trafficData$: Observable<ClientTrafficSummary[]> = this.trafficDataSubject.asObservable();
-  /** Observable público para o estado de carregamento. */
   public readonly isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
-  /** Observable público para o estado de erro. */
   public readonly error$: Observable<string | null> = this.errorSubject.asObservable();
+  public readonly isDrillDownActive$: Observable<boolean> = this.isDrillDownActiveSubject.asObservable();
+  public readonly selectedClientData$: Observable<ClientTrafficSummary | null> = this.selectedClientDataSubject.asObservable();
 
-  // --- SEÇÃO 4: PROPRIEDADES DO SERVIÇO ---
+  // Propriedades internas para gerenciamento.
   private pollingSubscription!: Subscription;
 
-  // --- SEÇÃO 5: CICLO DE VIDA E INICIALIZAÇÃO ---
-
+  // --- SEÇÃO 6: CONSTRUTOR E CICLO DE VIDA ---
   constructor(private http: HttpClient) {
     this.startDataPolling();
   }
 
   /**
-   * Garante que a inscrição do polling seja cancelada quando o serviço for destruído.
-   * Embora seja um serviço singleton, esta é uma prática robusta.
+   * Executado na destruição do serviço.
+   * Garante que a inscrição do polling seja cancelada para evitar vazamentos de memória.
    */
   ngOnDestroy(): void {
     this.pollingSubscription?.unsubscribe();
   }
 
-  // --- SEÇÃO 6: MÉTODOS PÚBLICOS (API DO SERVIÇO) ---
+  // --- SEÇÃO 7: MÉTODOS PÚBLICOS (API DO SERVIÇO) ---
 
   /**
    * Busca os dados detalhados por protocolo para um cliente específico.
@@ -76,92 +75,74 @@ export class TrafficDataService implements OnDestroy {
    */
   public getProtocolDrilldownData(ip: string): Observable<ProtocolDrilldown[]> {
     const drilldownUrl = `${this.API_BASE_URL}/api/traffic/${ip}/protocols`;
-    return this.http.get<ProtocolDrilldown[]>(drilldownUrl)
-      .pipe(
-        catchError(error => {
-          const errorMessage = `Não foi possível carregar os detalhes para o IP ${ip}.`;
-          console.error(`Erro ao buscar dados de drilldown para ${ip}:`, error);
-          this.errorSubject.next(errorMessage);
-          return of([]); // Retorna um Observable com um array vazio para não quebrar a inscrição
-        })
-      );
+    return this.http.get<ProtocolDrilldown[]>(drilldownUrl).pipe(
+      catchError(error => {
+        const errorMessage = `Não foi possível carregar os detalhes para o IP ${ip}.`;
+        console.error(`Erro ao buscar dados de drilldown para ${ip}:`, error);
+        this.errorSubject.next(errorMessage);
+        return of([]);
+      })
+    );
   }
-
-  public setSelectedClient(client: ClientTrafficSummary | null): void {
-    this.selectedClientData.next(client);
-  }
-
-  // --- SEÇÃO 7: LÓGICA PRIVADA (POLLING E FETCHING) ---
 
   /**
-   * Inicia o ciclo de polling que busca dados da API em intervalos regulares.
+   * Define o cliente atualmente selecionado no estado do serviço.
+   * @param client O objeto do cliente selecionado ou `null` para limpar a seleção.
    */
-  private startDataPolling(): void {
-    const trafficUrl = `${this.API_BASE_URL}/api/traffic`;
-
-    this.pollingSubscription = timer(0, this.POLLING_INTERVAL_MS)
-      .pipe(
-        // Antes de cada busca, sinaliza que o carregamento começou.
-        tap(() => this.isLoadingSubject.next(true)),
-
-        // Cancela a requisição HTTP anterior se uma nova for iniciada (evita race conditions).
-        switchMap(() =>
-          this.http.get<ClientTrafficSummary[]>(trafficUrl).pipe(
-            // Em caso de erro na requisição HTTP, trata o erro sem quebrar o polling.
-            catchError(error => {
-              const errorMessage = 'Não foi possível carregar os dados do tráfego.';
-              console.error('Erro ao buscar dados da API de tráfego:', error);
-              this.errorSubject.next(errorMessage);
-              this.trafficDataSubject.next([]); // Aprimoramento: Limpa dados antigos em caso de erro.
-              this.isLoadingSubject.next(false); // Correção Crítica: Finaliza o loading em caso de erro.
-              return of([]); // Retorna um array vazio para o fluxo principal (timer) não quebrar.
-            })
-          )
-        )
-      )
-      .subscribe(data => {
-        // Bloco executado a cada vez que dados são recebidos com sucesso:
-        this.trafficDataSubject.next(data);  // 1. Atualiza os dados para todos os componentes.
-        this.isLoadingSubject.next(false);   // 2. Avisa que o carregamento terminou.
-        this.errorSubject.next(null);        // 3. Limpa qualquer mensagem de erro anterior.
-      });
+  public setSelectedClient(client: ClientTrafficSummary | null): void {
+    this.selectedClientDataSubject.next(client);
   }
 
-  // --- CÓDIGO NOVO PARA O ESTADO DO DRILL DOWN ---
-
-  // 1. Cria um "armazém" privado para o estado. Inicia como `false` (fechado).
-  private isDrillDownActive = new BehaviorSubject<boolean>(false);
-
-  // 2. Expõe o estado como um Observable público que os componentes podem "ouvir".
-  public isDrillDownActive$ = this.isDrillDownActive.asObservable();
-
-  private readonly selectedClientData = new BehaviorSubject<ClientTrafficSummary | null>(null);
-public readonly selectedClientData$ = this.selectedClientData.asObservable();
-
   /**
-   * Método público para permitir que outros componentes atualizem o estado.
+   * Define o estado do modo de detalhe (drilldown).
    * @param isActive Booleano indicando se o modo de detalhe está ativo.
    */
   public setDrillDownState(isActive: boolean): void {
-    this.isDrillDownActive.next(isActive);
+    this.isDrillDownActiveSubject.next(isActive);
   }
 
   /**
    * Busca um resumo global do tráfego por protocolo em toda a rede.
-   * NOTA: Supõe a existência de um novo endpoint no backend.
-   * @returns Um Observable com o resumo dos protocolos.
+   * @returns Um Observable com o resumo dos protocolos ou um array vazio em caso de erro.
    */
   public getGlobalProtocolSummary(): Observable<GlobalProtocolSummary[]> {
     const summaryUrl = `${this.API_BASE_URL}/api/traffic/protocols/summary`;
-    return this.http.get<GlobalProtocolSummary[]>(summaryUrl)
-      .pipe(
-        catchError(error => {
-          const errorMessage = `Não foi possível carregar o resumo de protocolos.`;
-          console.error(`Erro ao buscar resumo de protocolos:`, error);
-          // Não emite erro global para não poluir a UI principal
-          return of([]); // Retorna um array vazio em caso de erro
-        })
-      );
+    return this.http.get<GlobalProtocolSummary[]>(summaryUrl).pipe(
+      catchError(error => {
+        const errorMessage = `Não foi possível carregar o resumo de protocolos.`;
+        console.error(`Erro ao buscar resumo de protocolos:`, error);
+        return of([]);
+      })
+    );
   }
-  
+
+  // --- SEÇÃO 8: LÓGICA PRIVADA (POLLING) ---
+
+  /**
+   * Inicia o ciclo de polling que busca dados da API em intervalos regulares.
+   * Utiliza `timer` e `switchMap` para uma estratégia de polling robusta.
+   */
+  private startDataPolling(): void {
+    const trafficUrl = `${this.API_BASE_URL}/api/traffic`;
+    this.pollingSubscription = timer(0, this.POLLING_INTERVAL_MS).pipe(
+      tap(() => this.isLoadingSubject.next(true)),
+      switchMap(() =>
+        this.http.get<ClientTrafficSummary[]>(trafficUrl).pipe(
+          catchError(error => {
+            const errorMessage = 'Não foi possível carregar os dados do tráfego.';
+            console.error('Erro ao buscar dados da API de tráfego:', error);
+            this.errorSubject.next(errorMessage);
+            this.trafficDataSubject.next([]);
+            this.isLoadingSubject.next(false);
+            return of([]);
+          })
+        )
+      )
+    ).subscribe(data => {
+      this.trafficDataSubject.next(data);
+      this.isLoadingSubject.next(false);
+      this.errorSubject.next(null);
+    });
+  }
 }
+
