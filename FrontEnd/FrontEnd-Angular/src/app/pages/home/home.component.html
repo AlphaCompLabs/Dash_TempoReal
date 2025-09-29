@@ -1,11 +1,31 @@
+<!--
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Componente da página principal (home), que estrutura o layout
+ #            com a barra lateral, o gráfico principal e o rodapé.
+ # =====================================================================================
+-->
+
+<!-- Início do Componente da Página Principal -->
 <div class="flex p-4 gap-4 min-h-[calc(100vh-90px)]">
+
+  <!-- Carrega a barra lateral de informações. -->
   <app-sidebar></app-sidebar>
 
+  <!-- Container para o conteúdo principal (gráfico e rodapé). -->
   <div class="flex flex-col flex-grow gap-4">
+
+    <!-- Garante que o gráfico ocupe o espaço vertical disponível. -->
     <div class="flex-grow">
       <app-main-chart></app-main-chart>
     </div>
+
+    <!-- Carrega o rodapé da página. -->
     <app-footer></app-footer>
   </div>
 
 </div>
+<!-- Fim do Componente da Página Principal -->
