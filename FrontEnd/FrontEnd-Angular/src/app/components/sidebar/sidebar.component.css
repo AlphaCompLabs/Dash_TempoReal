@@ -1,126 +1,97 @@
-/* Estilos base para a sidebar (equivalente ao seu style="..." antigo) */
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Estilos para o componente da barra lateral (sidebar), incluindo
+ #            a lógica de temas e as cores dinâmicas para os gráficos circulares.
+ # =====================================================================================
+*/
+
+/* --- SEÇÃO 1: ESTILOS DE BASE DO COMPONENTE --- */
 :host {
-  display: block; /* Garante que o componente se comporte como um bloco */
+  display: block;
 }
 
 .sidebar-component {
   width: 250px;
   height: calc(100vh - 90px);
   background-color: var(--color-dark);
-  
-  /* Gradiente escuro sobre a imagem de fundo para o tema escuro */
-  background-image: 
+  background-image:
     linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)),
-    url('/assets/images/sidebar_image.png'); /* Caminho relativo à pasta 'src' */
-
+    url('/assets/images/sidebar_image.png');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: top;
-  transition: background-color 0.3s ease; /* Transição suave */
+  transition: background-color 0.3s ease;
 }
 
-/* ================================================= */
-/* ✨ VARIAÇÕES PARA O TEMA CLARO (body.light) ✨ */
-/* ================================================= */
 
-/* Quando o body tiver a classe .light, estas regras serão aplicadas */
-body.light .sidebar-component {
-  /* O background-color já muda automaticamente por causa da variável --color-dark */
-
-  /* Trocamos o gradiente escuro por um claro para a imagem ter contraste */
-  background-image: 
+/* --- SEÇÃO 2: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
+:host-context(body.light) .sidebar-component {
+  background-image:
     linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
     url('/assets/images/sidebar_image.png');
 }
 
-/* Inverte a cor da imagem SVG de branco para preto no tema claro
-*/
-body.light .sidebar-stats-circle img {
+:host-context(body.light) .sidebar-stats-circle img {
   filter: invert(1);
 }
 
-/*
-  Adiciona uma borda sutil às caixas de informação no tema claro,
-  já que o fundo delas (bg-dark) também ficará branco.
-*/
-body.light .info-box {
+:host-context(body.light) .info-box {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/*
- * =================================================================
- * SEÇÃO DE VARIÁVEIS DE COR PARA OS GRADIENTES DOS GRÁFICOS
- * =================================================================
- */
+:host-context(body.light) circle.text-gray-700 {
+  color: #c2c1c1;
+}
 
-/* Define as cores padrão (Dark Mode) para os gradientes */
+
+/* --- SEÇÃO 3: VARIÁVEIS DE COR PARA GRADIENTES --- */
+
+/* Cores padrão (Tema Escuro / Visão Geral) */
 :host {
   --grad-download-1: var(--color-chart-blue-light);
   --grad-download-2: var(--color-chart-blue-dark);
-
   --grad-upload-1: var(--color-chart-blue-light);
   --grad-upload-2: var(--color-chart-blue-dark);
 }
 
-/* --- Cores para o Estado Padrão --- */
+/* Cores para o modo de detalhe (Drilldown) */
+.sidebar-component.drilldown-active {
+  --grad-download-1: var(--color-chart-teal-light);
+  --grad-download-2: var(--color-chart-teal-dark);
+  --grad-upload-1: var(--color-chart-teal-light);
+  --grad-upload-2: var(--color-chart-teal-dark);
+}
 
-/*
- * =================================================================
- * SEÇÃO DE ESTILOS PARA O TEXTO DA PORCENTAGEM (COM 4 ESTADOS)
- * =================================================================
- */
 
-/* Propriedade base para a transição suave */
+/* --- SEÇÃO 4: ESTILOS DO TEXTO DE PORCENTAGEM (4 ESTADOS) --- */
 .progress-percentage {
   transition: color 0.3s ease-in-out;
 }
 
-/*
- * =================================================================
- * ESTILOS PARA O TEXTO DA PORCENTAGEM (COM 4 ESTADOS) - VERSÃO CORRIGIDA
- * =================================================================
- */
-
-/* --- ESTADO 1: Geral / Modo Escuro (Padrão) --- */
-.progress-percentage-download, 
+/* Estado 1: Geral / Tema Escuro */
+.progress-percentage-download,
 .progress-percentage-upload {
   color: var(--color-chart-blue-light);
 }
-/* --- ESTADO 2: Geral / Modo Claro --- */
-/* CORRIGIDO: Trocado 'body.light' por ':host-context(body.light)' */
+
+/* Estado 2: Geral / Tema Claro */
 :host-context(body.light) .progress-percentage-download,
 :host-context(body.light) .progress-percentage-upload {
   color: var(--color-chart-blue-dark);
 }
 
-/* --- ESTADO 3: Foco (Drill Down) / Modo Escuro --- */
+/* Estado 3: Detalhe / Tema Escuro */
 .sidebar-component.drilldown-active .progress-percentage-download,
 .sidebar-component.drilldown-active .progress-percentage-upload {
   color: var(--color-chart-teal-light);
-} 
+}
 
-/* --- ESTADO 4: Foco (Drill Down) / Modo Claro --- */
-/* CORRIGIDO: Trocado 'body.light' por ':host-context(body.light)' */
+/* Estado 4: Detalhe / Tema Claro */
 :host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-download,
 :host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-upload {
   color: var(--color-chart-teal-dark);
-}
-
-/* Opcional: Ajusta a cor do trilho cinza para o light mode */
-:host-context(body.light) circle.text-gray-700 {
-  color: #c2c1c1; /* Um cinza mais claro */
-}
-
-/*
- * Quando o modo de detalhe (drill down) está ATIVO,
- * sobrescreve as variáveis de cor dos gradientes dos círculos.
- */
-.sidebar-component.drilldown-active {
-  /* Novas cores para os gradientes em modo de foco */
-  /* Usando os tons de verde-azulado (teal) do tema do gráfico */
-  --grad-download-1: var(--color-chart-teal-light);
-  --grad-download-2: var(--color-chart-teal-dark);
-  
-  --grad-upload-1: var(--color-chart-teal-light);
-  --grad-upload-2: var(--color-chart-teal-dark);
 }

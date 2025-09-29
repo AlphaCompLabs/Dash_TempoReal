@@ -1,78 +1,45 @@
-/**
- * =====================================================================================
- * ARQUIVO DE ESTILOS - COMPONENTE MAIN-CHART (main-chart.component.css)
- * Versão: 1.2.0 (Estrutura e comentários aprimorados)
- *
- * Autor: Equipe Frontend
- * Descrição: Este arquivo contém os estilos específicos para o componente do gráfico
- * principal (MainChartComponent). A versão 1.2.0 melhora a organização
- * dos seletores e adiciona comentários detalhados para explicar a
- * função de cada bloco de estilo, facilitando a manutenção futura.
- * =====================================================================================
- */
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Estilos para o componente do gráfico principal, incluindo tooltip,
+ #            filtros, animações e ajustes para o tema claro (light mode).
+ # =====================================================================================
+*/
 
-/* --- SEÇÃO 1: ESTILOS DO TOOLTIP DO GRÁFICO --- */
-
-/**
- * Define o container principal do tooltip, que aparece ao passar o mouse sobre as barras.
- * Este elemento é posicionado de forma fixa na tela para flutuar sobre outros conteúdos.
- */
+/* --- SEÇÃO 1: ESTILOS DO TOOLTIP DO GRÁFECO --- */
 .chart-tooltip {
-  /* --- 1.1: Posicionamento e Camada --- */
-  /* `fixed` mantém o tooltip visível mesmo com a rolagem da página. */
   position: fixed;
-  /* `z-index` elevado garante que o tooltip fique acima de todos os outros elementos. */
   z-index: 9999;
-  /* `transform` é usado para centralizar o tooltip horizontalmente em relação ao cursor
-     e posicioná-lo um pouco acima dele para não obstruir a visão. */
   transform: translateX(-50%) translateY(-115%);
-
-  /* --- 1.2: Aparência e Box Model --- */
-  background-color: rgba(45, 55, 72, 0.95); /* Fundo escuro com leve transparência */
+  background-color: rgba(45, 55, 72, 0.95);
   padding: 8px 12px;
   border-radius: 6px;
-
-  /* --- 1.3: Tipografia --- */
   color: white;
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: bold;
   text-align: center;
-  /* `pre-line` respeita as quebras de linha (\n) no texto, essencial para exibir
-     informações de Download e Upload em linhas separadas. */
   white-space: pre-line;
-
-  /* --- 1.4: Comportamento e Animação --- */
-  /* `pointer-events: none` impede que o próprio tooltip intercepte eventos do mouse,
-     garantindo que os eventos `mouseleave` e `mousemove` da barra do gráfico funcionem corretamente. */
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
 
-/**
- * Cria o triângulo (seta) na base do tooltip, simulando um "balão de fala".
- * É um pseudo-elemento posicionado em relação ao container principal do tooltip.
- */
 .chart-tooltip::after {
   content: '';
   position: absolute;
-  top: 100%; /* Posiciona a seta exatamente abaixo do corpo do tooltip */
-  left: 50%; /* Centraliza a seta horizontalmente */
+  top: 100%;
+  left: 50%;
   transform: translateX(-50%);
-
-  /* A "mágica" para criar um triângulo com bordas. Apenas a borda superior
-     tem cor, as outras são transparentes, formando a ponta da seta. */
   border-width: 6px;
   border-style: solid;
   border-color: rgba(45, 55, 72, 0.95) transparent transparent transparent;
 }
 
 
-/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO (LÓGICA AVANÇADA DE TEMAS) --- */
-
-/**
- * Classe base para os botões de filtro.
- */
+/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO --- */
 .filter-button {
   padding: 4px 16px;
   border-radius: 6px;
@@ -80,16 +47,10 @@
   transition: all 0.2s ease;
 }
 
-/**
- * Estilo para o estado de :hover.
- */
 .filter-button:hover {
   opacity: 0.8;
 }
 
-/**
- * Propriedades COMUNS a todos os botões no estado ATIVO.
- */
 .filter-button.active-filter {
   font-weight: bold;
   outline-width: 3px;
@@ -97,62 +58,41 @@
   outline-offset: 2px;
 }
 
-/* * ===============================================================
- * LÓGICA DE CORES PARA OS 4 ESTADOS DO BOTÃO ATIVO
- * ===============================================================
- */
-
-/* --- ESTADO 1: Dark Mode / Gráfico GERAL --- */
+/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Geral */
 .mainchart-filter .filter-button.active-filter {
   background-color: var(--color-accent-light) !important;
   color: var(--color-chart-blue-dark) !important;
   outline-color: white;
 }
 
-/* --- ESTADO 2: Dark Mode / Gráfico DRILLDOWN --- */
+/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Detalhado */
 .drilldowndetail-filter .filter-button.active-filter {
   background-color: var(--color-accent-light) !important;
   color: var(--color-chart-teal-dark) !important;
   outline-color: white;
 }
 
-/* --- ESTADO 3: Light Mode / Gráfico GERAL --- */
+/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Geral */
 :host-context(body.light) .mainchart-filter .filter-button.active-filter {
   background-color: #ACE5E9 !important;
   color: var(--color-chart-blue-dark) !important;
   outline-color: var(--color-chart-blue-dark);
 }
 
-/* --- ESTADO 4: Light Mode / Gráfico DRILLDOWN --- */
+/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Detalhado */
 :host-context(body.light) .drilldowndetail-filter .filter-button.active-filter {
   background-color: #ACE5E9 !important;
   color: var(--color-chart-teal-dark) !important;
   outline-color: var(--color-chart-teal-dark);
 }
 
-
-/* * ===============================================================
- * REGRA DE EXCEÇÃO (MANTIDA)
- * ===============================================================
- */
-
-/**
- * Garante que o texto dos botões INATIVOS permaneça branco no Light Mode.
- */
+/* Regra de exceção para botões inativos no Tema Claro */
 :host-context(body.light) .filter-button.text-white:not(.active-filter) {
   color: white !important;
 }
 
 
-/*
- * =================================================================
- * SEÇÃO DE ANIMAÇÃO DO INDICADOR DE DADOS
- * =================================================================
- */
-
-/* * Define a animação de "ping" que executa apenas uma vez.
- * É uma cópia da animação 'ping' do Tailwind, mas sem o loop infinito.
- */
+/* --- SEÇÃO 3: ANIMAÇÃO DO INDICADOR "PING" --- */
 @keyframes one-shot-ping {
   75%, 100% {
     transform: scale(2);
@@ -160,14 +100,10 @@
   }
 }
 
-/*
- * Classe que podemos adicionar a um elemento para aplicar a animação de disparo único.
- */
 .animate-one-shot-ping {
   animation: one-shot-ping 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Define a animação (o movimento), que é a mesma para ambas as cores */
 @keyframes ping-once-animation {
   75%, 100% {
     transform: scale(2);
@@ -175,10 +111,6 @@
   }
 }
 
-/*
-  Esta é uma regra base para ambas as animações, usando o pseudo-elemento ::before
-  para criar o anel que se expande.
-*/
 [class*="ping-"]::before {
   content: '';
   position: absolute;
@@ -187,62 +119,35 @@
   width: 100%;
   height: 100%;
   border-radius: 9999px;
-  /* Aplica a animação definida acima */
   animation: ping-once-animation 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Define a COR para o ping VERMELHO */
 .ping-red::before {
   background-color: #ef4444; /* Vermelho (Tailwind red-500) */
 }
 
-/* Define a COR para o ping VERDE */
 .ping-green::before {
   background-color: #22c55e; /* Verde (Tailwind green-500) */
 }
 
-/*
- * =================================================================
- * SEÇÃO DE AJUSTES PARA O TEMA CLARO (LIGHT MODE)
- * =================================================================
- */
 
-/**
- * Altera o fundo da seção "Descrição" no modo claro
- * para garantir visibilidade tanto no gráfico GERAL quanto no de DETALHE.
- */
+/* --- SEÇÃO 4: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
 :host-context(body.light) .bg-white\/5 {
-  background-color: #e5e5e5; /* Cor escura, similar à da sidebar no modo escuro */
+  background-color: #e5e5e5;
 }
 
-/**
- * Altera a cor do título "Descrição:" no gráfico de detalhe (drill down)
- * para garantir o contraste no modo claro.
- */
 :host-context(body.light) .drilldowndetail-container .text-chart-teal-light {
   color: var(--color-dark-black);
 }
 
-/*
- * =================================================================
- * SEÇÃO DE AJUSTES PARA O TEMA CLARO (LIGHT MODE) NO GRÁFICO
- * =================================================================
- */
-
-/**
- * Altera a cor das linhas de grade do gráfico para garantir o contraste.
- */
 :host-context(body.light) .grid-lines .bg-white\/10 {
-  background-color: rgba(var(--color-accent-light-rgb), 0.2); /* Preto com 10% de opacidade */
+  background-color: rgba(var(--color-accent-light-rgb), 0.2);
 }
+
 :host-context(body.light) .grid-lines .bg-white\/30 {
-  background-color: rgba(var(--color-accent-light-rgb), 0.2); /* Preto com 20% de opacidade */
+  background-color: rgba(var(--color-accent-light-rgb), 0.2);
 }
 
-/**
- * Altera a cor dos eixos X e Y do gráfico (as bordas principais).
- */
 :host-context(body.light) .border-white\/50 {
-  border-color: rgba(var(--color-accent-light-rgb), 0.2); /* Cor de texto principal do tema claro */
+  border-color: rgba(var(--color-accent-light-rgb), 0.2);
 }
-
