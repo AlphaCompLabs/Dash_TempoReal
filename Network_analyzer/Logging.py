@@ -1,6 +1,21 @@
+# =====================================================================================
+# CONFIGURAÇÃO DE LOGGING - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a função para configurar o sistema de logging
+#            da aplicação, direcionando as mensagens para o console e/ou um arquivo.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
+
 import sys
 import logging
 from typing import Optional
+
+# --- SEÇÃO 1: FUNÇÃO DE CONFIGURAÇÃO DE LOGS ---
 
 def setup_logging(level: str, log_file: Optional[str]) -> None:
     """

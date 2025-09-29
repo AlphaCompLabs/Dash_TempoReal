@@ -1,4 +1,16 @@
-# Importa as bibliotecas necessárias.
+# =====================================================================================
+# LÓGICA DE AGREGAÇÃO DE DADOS - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a classe Aggregator, responsável por coletar,
+#            processar e sumarizar dados de tráfego de rede em janelas de tempo,
+#            sendo thread-safe para uso em ambientes concorrentes.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
 import threading  # Para controle de concorrência (Lock) e garantir que o código seja thread-safe.
 from collections import defaultdict  # Dicionário especial que cria itens padrão para chaves que não existem.
 from typing import Dict, Any, Optional, Callable  # Para anotações de tipo, melhorando a legibilidade.

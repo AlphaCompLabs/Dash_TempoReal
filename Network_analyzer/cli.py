@@ -1,7 +1,20 @@
+# =====================================================================================
+# INTERFACE DE LINHA DE COMANDO (CLI) - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes- Mayron Malaquias e Pedro Borges
+# Descrição: Este script define os argumentos da linha de comando para a aplicação,
+#            permitindo a configuração de captura, agregação e emissão de dados
+#            de forma flexível.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
 # Importa a biblioteca argparse, que é o padrão do Python para criar
 # interfaces de linha de comando (CLI - Command-Line Interface).
 import argparse
 
+# --- SEÇÃO 1: FUNÇÃO DE PARSEAMENTO ---
 def parse_args():
     """
     Configura e processa os argumentos da linha de comando para o programa.

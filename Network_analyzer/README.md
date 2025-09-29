@@ -18,8 +18,8 @@ ipconfig
 
 - 3° Passo: Instalar dependências 
 ```bash
-pip instal Scapy
-pip instal cap
+pip install Scapy
+pip install cap
 ```
 
 - 4° Passo: Identificar qual a sua interface
@@ -29,7 +29,15 @@ Get-NetAdapter | Select Name, Status
 
 - 5° Passo: executar o comando abaixo
 ```bash
-python .\main.py --server-ip <Seu IP>--iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest"
+python .\main.py --server-ip <Seu IP> --iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest"
+```
+*(OU)*
+```bash
+python .\main.py --server-ip <Seu IP> --iface "<Sua interface>" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "http port 8001 and ftp port 2121"
+```
+*(OU)*
+```bash
+ python .\main.py --server-ip 192.168.1.18 --iface "Ethernet 2" --interval 5 --post "http://localhost:8000/api/ingest" --bpf "host 192.168.1.18 and (tcp port 8001 or tcp port 2121) and not (tcp port 80 or tcp port 443 or udp port 443 or port 53)"
 ```
 
 ### Exemplo 2: Leitura de PCAP e Saída para Arquivo

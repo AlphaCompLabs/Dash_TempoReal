@@ -1,4 +1,16 @@
-# Importa as bibliotecas necessárias.
+# =====================================================================================
+# CAPTURA DE PACOTES - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a classe Sniffer, que utiliza a biblioteca Scapy
+#            para capturar pacotes de rede e enviar os dados para a classe
+#            Aggregator para processamento.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
 import logging  # Para registrar mensagens de informação, aviso e erro.
 import threading  # Para rodar a captura de pacotes em uma thread separada, sem bloquear o programa principal.
 from typing import Optional

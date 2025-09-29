@@ -1,3 +1,17 @@
+# =====================================================================================
+# CAPTURA E PROCESSAMENTO - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script orquestra a captura de pacotes de rede e o envio de
+#            dados agregados para um servidor backend, permitindo a visualização
+#            em tempo real de métricas de tráfego.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
+
 import os
 import sys
 import time

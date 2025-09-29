@@ -1,3 +1,16 @@
+# =====================================================================================
+# LÓGICA DE EMISSÃO DE DADOS - DASHBOARD DE ANÁLISE DE TRÁFEGO
+# Versão: 2.3.1
+#
+# Autor: Equipe Redes - Mayron Malaquias e Pedro Borges
+# Descrição: Este script contém a função que envia o payload JSON para diferentes
+#            destinos, como uma API RESTful, um arquivo local ou a saída padrão.
+# =====================================================================================
+
+# --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
+
+# Importações de bibliotecas padrão do Python
+
 import sys
 import time
 import json
@@ -6,6 +19,7 @@ from typing import Dict, Any, Optional
 from urllib import request, error  # Módulos padrão do Python para fazer requisições web.
 
 
+# --- SEÇÃO 1: FUNÇÃO PRINCIPAL DE EMISSÃO ---
 def emit_json(payload: Dict[str, Any],
               to_file: Optional[str],
               post_url: Optional[str],
