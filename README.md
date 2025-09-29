@@ -113,14 +113,6 @@ A parte de `~/Network_analyzer` emite um objeto JSON que contém os dados agrega
 
 ---
 
-Perfeito\! Fiz os ajustes para focar no ambiente **Windows**, usei o símbolo `~` para representar a pasta raiz do projeto e adicionei avisos claros sobre a necessidade de **múltiplos terminais** e a criação de **novos ambientes virtuais**.
-
------
-
-Ajuste finalizado\! Adicionei os links de download para os pré-requisitos, mantendo a estrutura clara, focada em **Windows** e utilizando o `~` para simplificar os caminhos dos comandos.
-
------
-
 ## 🏗️ Como Construir o Projeto
 
 ### 🧩 Pré-requisitos
