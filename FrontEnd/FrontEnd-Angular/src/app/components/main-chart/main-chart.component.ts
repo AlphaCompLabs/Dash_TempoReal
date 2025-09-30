@@ -1,19 +1,18 @@
 /*
- # =====================================================================================
- # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
- # Versão: 4.0.1 (Correção de Persistência de Estilo da Legenda)
- # Autor(es): Equipe Frontend
- # Data: 2025-09-30
- # Descrição: Lógica do componente principal. Funcionalidade de drill-down
- #            restaurada e integrada com o novo gráfico de histórico sincronizado.
- #            Correção aplicada para manter o estado visual da legenda após
- #            atualizações de dados em tempo real.
- # =====================================================================================
+# =====================================================================================
+# SERVIDOR FRONTEND - COMPONENTE DO GRÁFICO PRINCIPAL
+# Versão: 4.0.2 (Revisão Final de Padrões de Código)
+#
+# Autor(es): Equipe Frontend 
+# Data: 2025-09-30
+# Descrição: Lógica do componente principal que renderiza os gráficos de tráfego
+#            em tempo real, a visualização de detalhes (drill-down) e o
+#            gráfico de histórico sincronizado.
+# =====================================================================================
 */
 
-// -----------------------------------------------------------------------------------------
-//                                SEÇÃO 1 - IMPORTAÇÕES
-// -----------------------------------------------------------------------------------------
+// --- SEÇÃO 1: IMPORTAÇÕES ---
+
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -35,9 +34,8 @@ import {
   Tooltip
 } from 'chart.js';
 
-// -----------------------------------------------------------------------------------------
-//                                SEÇÃO 2 - COMPONENTE
-// -----------------------------------------------------------------------------------------
+// --- SEÇÃO 2: TIPOS E CONSTANTES LOCAIS ---
+
 @Component({
   selector: 'app-main-chart',
   templateUrl: './main-chart.component.html',
@@ -49,9 +47,7 @@ import {
 })
 export class MainChartComponent implements OnInit, OnDestroy {
 
-  // -----------------------------------------------------------------------------------------
-  //                                SEÇÃO 3 - PROPRIEDADES
-  // -----------------------------------------------------------------------------------------
+  // --- SEÇÃO 3: METADADOS DO COMPONENTE ---
 
   // --- Estado do Gráfico Principal ---
   public networkClients: ClientTrafficSummary[] = [];
@@ -169,9 +165,8 @@ export class MainChartComponent implements OnInit, OnDestroy {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   private historyChartSelection: 'download' | 'upload' | 'both' = 'both';
 
-  // -----------------------------------------------------------------------------------------
-  //                                SEÇÃO 4 - CONSTRUTOR
-  // -----------------------------------------------------------------------------------------
+  // --- SEÇÃO 4: PROPRIEDADES E ESTADO DA CLASSE ---
+
   constructor(
     private trafficService: TrafficDataService,
     public uiStateService: UiStateService
@@ -183,9 +178,8 @@ export class MainChartComponent implements OnInit, OnDestroy {
     this.initializeHistoryChartData();
   }
 
-  // -----------------------------------------------------------------------------------------
-  //                                SEÇÃO 5 - MÉTODOS DE CICLO DE VIDA
-  // -----------------------------------------------------------------------------------------
+   // --- SEÇÃO 5: CONSTRUTOR E MÉTODOS DE CICLO DE VIDA ---
+
   ngOnInit(): void {
     this.subscribeToTrafficData();
 
@@ -206,9 +200,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
     this.historySubscription?.unsubscribe();
   }
 
-  // -----------------------------------------------------------------------------------------
-  //                                SEÇÃO 6 - MÉTODOS PÚBLICOS
-  // -----------------------------------------------------------------------------------------
+  // --- SEÇÃO 6: MÉTODOS PÚBLICOS (Acessados pelo Template) ---
 
   public get hasClients(): boolean {
     return this.networkClients && this.networkClients.length > 0;
@@ -311,9 +303,7 @@ export class MainChartComponent implements OnInit, OnDestroy {
     return protocol.y === 0 ? 0 : (protocol.outbound / protocol.y) * 100;
   }
 
-  // -----------------------------------------------------------------------------------------
-  //                                SEÇÃO 7 - MÉTODOS PRIVADOS
-  // -----------------------------------------------------------------------------------------
+ // --- SEÇÃO 7: MÉTODOS PRIVADOS (Lógica Interna) ---
 
   private subscribeToTrafficData(): void {
     this.dataSubscription = this.trafficService.trafficData$.subscribe(data => {
