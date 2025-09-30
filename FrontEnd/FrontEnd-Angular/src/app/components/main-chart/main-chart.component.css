@@ -1,32 +1,86 @@
 /*
- # =====================================================================================
- # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
- # Versão: 3.0.0 (Padronização do Código)
- # Autor(es): Equipe UX/UI - Elisa Nunes
- # Data: 2025-09-29
- # Descrição: Estilos para o componente do gráfico principal, incluindo tooltip,
- #            filtros, animações e ajustes para o tema claro (light mode).
- # =====================================================================================
+# =====================================================================================
+# SERVIDOR FRONTEND - ESTILOS DO GRÁFICO PRINCIPAL
+# Versão: 3.1.0 (Refatoração com Variáveis CSS)
+# Autor(es): Equipe UX/UI - Elisa Nunes (Revisado por Padronização de Código)
+# Data: 2025-09-30
+# Descrição: Folha de estilos para o componente do gráfico principal.
+#            Este código foi refatorado para usar Variáveis CSS, centralizando
+#            a lógica de temas (escuro/claro) e simplificando a manutenção.
+#
+# Tabela de Conteúdos:
+# 1. Variáveis de Tema e Configuração
+# 2. Estilos do Tooltip do Gráfico
+# 3. Estilos dos Botões de Filtro
+# 4. Animações (Ping Effect)
+# 5. Ajustes de Classes Utilitárias
+# =====================================================================================
 */
 
-/* --- SEÇÃO 1: ESTILOS DO TOOLTIP DO GRÁFECO --- */
+/* --- SEÇÃO 1: VARIÁVEIS DE TEMA E CONFIGURAÇÃO --- */
+:host {
+  /*
+   * As variáveis são definidas aqui para o tema padrão (escuro).
+   * Elas são redefinidas em um contexto específico para o tema claro.
+  */
+
+  /* Variáveis do Tooltip */
+  --tooltip-bg: rgba(45, 55, 72, 0.95);
+  --tooltip-text-color: white;
+
+  /* Variáveis dos Botões de Filtro */
+  --filter-button-active-outline: white;
+  --filter-button-general-bg: var(--color-accent-light);
+  --filter-button-general-text: var(--color-chart-blue-dark);
+  --filter-button-detail-bg: var(--color-accent-light);
+  --filter-button-detail-text: var(--color-chart-teal-dark);
+
+  /* Variáveis de Cores Utilitárias */
+  --bg-opacity-5: #e5e5e5; /* Usado no .bg-white/5 do tema claro */
+  --grid-line-color: rgba(var(--color-accent-light-rgb), 0.2);
+  --border-color: rgba(var(--color-accent-light-rgb), 0.2);
+  --back-button-hover-bg: #d4e7e8;
+}
+
+/* Redefinição das variáveis para o Tema Claro (light mode) */
+:host-context(body.light) {
+  --filter-button-active-outline: var(--color-chart-blue-dark);
+  --filter-button-general-bg: #ACE5E9;
+  --filter-button-detail-bg: #ACE5E9;
+
+  /* Para o botão de detalhe no tema claro, o outline usa outra cor */
+  .drilldowndetail-filter {
+    --filter-button-active-outline: var(--color-chart-teal-dark);
+  }
+}
+
+
+/* --- SEÇÃO 2: ESTILOS DO TOOLTIP DO GRÁFICO --- */
 .chart-tooltip {
+  /* Posicionamento e Camada */
   position: fixed;
   z-index: 9999;
   transform: translateX(-50%) translateY(-115%);
-  background-color: rgba(45, 55, 72, 0.95);
+
+  /* Caixa e Espaçamento */
   padding: 8px 12px;
   border-radius: 6px;
-  color: white;
+
+  /* Tipografia */
+  color: var(--tooltip-text-color);
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: bold;
   text-align: center;
-  white-space: pre-line;
-  pointer-events: none;
+  white-space: pre-line; /* Permite que \n em strings quebre a linha */
+
+  /* Aparência e Comportamento */
+  background-color: var(--tooltip-bg);
+  pointer-events: none; /* Impede que o tooltip intercepte cliques do mouse */
   transition: opacity 0.2s ease;
 }
 
+/* Seta inferior do tooltip */
 .chart-tooltip::after {
   content: '';
   position: absolute;
@@ -35,11 +89,11 @@
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: rgba(45, 55, 72, 0.95) transparent transparent transparent;
+  border-color: var(--tooltip-bg) transparent transparent transparent;
 }
 
 
-/* --- SEÇÃO 2: ESTILOS DOS BOTÕES DE FILTRO --- */
+/* --- SEÇÃO 3: ESTILOS DOS BOTÕES de FILTRO --- */
 .filter-button {
   padding: 4px 16px;
   border-radius: 6px;
@@ -51,66 +105,47 @@
   opacity: 0.8;
 }
 
+/* Estado ativo - Estrutura ÚNICA usando variáveis */
 .filter-button.active-filter {
   font-weight: bold;
   outline-width: 3px;
   outline-style: solid;
   outline-offset: 2px;
+  outline-color: var(--filter-button-active-outline);
 }
 
-/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Geral */
+/* Define as cores do botão ativo com base no container pai */
 .mainchart-filter .filter-button.active-filter {
-  background-color: var(--color-accent-light) !important;
-  color: var(--color-chart-blue-dark) !important;
-  outline-color: white;
+  background-color: var(--filter-button-general-bg);
+  color: var(--filter-button-general-text);
 }
 
-/* Lógica de cores para o botão ativo em Tema Escuro / Gráfico Detalhado */
 .drilldowndetail-filter .filter-button.active-filter {
-  background-color: var(--color-accent-light) !important;
-  color: var(--color-chart-teal-dark) !important;
-  outline-color: white;
+  background-color: var(--filter-button-detail-bg);
+  color: var(--filter-button-detail-text);
 }
 
-/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Geral */
-:host-context(body.light) .mainchart-filter .filter-button.active-filter {
-  background-color: #ACE5E9 !important;
-  color: var(--color-chart-blue-dark) !important;
-  outline-color: var(--color-chart-blue-dark);
-}
-
-/* Lógica de cores para o botão ativo em Tema Claro / Gráfico Detalhado */
-:host-context(body.light) .drilldowndetail-filter .filter-button.active-filter {
-  background-color: #ACE5E9 !important;
-  color: var(--color-chart-teal-dark) !important;
-  outline-color: var(--color-chart-teal-dark);
-}
-
-/* Regra de exceção para botões inativos no Tema Claro */
+/* Regra de exceção para botões inativos no Tema Claro (mantida por especificidade) */
 :host-context(body.light) .filter-button.text-white:not(.active-filter) {
   color: white !important;
 }
 
 
-/* --- SEÇÃO 3: ANIMAÇÃO DO INDICADOR "PING" --- */
-@keyframes one-shot-ping {
+/* --- SEÇÃO 4: ANIMAÇÕES (Ping Effect) --- */
+/* Animação única e reutilizável para o efeito "ping" */
+@keyframes ping {
   75%, 100% {
     transform: scale(2);
     opacity: 0;
   }
 }
 
+/* Classe de gatilho para a animação */
 .animate-one-shot-ping {
-  animation: one-shot-ping 1s cubic-bezier(0, 0, 0.2, 1);
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
-@keyframes ping-once-animation {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
+/* Estrutura base para classes de "ping" coloridas */
 [class*="ping-"]::before {
   content: '';
   position: absolute;
@@ -118,8 +153,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 9999px;
-  animation: ping-once-animation 1s cubic-bezier(0, 0, 0.2, 1);
+  border-radius: 9999px; /* Efeito de círculo perfeito */
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .ping-red::before {
@@ -131,28 +166,27 @@
 }
 
 
-/* --- SEÇÃO 4: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
+/* --- SEÇÃO 5: AJUSTES DE CLASSES UTILITÁRIAS PARA TEMA CLARO --- */
 :host-context(body.light) .bg-white\/5 {
-  background-color: #e5e5e5;
+  background-color: var(--bg-opacity-5);
 }
 
 :host-context(body.light) .drilldowndetail-container .text-chart-teal-light {
   color: var(--color-dark-black);
 }
 
-:host-context(body.light) .grid-lines .bg-white\/10 {
-  background-color: rgba(var(--color-accent-light-rgb), 0.2);
-}
-
+/* Agrupamento de seletores com o mesmo resultado para evitar repetição */
+:host-context(body.light) .grid-lines .bg-white\/10,
 :host-context(body.light) .grid-lines .bg-white\/30 {
-  background-color: rgba(var(--color-accent-light-rgb), 0.2);
+  background-color: var(--grid-line-color);
 }
 
 :host-context(body.light) .border-white\/50 {
-  border-color: rgba(var(--color-accent-light-rgb), 0.2);
+  border-color: var(--border-color);
 }
 
 :host-context(body.light) .drilldowndetail-back-button:hover {
-  background-color: #d4e7e8; 
+  background-color: var(--back-button-hover-bg);
   color: var(--color-dark-black);
 }
+

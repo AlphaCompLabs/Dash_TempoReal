@@ -129,6 +129,19 @@ body.light .logo-traffic {
   background-image: url('assets/images/logo_network_traffic_blue.png'); /* Tema Claro */
 }
 
+.traffic-history-icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain; /* Ou 'cover' se preferir */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url('assets/icons/traffic-light.svg'); 
+}
+
+body.light .traffic-history-icon {
+  background-image: url('assets/icons/traffic-dark.svg');
+}
+
 /**
  * Classe para a decoração de imagem do footer.
  * As propriedades de tamanho e posicionamento são definidas uma vez.

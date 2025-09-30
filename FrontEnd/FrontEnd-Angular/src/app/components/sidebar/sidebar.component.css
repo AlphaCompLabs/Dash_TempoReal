@@ -1,21 +1,36 @@
 /*
- # =====================================================================================
- # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
- # Versão: 3.0.0 (Padronização do Código)
- # Autor(es): Equipe UX/UI - Elisa Nunes
- # Data: 2025-09-29
- # Descrição: Estilos para o componente da barra lateral (sidebar), incluindo
- #            a lógica de temas e as cores dinâmicas para os gráficos circulares.
- # =====================================================================================
+# =====================================================================================
+# SERVIDOR FRONTEND - ESTILOS DA BARRA LATERAL (SIDEBAR)
+# Versão: 3.0.1 (Padronização Segura de Código)
+#
+# Autor(es): Equipe UX/UI - Elisa Nunes (Revisado por Padronização de Código)
+# Data: 2025-09-30
+# Descrição: Estilos para o componente da barra lateral (sidebar), incluindo
+#            a lógica de temas e as cores dinâmicas para os gráficos circulares.
+#
+# Tabela de Conteúdos:
+# 1. Estilos de Base e Variáveis Padrão
+# 2. Ajustes para o Tema Claro (Light Mode)
+# 3. Variáveis de Cor para o Modo de Detalhe (Drilldown)
+# 4. Estilos do Texto de Porcentagem (4 Estados)
+# =====================================================================================
 */
 
-/* --- SEÇÃO 1: ESTILOS DE BASE DO COMPONENTE --- */
+/* --- SEÇÃO 1: ESTILOS DE BASE E VARIÁVEIS PADRÃO --- */
+
 :host {
   display: block;
+
+  /* Cores padrão (Tema Escuro / Visão Geral) */
+  --grad-download-1: var(--color-chart-blue-light);
+  --grad-download-2: var(--color-chart-blue-dark);
+  --grad-upload-1: var(--color-chart-blue-light);
+  --grad-upload-2: var(--color-chart-blue-dark);
 }
 
 .sidebar-component {
   width: 250px;
+  /* Altura total da tela menos a altura do cabeçalho (provavelmente 90px) */
   height: calc(100vh - 90px);
   background-color: var(--color-dark);
   background-image:
@@ -29,6 +44,7 @@
 
 
 /* --- SEÇÃO 2: AJUSTES PARA O TEMA CLARO (LIGHT MODE) --- */
+
 :host-context(body.light) .sidebar-component {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
@@ -36,6 +52,7 @@
 }
 
 :host-context(body.light) .sidebar-stats-circle img {
+  /* Inverte as cores do ícone para garantir visibilidade no fundo claro */
   filter: invert(1);
 }
 
@@ -48,17 +65,9 @@
 }
 
 
-/* --- SEÇÃO 3: VARIÁVEIS DE COR PARA GRADIENTES --- */
+/* --- SEÇÃO 3: VARIÁVEIS DE COR PARA O MODO DE DETALHE (DRILLDOWN) --- */
 
-/* Cores padrão (Tema Escuro / Visão Geral) */
-:host {
-  --grad-download-1: var(--color-chart-blue-light);
-  --grad-download-2: var(--color-chart-blue-dark);
-  --grad-upload-1: var(--color-chart-blue-light);
-  --grad-upload-2: var(--color-chart-blue-dark);
-}
-
-/* Cores para o modo de detalhe (Drilldown) */
+/* Cores para o modo de detalhe (Drilldown) em tema escuro */
 .sidebar-component.drilldown-active {
   --grad-download-1: var(--color-chart-teal-light);
   --grad-download-2: var(--color-chart-teal-dark);
@@ -68,29 +77,30 @@
 
 
 /* --- SEÇÃO 4: ESTILOS DO TEXTO DE PORCENTAGEM (4 ESTADOS) --- */
+
 .progress-percentage {
   transition: color 0.3s ease-in-out;
 }
 
-/* Estado 1: Geral / Tema Escuro */
+/* Estado 1: Visão Geral / Tema Escuro */
 .progress-percentage-download,
 .progress-percentage-upload {
   color: var(--color-chart-blue-light);
 }
 
-/* Estado 2: Geral / Tema Claro */
+/* Estado 2: Visão Geral / Tema Claro */
 :host-context(body.light) .progress-percentage-download,
 :host-context(body.light) .progress-percentage-upload {
   color: var(--color-chart-blue-dark);
 }
 
-/* Estado 3: Detalhe / Tema Escuro */
+/* Estado 3: Modo de Detalhe / Tema Escuro */
 .sidebar-component.drilldown-active .progress-percentage-download,
 .sidebar-component.drilldown-active .progress-percentage-upload {
   color: var(--color-chart-teal-light);
 }
 
-/* Estado 4: Detalhe / Tema Claro */
+/* Estado 4: Modo de Detalhe / Tema Claro */
 :host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-download,
 :host-context(body.light) .sidebar-component.drilldown-active .progress-percentage-upload {
   color: var(--color-chart-teal-dark);

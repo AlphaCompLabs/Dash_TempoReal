@@ -12,11 +12,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BehaviorSubject, Subscription } from 'rxjs';
-
-
-// ✅ IMPORTANTE: Importar o módulo real para poder removê-lo
 import { HttpClientModule } from '@angular/common/http'; 
-
 import { WelcomeComponent } from './welcome.component';
 import { ThemeService } from '../../services/theme.service';
 
@@ -38,7 +34,6 @@ describe('WelcomeComponent', () => {
         { provide: ThemeService, useValue: mockThemeService }
       ]
     })
-    // ✅ A CORREÇÃO DEFINITIVA ESTÁ AQUI:
     .overrideComponent(WelcomeComponent, {
       // Remove o HttpClientModule importado pelo próprio componente
       remove: { imports: [HttpClientModule] }

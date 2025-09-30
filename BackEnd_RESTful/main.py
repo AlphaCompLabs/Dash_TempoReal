@@ -1,11 +1,11 @@
 # =====================================================================================
 # SERVIDOR BACKEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
-# Versão: 2.8.0 (Refatorado para Lifespan Events)
+# Versão: 2.9.0 (com Histórico de Tráfego)
 #
 # Autor: Equipe Backend - Diogo Freitas e Gustavo Martins
-# Descrição: Esta versão moderniza o código, substituindo o decorador obsoleto
-#            `@app.on_event("startup")` pelo novo gerenciador de `lifespan`,
-#            conforme recomendado pela documentação do FastAPI.
+# Descrição: Esta versão adiciona a capacidade de armazenar o histórico do
+#            tráfego total (inbound/outbound) do último minuto e o expõe
+#            através de um novo endpoint /api/traffic/history.
 # =====================================================================================
 
 # --- SEÇÃO 0: IMPORTAÇÕES E CONFIGURAÇÃO INICIAL ---
@@ -15,7 +15,9 @@ import time
 from typing import Dict, List, Optional
 import logging
 import socket
-from contextlib import asynccontextmanager 
+from contextlib import asynccontextmanager
+from collections import deque
+
 from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
@@ -24,8 +26,8 @@ from functools import lru_cache
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# --- SEÇÃO 1: MODELOS DE DADOS PARA INGESTÃO ---
-# (Nenhuma alteração nesta seção)
+# --- SEÇÃO 1: MODELOS DE DADOS PARA INGESTÃO E CONSUMO ---
+
 class ProtocolInOutData(BaseModel):
     in_bytes: int = Field(alias="in")
     out_bytes: int = Field(alias="out")
@@ -47,25 +49,81 @@ class GlobalProtocolSummary(BaseModel):
     name: str
     y: int
 
+class HistoricalDataPoint(BaseModel):
+    """ Representa um ponto de dados no gráfico de histórico. """
+    timestamp: int
+    total_inbound: int
+    total_outbound: int
+
+class ClientTrafficSummary(BaseModel):
+    ip: str
+    inbound: int
+    outbound: int
+
+class ProtocolDrilldown(BaseModel):
+    name: str
+    inbound: int
+    outbound: int
+    y: int
+
 # --- SEÇÃO 2: ARMAZENAMENTO DE DADOS EM MEMÓRIA --- 
-# (Nenhuma alteração nesta seção)
+
 class TimestampedClientData(BaseModel):
     data: ClientData
     last_seen: float = Field(default_factory=time.time)
 
 class TrafficDataStore:
-    # ... (A classe TrafficDataStore continua exatamente igual)
+    """
+    Armazena e gerencia os dados de tráfego, incluindo o histórico do último minuto.
+    """
     def __init__(self, timeout_seconds: int = 15):
         self.CLIENT_TIMEOUT_SECONDS = timeout_seconds
         self._clients_data: Dict[str, TimestampedClientData] = {}
         self._lock = threading.Lock()
-        logging.info(f"Gerenciador de estado iniciado. Timeout de cliente definido para {self.CLIENT_TIMEOUT_SECONDS} segundos.")
-    def update_data(self, new_clients_data: Dict[str, ClientData]):
+        
+        # Como recebemos dados a cada 5s, 12 registos cobrem 60s.
+        self.HISTORY_LENGTH = 12 
+        self._history: deque[HistoricalDataPoint] = deque(maxlen=self.HISTORY_LENGTH)
+        
+        logging.info(f"Gerenciador de estado iniciado. Timeout: {self.CLIENT_TIMEOUT_SECONDS}s. Histórico: {self.HISTORY_LENGTH} pontos.")
+
+    # Dentro da classe TrafficDataStore
+
+    def update_data(self, new_clients_data: Dict[str, ClientData], timestamp: int):
+        """
+        Atualiza os dados dos clientes e adiciona um novo ponto ao histórico.
+        Se não houver clientes, adiciona um ponto com tráfego zero.
+        """
         with self._lock:
             now = time.time()
-            for ip, client_data in new_clients_data.items():
-                self._clients_data[ip] = TimestampedClientData(data=client_data, last_seen=now)
-            logging.info(f"{len(new_clients_data)} clientes recebidos/atualizados.")
+            total_inbound_window = 0
+            total_outbound_window = 0
+
+            # Atualiza os dados dos clientes se houver algum
+            if new_clients_data:
+                for ip, client_data in new_clients_data.items():
+                    self._clients_data[ip] = TimestampedClientData(data=client_data, last_seen=now)
+                    total_inbound_window += client_data.in_bytes
+                    total_outbound_window += client_data.out_bytes
+            
+            # ESTA PARTE AGORA RODA SEMPRE, mesmo com os totais em zero
+            history_point = HistoricalDataPoint(
+                timestamp=timestamp,
+                total_inbound=total_inbound_window,
+                total_outbound=total_outbound_window
+            )
+            self._history.append(history_point)
+            
+            if not new_clients_data:
+                logging.info("Nenhum cliente ativo. Ponto de histórico com tráfego zero adicionado.")
+            else:
+                logging.info(f"{len(new_clients_data)} clientes recebidos. Histórico atualizado.")
+
+    def get_history(self) -> List[HistoricalDataPoint]:
+        """ Retorna a lista de pontos de dados do histórico. """
+        with self._lock:
+            return list(self._history)
+
     def cleanup_inactive_clients(self):
         with self._lock:
             now = time.time()
@@ -77,13 +135,17 @@ class TrafficDataStore:
                 for ip in inactive_ips:
                     del self._clients_data[ip]
                 logging.info(f"Clientes inativos removidos: {', '.join(inactive_ips)}")
+
     def get_data(self) -> Dict[str, ClientData]:
         with self._lock:
             return {ip: ts_data.data for ip, ts_data in self._clients_data.items()}
+        
     def clear(self):
+        """ Limpa todos os dados, incluindo o histórico. """
         with self._lock:
             self._clients_data.clear()
-            logging.info("Armazenamento de dados de tráfego limpo para teste.")
+            self._history.clear()
+            logging.info("Armazenamento de dados e histórico limpos para teste.")
 
 data_store = TrafficDataStore(timeout_seconds=15)
 
@@ -98,63 +160,36 @@ def run_cleanup_task():
 def clear_traffic_data():
     data_store.clear()
 
-# --- SEÇÃO 3: INICIALIZAÇÃO DA APLICAÇÃO FASTAPI (REFATORADO) ---
+# --- SEÇÃO 3: INICIALIZAÇÃO DA APLICAÇÃO FASTAPI ---
 
-# CRIA A FUNÇÃO LIFESPAN
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Código a ser executado na inicialização (startup)
     cleanup_thread = threading.Thread(target=run_cleanup_task, daemon=True)
     cleanup_thread.start()
     logging.info("Tarefa de limpeza de clientes inativos iniciada em segundo plano.")
-    
-    yield # A aplicação fica "viva" aqui
-    
-    # Código a ser executado na finalização (shutdown) - opcional
+    yield
     logging.info("Servidor a finalizar. Tarefa de limpeza será encerrada.")
 
 app = FastAPI(
     title="Dashboard de Tráfego de Servidor - API",
     description="API RESTful que recebe dados do `network_analyzer` e os fornece para um dashboard de visualização.",
-    version="2.8.0",
+    version="2.9.0",
     contact={ "name": "Equipe Backend", "url": "https://github.com/AlphaCompLabs/Dash_TempoReal" },
-    lifespan=lifespan # REGISTRA A FUNÇÃO LIFESPAN
+    lifespan=lifespan
 )
 
-# --- CONFIGURAÇÃO DE CORS ---
-# (Nenhuma alteração nesta seção)
-origins = [
-    "http://localhost:4200",
-    "http://localhost",
-    "http://127.0.0.1:4200",
-]
+origins = [ "http://localhost:4200", "http://localhost", "http://127.0.0.1:4200" ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
 )
 
-# --- SEÇÃO 4: MODELOS DE DADOS PARA CONSUMO (CONTRATO COM O FRONTEND) ---
-# (Nenhuma alteração nesta seção)
-class ClientTrafficSummary(BaseModel):
-    ip: str
-    inbound: int
-    outbound: int
+# --- SEÇÃO 4: ENDPOINTS DA API ---
 
-class ProtocolDrilldown(BaseModel):
-    name: str
-    inbound: int
-    outbound: int
-    y: int
-
-# --- SEÇÃO 5: ENDPOINTS DA API ---
-# (Nenhuma alteração nesta seção)
 @app.post("/api/ingest", status_code=204, tags=["Data Ingestion"])
 def receive_traffic_data(payload: TrafficPayload):
     try:
-        data_store.update_data(payload.clients)
+        data_store.update_data(payload.clients, payload.window_end)
         return Response(status_code=204)
     except Exception as e:
         logging.error(f"Erro inesperado ao armazenar dados: {e}", exc_info=True)
@@ -170,6 +205,19 @@ def get_main_traffic_data():
         for ip, data in latest_clients.items()
     ]
     return response_data
+
+@app.get("/api/traffic/history", response_model=List[HistoricalDataPoint], tags=["Data Consumption"])
+def get_traffic_history():
+    """
+    Fornece os dados históricos de tráfego total (inbound/outbound) do último
+    minuto, com pontos de dados a cada 5 segundos.
+    """
+    try:
+        history_data = data_store.get_history()
+        return history_data
+    except Exception as e:
+        logging.error(f"Erro ao obter dados do histórico: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Erro ao processar o histórico de tráfego.")
 
 @app.get("/api/traffic/{client_ip}/protocols", response_model=List[ProtocolDrilldown], tags=["Data Consumption"])
 def get_protocol_drilldown_data(client_ip: str):
@@ -202,11 +250,9 @@ def get_global_protocol_summary():
     ]
     return response_data
 
-# --- 5.3 Função para descobrir o IP local ---
 def get_lan_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Este IP não precisa ser alcançável
         s.connect(('10.255.255.255', 1))
         IP = s.getsockname()[0]
     except Exception:
@@ -215,16 +261,13 @@ def get_lan_ip():
         s.close()
     return IP
 
-# O decorador @lru_cache memoriza o resultado da função.
-# maxsize=1 significa que ele armazenará apenas o resultado mais recente.
 @lru_cache(maxsize=1)
 def get_cached_lan_ip():
-    """Função "cacheada" que chama a lógica original apenas uma vez."""
-    print("Calculando o IP da LAN (executado apenas uma vez)...")
+    logging.info("A calcular o IP da LAN (executado apenas uma vez)...")
     return get_lan_ip()
 
 @app.get("/api/server-info")
 def get_server_info():
-    # Agora chamamos a versão com cache
     lan_ip = get_cached_lan_ip()
     return {"server_ip": lan_ip}
+

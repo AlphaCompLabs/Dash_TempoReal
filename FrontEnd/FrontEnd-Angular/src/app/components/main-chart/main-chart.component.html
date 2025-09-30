@@ -1,28 +1,54 @@
-<!--
- # =====================================================================================
- # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
- # Versão: 3.0.0 (Padronização do Código)
- # Autor(es): Equipe UX/UI - Elisa Nunes
- # Data: 2025-09-29
- # Descrição: Componente principal que exibe o gráfico de tráfego geral e a
- #            visualização detalhada por cliente.
- # =====================================================================================
--->
-
-<!-- Início do Componente de Gráfico Principal -->
 <div class="mainchart-component flex flex-col gap-1 w-full h-full relative">
 
-  <!-- Tooltip (Dica de Contexto) do Gráfico -->
+  @if (showHistoryChart) {
+  <div class="absolute inset-0 bg-dark/90 backdrop-blur-sm z-50 flex flex-col p-4 items-center justify-center">
+    <div class="w-full max-w-4xl h-auto bg-dark-deep p-6 rounded-lg border border-accent-light/20 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col">
+          <h3 class="font-sans text-xl font-bold text-white">Histórico de Tráfego</h3>
+          <span class="text-sm text-secondary">Últimos 60 segundos</span>
+        </div>
+        <button (click)="uiStateService.toggleHistoryChart()" class="text-white hover:text-accent-light text-2xl">&times;</button>
+      </div>
+
+      <div class="w-full h-64 bg-white/5 rounded-md p-4">
+        <div class="flex items-center justify-center h-full text-white">
+          <div class="w-full h-64">
+          @if (lineChartData.labels && lineChartData.labels.length > 0) {
+            <canvas baseChart class="chart"
+              [data]="lineChartData"
+              [options]="lineChartOptions"
+              [type]="lineChartType">
+            </canvas>
+          } @else {
+            <div class="flex items-center justify-center h-full text-white/50">
+              <p>Aguardando dados do servidor...</p>
+            </div>
+          }
+        </div>
+          </div>
+      </div>
+
+       <div class="mt-4 flex items-center justify-center gap-6 text-xs text-white">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-[#0d93c3]"></span> Download
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-[#8bd9f5]"></span> Upload
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
   @if (isTooltipVisible) {
   <div class="chart-tooltip" [style.top.px]="tooltipTop" [style.left.px]="tooltipLeft">
     {{ tooltipText }}
   </div>
   }
 
-  <!-- Visualização: Gráfico Principal (Visão Geral) -->
   @if (!selectedClientForDetail) {
 
-  <!-- Cabeçalho do Gráfico Principal -->
   <div class="mainchart-header flex items-center justify-between">
     <div class="flex items-center gap-2 ml-4">
       <div class="flex flex-col">
@@ -44,7 +70,6 @@
     </div>
   </div>
 
-  <!-- Corpo do Gráfico Principal -->
   <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
     <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
       <span [ngClass]="{
@@ -56,13 +81,11 @@
       </span>
     </div>
 
-    <!-- Conteúdo do Gráfico (se houver clientes) -->
     @if (hasClients) {
     <div class="bg-white/5 w-full h-full flex relative p-6 z-10">
       <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans text-accent-light text-xs">Tráfego ({{ chartUnit }})</span>
 
       <div class="flex-grow flex gap-2">
-        <!-- Eixo Y (Valores) -->
         <div class="flex flex-col">
           <div class="relative flex-grow w-8 pr-4">
             @for (label of yAxisLabels; track $index) {
@@ -74,17 +97,14 @@
           <div class="h-8"></div>
         </div>
 
-        <!-- Área das Barras do Gráfico -->
         <div class="w-full flex flex-col">
           <div class="relative w-full flex-grow border-l-2 border-b-2 border-white/50 px-4">
-            <!-- Linhas de Grade -->
             <div class="grid-lines absolute inset-0 px-4 py-2">
               @for (label of yAxisLabels; track $index) {
               <div class="absolute left-0 w-full h-px bg-white/10" [style.bottom.%]="(label / maxChartValue) * 100"></div>
               <div class="absolute left-0 h-px w-2 bg-white/30 -translate-x-full" [style.bottom.%]="(label / maxChartValue) * 100"></div>
               }
             </div>
-            <!-- Barras Individuais dos Clientes -->
             <div class="w-full h-full flex gap-x-6 px-4" style="position: relative; z-index: 10;">
               @for (client of networkClients; track client.ip) {
               <div class="grow w-0 flex flex-col justify-end">
@@ -97,7 +117,6 @@
             </div>
           </div>
 
-          <!-- Eixo X (Rótulos) -->
           <div class="h-8 w-full flex flex-col gap-1 px-4 pt-2">
             <div class="flex gap-x-4">
               @for (client of networkClients; track client.ip) {
@@ -116,7 +135,6 @@
       </div>
     </div>
 
-    <!-- Rodapé/Legenda do Gráfico Principal -->
     <div class="mainchart-footer mt-2">
       <div class="bg-white/5 p-3 rounded-lg flex items-center justify-between gap-4">
         <div class="flex flex-col items-start gap-1">
@@ -132,7 +150,6 @@
       </div>
     </div>
     } @else {
-    <!-- Mensagem de ausência de clientes -->
     <div class="flex items-center justify-center h-full">
       <p class="text-white text-lg text-center">
         Não há Clientes (IP) conectados a esse servidor no momento.
@@ -142,12 +159,10 @@
   </section>
   }
 
-  <!-- Visualização: Detalhes do Cliente (Drilldown) -->
   @if (selectedClientForDetail) {
   <div class="drilldowndetail-component w-full h-full flex flex-col gap-1">
     @if (isSelectedClientConnected) {
 
-    <!-- Cabeçalho da Visão Detalhada -->
     <div class="flex items-center justify-between">
       <button (click)="goBackToMainChart()" class="drilldowndetail-back-button text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
         &larr; Voltar para o gráfico geral
@@ -165,7 +180,6 @@
       </div>
     </div>
 
-    <!-- Corpo do Gráfico Detalhado -->
     <section class="drilldowndetail-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
       <div class="drilldowndetail-title text-center">
         <h3 class="font-sans text-lg font-light text-white leading-tight">
@@ -181,11 +195,9 @@
             class="relative inline-flex rounded-full h-5 w-5"></span>
       </div>
 
-      <!-- Conteúdo do Gráfico Detalhado -->
       <div class="bg-white/5 rounded-lg p-2 w-full h-full flex relative p-6 z-10">
         <span class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 rotate-[-90deg] font-sans text-chart-teal-light text-xs">Tráfego ({{ detailChartUnit }})</span>
         <div class="flex-grow flex gap-2">
-          <!-- Eixo Y (Valores) -->
           <div class="flex flex-col">
             <div class="relative flex-grow w-8 pr-2">
               @for (label of yAxisDetailLabels; track $index) {
@@ -194,44 +206,42 @@
             </div>
             <div class="h-8"></div>
           </div>
-          <!-- Área das Barras do Gráfico -->
-          <div class="w-full flex flex-col">
-            <div class="relative w-full flex-grow border-l-2 border-b-2 border-white/50">
-              <!-- Linhas de Grade -->
-              <div class="grid-lines absolute inset-0" style="z-index: 0;">
-                @for (label of yAxisDetailLabels; track $index) {
-                <div class="absolute left-0 w-full h-px bg-white/10" [style.bottom.%]="(label / maxDetailChartValue) * 100"></div>
-                }
-              </div>
-              <!-- Barras Individuais dos Protocolos -->
-              <div class="w-full h-full flex gap-x-6 px-2" style="position: relative; z-index: 10;">
-                @for (protocol of detailData; track protocol.name) {
-                <div class="grow w-0 flex flex-col justify-end">
-                  <div class="w-full mx-auto flex flex-col rounded-t-md overflow-hidden transition-all duration-200 ease-in-out hover:brightness-125" [style.height.%]="calculateDetailTotalHeight(protocol)" (mouseenter)="showTooltip($event, protocol)" (mouseleave)="hideTooltip()" (mousemove)="moveTooltip($event)">
-                    <div class="bg-chart-teal-dark" [style.height.%]="calculateDetailDownloadRatio(protocol)"></div>
-                    <div class="bg-chart-teal-light" [style.height.%]="calculateDetailUploadRatio(protocol)"></div>
+          <div class="flex-grow flex flex-col min-w-0">
+            <div class="flex-grow overflow-x-auto">
+              <div class="h-full min-w-max">
+                <div class="relative h-[calc(100%-2rem)] border-l-2 border-b-2 border-white/50">
+                  <div class="grid-lines absolute inset-0" style="z-index: 0;">
+                    @for (label of yAxisDetailLabels; track $index) {
+                    <div class="absolute left-0 w-full h-px bg-white/10" [style.bottom.%]="(label / maxDetailChartValue) * 100"></div>
+                    }
+                  </div>
+                  <div class="w-full h-full flex gap-x-4 px-2" style="position: relative; z-index: 10;">
+                    @for (protocol of detailData; track protocol.name) {
+                    <div class="flex-grow flex-shrink basis-0 min-w-20 flex flex-col justify-end">
+                      <div class="w-full mx-auto flex flex-col rounded-t-md overflow-hidden transition-all duration-200 ease-in-out hover:brightness-125" [style.height.%]="calculateDetailTotalHeight(protocol)" (mouseenter)="showTooltip($event, protocol)" (mouseleave)="hideTooltip()" (mousemove)="moveTooltip($event)">
+                        <div class="bg-chart-teal-dark" [style.height.%]="calculateDetailDownloadRatio(protocol)"></div>
+                        <div class="bg-chart-teal-light" [style.height.%]="calculateDetailUploadRatio(protocol)"></div>
+                      </div>
+                    </div>
+                    }
                   </div>
                 </div>
-                }
-              </div>
-            </div>
-
-            <!-- Eixo X (Rótulos) -->
-            <div class="h-8 w-full flex flex-col gap-1 px-2 pt-1">
-              <div class="flex gap-x-4">
-                @for (protocol of detailData; track protocol.name) {
-                <div class="grow w-0 text-center">
-                  <span class="block text-white text-xs truncate">{{ protocol.name }}</span>
+                <div class="h-8 w-full flex flex-col pt-1">
+                  <div class="flex gap-x-4 px-2">
+                    @for (protocol of detailData; track protocol.name) {
+                    <div class="flex-grow flex-shrink basis-0 min-w-14 text-center">
+                      <span class="block text-white text-xs truncate">{{ protocol.name }}</span>
+                    </div>
+                    }
+                  </div>
                 </div>
-                }
               </div>
-              <span class="text-center mt-1 font-sans text-chart-teal-light text-xs">Protocolos</span>
             </div>
+            <span class="text-center mt-1 font-sans text-chart-teal-light text-xs">Protocolos</span>
           </div>
         </div>
       </div>
 
-      <!-- Rodapé/Legenda do Gráfico Detalhado -->
       <div class="mt-2">
         <div class="bg-white/5 p-3 rounded-lg flex items-center justify-between gap-4">
           <div class="flex flex-col items-start gap-1">
@@ -246,7 +256,6 @@
     </section>
 
     } @else {
-    <!-- Tela de Cliente Desconectado -->
     <div class="w-full h-full flex flex-col gap-1">
       <div class="flex items-center justify-start">
         <button (click)="goBackToMainChart()" class="drilldowndetail-back-button text-white px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">
@@ -269,4 +278,3 @@
   </div>
   }
 </div>
-<!-- Fim do Componente de Gráfico Principal -->
