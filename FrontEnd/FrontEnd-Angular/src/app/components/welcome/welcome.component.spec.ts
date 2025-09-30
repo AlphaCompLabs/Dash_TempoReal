@@ -1,116 +1,139 @@
-// =====================================================================================
-// CLIENTE FRONTEND - TESTES UNITÁRIOS AUTOMATIZADOS
-// Componente: WelcomeComponent (welcome.component.spec.ts)
-// Versão: 3.0.0 (Solução Definitiva com overrideComponent)
-//
-// Autor: Equipe Frontend/QA
-// Descrição: Corrigido o conflito entre HttpClientModule (do componente standalone)
-//            e HttpClientTestingModule usando TestBed.overrideComponent para remover
-//            o módulo conflitante durante os testes.
-// =====================================================================================
+/*
+# =====================================================================================
+# SERVIDOR FRONTEND - TESTES DE UNIDADE PARA O COMPONENTE DE BOAS-VINDAS (WELCOME)
+# Versão: 1.0.0
+#
+# Autor(es): Backend / QA
+# Data: 2025-09-30
+# Descrição: Este ficheiro contém os testes de unidade para o WelcomeComponent,
+#            verificando a lógica de UI, a busca de dados da API, a subscrição
+#            a serviços e o ciclo de vida do componente.
+# =====================================================================================
+*/
 
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { HttpClientModule } from '@angular/common/http'; 
+import { BehaviorSubject } from 'rxjs';
+
 import { WelcomeComponent } from './welcome.component';
 import { ThemeService } from '../../services/theme.service';
 
-const mockThemeService = {
-  isLightMode$: new BehaviorSubject<boolean>(false),
-};
+// Mock para o ThemeService para controlar o estado do tema nos testes
+class MockThemeService {
+  isLightMode$ = new BehaviorSubject<boolean>(false);
+}
 
 describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
-  let httpMock: HttpTestingController;
-
+  let httpTestingController: HttpTestingController;
+  let themeService: MockThemeService;
   const API_URL = 'http://localhost:8000/api/server-info';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WelcomeComponent, HttpClientTestingModule],
+      // Como o componente é standalone, ele é importado diretamente
+      imports: [ WelcomeComponent, HttpClientTestingModule ],
       providers: [
-        { provide: ThemeService, useValue: mockThemeService }
+        { provide: ThemeService, useClass: MockThemeService }
       ]
-    })
-    .overrideComponent(WelcomeComponent, {
-      // Remove o HttpClientModule importado pelo próprio componente
-      remove: { imports: [HttpClientModule] }
     })
     .compileComponents();
 
-    // A criação do fixture e do mock volta para o beforeEach
     fixture = TestBed.createComponent(WelcomeComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    themeService = TestBed.inject(ThemeService) as unknown as MockThemeService;
   });
-  
+
   afterEach(() => {
-    httpMock.verify();
+    // Garante que não há requisições HTTP pendentes entre os testes
+    httpTestingController.verify();
   });
 
-  it('should create', fakeAsync(() => {
+  it('deve ser criado', () => {
+    // Dispara o ngOnInit, que faz a chamada HTTP
     fixture.detectChanges();
-    tick();
-
+    // Responde à chamada para que o teste passe na verificação do afterEach
+    httpTestingController.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
     expect(component).toBeTruthy();
-    httpMock.expectOne(API_URL).flush({ server_ip: '0.0.0.0' });
-    tick();
-  }));
+  });
 
-  it('should fetch server address successfully on init', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-
-    const req = httpMock.expectOne(API_URL);
-    req.flush({ server_ip: '192.168.1.100' }); 
-    tick();
-
-    expect(component.serverAddress).toBe(`http://192.168.1.100:8001`);
-  }));
-
-  // O restante dos testes continua igual à versão 2.0.0, pois a lógica com fakeAsync/tick
-  // já estava correta para controlar o fluxo de execução. O problema era apenas a configuração inicial.
-  it('should handle API error when fetching server address', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    
-    const req = httpMock.expectOne(API_URL);
-    req.flush('Error', { status: 500, statusText: 'Server Error' });
-    tick();
-    
-    expect(component.serverAddress).toBe('Falha na conexão com a API');
-  }));
-
-  it('should react to theme changes from ThemeService', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    
-    httpMock.expectOne(API_URL).flush({ server_ip: '0.0.0.0' });
-    tick();
-    
+  it('deve ter o estado inicial correto antes do ngOnInit', () => {
+    // Verifica o estado antes de qualquer detecção de alterações
+    expect(component.isPanelOpen).toBe(true);
+    expect(component.serverAddress).toBe('Carregando...');
     expect(component.isLightMode).toBe(false);
 
-    mockThemeService.isLightMode$.next(true);
-    tick();
-    
-    expect(component.isLightMode).toBe(true);
-  }));
-
-  it('should unsubscribe from all subscriptions on destroy', fakeAsync(() => {
+    // Dispara o ngOnInit e limpa a requisição para satisfazer o afterEach
     fixture.detectChanges();
-    tick();
+    httpTestingController.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
+  });
 
-    const serverSubSpy = jest.spyOn(component['serverInfoSubscription'], 'unsubscribe');
-    const themeSubSpy = jest.spyOn(component['themeSubscription'], 'unsubscribe');
+  it('deve buscar o IP do servidor e formatar o endereço com sucesso', () => {
+    const mockServerIp = '192.168.1.100';
+    const mockResponse = { server_ip: mockServerIp };
+
+    // Dispara o ngOnInit
+    fixture.detectChanges();
+
+    const req = httpTestingController.expectOne(API_URL);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
+
+    expect(component.serverAddress).toBe(`http://${mockServerIp}:8001`);
+  });
+
+  it('deve definir uma mensagem de erro se a busca pelo IP do servidor falhar', () => {
+    fixture.detectChanges();
+
+    const req = httpTestingController.expectOne(API_URL);
+    req.flush('Error', { status: 500, statusText: 'Server Error' });
+
+    expect(component.serverAddress).toBe('Falha na conexão com a API');
+  });
+
+  it('deve reagir a mudanças de tema', () => {
+    fixture.detectChanges(); // Dispara o ngOnInit
+    httpTestingController.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
     
-    httpMock.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
-    tick();
+    expect(component.isLightMode).toBe(false); // Estado inicial
 
-    fixture.destroy();
+    // Simula a mudança para o modo claro
+    themeService.isLightMode$.next(true);
+    fixture.detectChanges();
+    expect(component.isLightMode).toBe(true);
 
-    expect(serverSubSpy).toHaveBeenCalled();
-    expect(themeSubSpy).toHaveBeenCalled();
-  }));
+    // Simula a volta para o modo escuro
+    themeService.isLightMode$.next(false);
+    fixture.detectChanges();
+    expect(component.isLightMode).toBe(false);
+  });
+
+  it('deve alternar a visibilidade do painel ao chamar togglePanel', () => {
+    fixture.detectChanges();
+    httpTestingController.expectOne(API_URL).flush({ server_ip: '127.0.0.1' });
+
+    expect(component.isPanelOpen).toBe(true);
+    component.togglePanel();
+    expect(component.isPanelOpen).toBe(false);
+    component.togglePanel();
+    expect(component.isPanelOpen).toBe(true);
+  });
+
+  it('deve cancelar as subscrições ao ser destruído (ngOnDestroy)', () => {
+    fixture.detectChanges();
+    const req = httpTestingController.expectOne(API_URL);
+    
+    // Cria um spy no método `unsubscribe` da propriedade `subscriptions`
+    const unsubscribeSpy = jest.spyOn((component as any).subscriptions, 'unsubscribe');
+    
+    // Chama o ngOnDestroy
+    component.ngOnDestroy();
+    
+    expect(unsubscribeSpy).toHaveBeenCalledTimes(1);
+    // Como a subscrição da chamada HTTP foi adicionada, ela deve ser cancelada
+    expect(req.cancelled).toBe(true);
+  });
 });
+
