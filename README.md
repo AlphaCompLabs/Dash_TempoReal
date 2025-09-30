@@ -38,7 +38,6 @@ Sistema para captura e análise de tráfego em servidores, permitindo a visualiz
 * **Comunicação em Tempo Real:** **API RestFull**
 * **Comparação de resultados:** **Wireshark API**
 
-
 ### Desenvolvimento & Testes
 * **Testes:** **Jest** (para testes unitários).
 * **Versionamento:** **Git** / **GitHub**
@@ -204,6 +203,7 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
     python -m venv venv
     .\venv\Scripts\activate
     ```
+**⚠️ Atenção:** Não esqueça de ter instalado em sua máquina o [NPCAP](https://npcap.com/#download, isso é pré-requisito para esse passo
 3.  **Instale as dependências** (`scapy` e `cap`):
     ```bash
     pip install scapy cap
@@ -271,6 +271,7 @@ Após a inicialização, acesse a aplicação web: **[http://localhost:4200/](ht
     ```bash
     python server_http.py
     ```
+Após a inicialização, acesse a aplicação web: **[http://127.0.0.1:8001](http://127.0.0.1:8001)**
 
 -----
 
@@ -327,6 +328,10 @@ Com os **cinco terminais rodando** (Backend, Network Analyzer, Frontend, Servido
         http://127.0.0.1:8001
         ```
       * *Ao realizar esses acessos, o **Terminal 2** (Network Analyzer) deve começar a exibir logs de pacotes e o **Terminal 1** (Backend) deve registrar a ingestão de dados.*
+
+### Teste Network Analyzer (HTTP e FTP)
+
+Acesse o **Terminal 2** realize testes de movimentação nos servidores e verifique os logs presentes.
 
 ### Teste da API (Swagger UI)
 
