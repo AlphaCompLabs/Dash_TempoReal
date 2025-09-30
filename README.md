@@ -215,8 +215,7 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
     Get-NetAdapter | Select Name, Status
     ipconfig
     ```
-    <img width="602" height="461" alt="image" src="https://github.com/user-attachments/assets/9e69198a-20c1-44d7-a9b6-f29e9495fbed" />
-
+    <img width="877" height="484" alt="image" src="https://github.com/user-attachments/assets/54b7ec74-8258-498d-9ad0-8019f3116cea" />
 
 #### Passo 2: Execução
 
@@ -315,14 +314,14 @@ Com os **cinco terminais rodando** (Backend, Network Analyzer, Frontend, Servido
 ### Teste de Geração de Tráfego (HTTP e FTP)
 
 1.  **Descubra seu IP:** Abra o **Prompt de Comando** e use:
-    ```bash
-    ipconfig
-    ```
+      ```bash
+      ipconfig
+      ```
 2.  **Acesse o Servidor FTP:**
       * Use o **Gerenciador de Arquivos** e na barra de endereço, use o seu IP:
-        ```
-        ftp://<SEU_IP_AQUI>:2121
-        ```
+      ```
+      ftp://<SEU_IP_AQUI>:2121
+      ```
 3.  **Acesse o Servidor HTTP:**
       * Use o **Navegador** e acesse:
       
