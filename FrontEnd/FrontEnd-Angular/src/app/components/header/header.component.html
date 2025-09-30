@@ -25,8 +25,8 @@
   <!-- Seção Direita: Seletor de Tema -->
   <div class="header-theme-switcher relative flex items-center space-x-2">
     <button class="bg-accent-light/20 rounded-md p-2 transition-all duration-300 hover:bg-white/20 active:scale-95" aria-label="Mostrar histórico de tráfego" (click)="toggleHistory()">
-      <img *ngIf="!isLightMode" src="assets/icons/traffic-light.svg" alt="Ícone de Sol para tema claro" class="h-6">
-      <img *ngIf="isLightMode" src="assets/icons/traffic-dark.svg" alt="Ícone de Lua para tema escuro" class="h-6">
+      <img *ngIf="!isLightMode" src="assets/icons/traffic-light.svg" alt="Ícone de Histórico - Modo Escuro" class="h-6">
+      <img *ngIf="isLightMode" src="assets/icons/traffic-dark.svg" alt="Ícone de Histórico - Modo Claro" class="h-6">
     </button>
 
     <button class="bg-accent-light/20 rounded-md p-2 transition-all duration-300 hover:bg-white/20 active:scale-95" aria-label="Alternar tema" (click)="toggleTheme()">
