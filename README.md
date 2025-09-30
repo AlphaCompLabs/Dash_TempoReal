@@ -324,9 +324,7 @@ Com os **cinco terminais rodando** (Backend, Network Analyzer, Frontend, Servido
         ```
 3.  **Acesse o Servidor HTTP:**
       * Use o **Navegador** e acesse:
-        ```
-        http://127.0.0.1:8001
-        ```
+        🔗 **[http://127.0.0.1:8001](http://127.0.0.1:8001)**
       * *Ao realizar esses acessos, o **Terminal 2** (Network Analyzer) deve começar a exibir logs de pacotes e o **Terminal 1** (Backend) deve registrar a ingestão de dados.*
 
 ### Teste Network Analyzer (HTTP e FTP)
