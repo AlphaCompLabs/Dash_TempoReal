@@ -30,18 +30,19 @@ Sistema para captura e análise de tráfego em servidores, permitindo a visualiz
 ### Frontend
 * **Framework:** **Angular 20.2.2**
 * **Linguagem:** **TypeScript**
-* **Visualização de Dados:** **Chart.js**
-* **Estilização:** **Tailwind CSS** e **PostCSS**
+* **Estilização:** **Tailwind CSS**
 * **Gerenciamento de dependências e execução:** **Node.js (npm)**
 
 ### Monitoramento & Comunicação
-* **Análise de Rede:** **Wireshark API, NPCAP**
-* **Comunicação em Tempo Real:** **Socket.IO**
+* **Análise de Rede:** **Scapy, NPCAP**
+* **Comunicação em Tempo Real:** **API RestFull**
+* **Comparação de resultados:** **Wireshark API**
+
 
 ### Desenvolvimento & Testes
 * **Testes:** **Jest** (para testes unitários).
 * **Versionamento:** **Git** / **GitHub**
-* **Pacotes:** **npm** ou **Yarn**
+* **Pacotes:** **npm**
 
 ### Gerenciamento
 * **Gerenciamento de Projeto:** **Trello**
@@ -171,12 +172,18 @@ Este é o primeiro componente a ser executado, pois ele hospeda o endpoint que r
 
 #### Passo 2: Execução
 
-**🖥️ Terminal 1 (Backend) - Inicie o Servidor Uvicorn**
-Com o ambiente virtual ativado na pasta `~`, inicie o servidor da API.
-
+**🖥️ No Terminal 1 - Inicie o Backend:**
+Com o ambiente virtual ativado, inicie o servidor da API.
 ```bash
 uvicorn main:app --reload
 ```
+*(OU)*
+
+```bash
+python -m uvicorn main:app --reload
+```
+
+> O backend estará rodando em `http://127.0.0.1:8000` e aguardando dados.
 
 -----
 
@@ -190,7 +197,7 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
 
 1.  **Abra o Terminal 2** e acesse o diretório:
     ```bash
-    cd ~/Network_analyzer
+    cd ~\Dash_TempoReal\Network_analyzer
     ```
 2.  **Crie um novo Ambiente Virtual** (`venv_analyzer`) e **Ative-o**:
     ```bash
@@ -231,12 +238,22 @@ python ./main.py --server-ip <Seu IP(Substitua informações dentro e apague o "
     ```bash
     cd ~\Dash_TempoReal\FrontEnd\FrontEnd-Angular 
     ```
-2.  Execute o seguinte comando:
+2.  Execute a sequência de comandos:
+   
+    2.1.  Instalar Node Modules:
     ```bash
+    npm install
+    ```
+    2.2. Instalar Angular CLI(Pré-requisto):
+     ```bash
+    npm install -g @angular/cli@20.2.2
+     ```
+     2.3. Inicializar server:
+     ```bash
     ng serve
     ```
 
-Após a inicialização, acesse a aplicação web: **`http://localhost:4200/`**
+Após a inicialização, acesse a aplicação web: **[http://localhost:4200/](http://localhost:4200/)**
 
 -----
 
@@ -285,6 +302,8 @@ Após a inicialização, acesse a aplicação web: **`http://localhost:4200/`**
     INFO: Servidor FTP iniciado em ftp://0.0.0.0:2121
     ```
 
+[🔼 Voltar ao topo](#-sumário)
+
 -----
 
 ## 🧪 Realizando Testes
@@ -318,7 +337,9 @@ Com os **cinco terminais rodando** (Backend, Network Analyzer, Frontend, Servido
 
 ### Visualização na Aplicação Web
 
-Acesse **`http://localhost:4200/`** no seu navegador para ver o tráfego gerado organizado no Dashboard.
+Acesse **[http://localhost:4200/](http://localhost:4200/)** no seu navegador para ver o tráfego gerado organizado no Dashboard.
+
+[🔼 Voltar ao topo](#-sumário)
 
 ---
 
