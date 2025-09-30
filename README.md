@@ -204,6 +204,7 @@ O Network Analyzer captura e envia os dados para o Backend (rodando no Terminal 
     .\venv\Scripts\activate
     ```
 **⚠️ Atenção:** Não esqueça de ter instalado em sua máquina o [NPCAP](https://npcap.com/#download, isso é pré-requisito para esse passo
+
 3.  **Instale as dependências** (`scapy` e `cap`):
     ```bash
     pip install scapy cap
@@ -324,6 +325,7 @@ Com os **cinco terminais rodando** (Backend, Network Analyzer, Frontend, Servido
         ```
 3.  **Acesse o Servidor HTTP:**
       * Use o **Navegador** e acesse:
+      
         🔗 **[http://127.0.0.1:8001](http://127.0.0.1:8001)**
       * *Ao realizar esses acessos, o **Terminal 2** (Network Analyzer) deve começar a exibir logs de pacotes e o **Terminal 1** (Backend) deve registrar a ingestão de dados.*
 
@@ -334,8 +336,10 @@ Acesse o **Terminal 2** realize testes de movimentação nos servidores e verifi
 ### Teste da API (Swagger UI)
 
 1.  **Abra o Navegador** e acesse a documentação interativa:
-      * 🔗 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-2.  **Explore os Endpoints:**
+
+      🔗 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+    
+4.  **Explore os Endpoints:**
       * Use as rotas `GET /api/traffic` e `GET /api/traffic/{client_ip}/protocols` para testar os dados em tempo real.
 
 ### Visualização na Aplicação Web
