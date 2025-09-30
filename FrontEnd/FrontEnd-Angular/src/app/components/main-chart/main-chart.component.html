@@ -102,7 +102,11 @@
             <div class="flex gap-x-4">
               @for (client of networkClients; track client.ip) {
               <div class="grow w-0 text-center">
-                <span class="block text-white text-xs truncate">{{ client.ip }}</span>
+                <span 
+                  class="inline-block text-white text-xs truncate cursor-pointer hover:font-bold hover:text-accent-light transition-colors"
+                  (click)="selectClientForDetail(client)">
+                  {{ client.ip }}
+                </span>
               </div>
               }
             </div>
@@ -122,8 +126,8 @@
             <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-chart-blue-light"></span> Upload</div>
           </div>
         </div>
-        <p class="text-secondary text-xs text-right max-w-xs">
-          *Para acessar mais informações sobre um Cliente (IP), clique na sua barra correspondente do gráfico.
+        <p class="text-secondary text-xs text-right max-w-sm">
+          *Para acessar mais informações sobre um Cliente (IP), clique no seu IP ou na sua barra correspondente do gráfico.
         </p>
       </div>
     </div>

@@ -151,3 +151,8 @@
 :host-context(body.light) .border-white\/50 {
   border-color: rgba(var(--color-accent-light-rgb), 0.2);
 }
+
+:host-context(body.light) .drilldowndetail-back-button:hover {
+  background-color: #d4e7e8; 
+  color: var(--color-dark-black);
+}
