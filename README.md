@@ -46,7 +46,7 @@ Sistema para captura e análise de tráfego em servidores, permitindo a visualiz
 ### Gerenciamento
 * **Gerenciamento de Projeto:** **Trello**
 
-[🔼 Voltar ao topo](#-sumário)
+[🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
 
 ---
 
@@ -109,7 +109,7 @@ A parte de `~/Network_analyzer` emite um objeto JSON que contém os dados agrega
     - `in_bytes`, `out_bytes`: Bytes de entrada e saída para aquele cliente específico.
     - `protocols`: Um dicionário detalhando o tráfego por protocolo (ex: HTTP, HTTPS, DNS, TCP:porta, UDP:porta, ICMP) para aquele cliente, também dividido em bytes de entrada e saída.
 
-[🔼 Voltar ao topo](#-sumário)
+[🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
 
 ---
 
@@ -303,7 +303,7 @@ Após a inicialização, acesse a aplicação web: **[http://127.0.0.1:8001](htt
     INFO: Servidor FTP iniciado em ftp://0.0.0.0:2121
     ```
 
-[🔼 Voltar ao topo](#-sumário)
+[🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
 
 -----
 
@@ -345,7 +345,7 @@ Acesse o **Terminal 2** realize testes de movimentação nos servidores e verifi
 
 Acesse **[http://localhost:4200/](http://localhost:4200/)** no seu navegador para ver o tráfego gerado organizado no Dashboard.
 
-[🔼 Voltar ao topo](#-sumário)
+[🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
 
 ---
 
@@ -354,4 +354,5 @@ Acesse **[http://localhost:4200/](http://localhost:4200/)** no seu navegador par
 * **Autor:** Compania AlphaCompLabs  
 * **GitHub:** [github.com/AlphaCompLabs](https://github.com/AlphaCompLabs)
 
-[🔼 Voltar ao topo](#-sumário)
+[🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
+
