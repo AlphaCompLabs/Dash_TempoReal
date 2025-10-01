@@ -1,0 +1,40 @@
+/*
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Estilos específicos para o componente de cabeçalho (header),
+ #            principalmente para o controle de visibilidade dos ícones de tema.
+ # =====================================================================================
+*/
+
+/*
+ * Estas regras controlam qual ícone (sol ou lua) é exibido com base na classe
+ * de tema (`.light-theme` ou `.dark-mode-active`) aplicada a um elemento pai.
+*/
+
+/* Estado padrão: exibe o ícone da lua. */
+.sun-icon {
+  display: none;
+}
+.moon-icon {
+  display: block;
+}
+
+/* No tema claro, inverte a visibilidade para mostrar o ícone do sol. */
+.light-theme .sun-icon {
+  display: block;
+}
+.light-theme .moon-icon {
+  display: none;
+}
+
+/* Regra específica para quando o modo escuro está explicitamente ativo. */
+.dark-mode-active .sun-icon {
+  display: block;
+}
+
+.dark-mode-active .moon-icon {
+  display: none;
+}

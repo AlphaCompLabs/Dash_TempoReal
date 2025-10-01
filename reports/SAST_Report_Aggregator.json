@@ -1,0 +1,918 @@
+{
+  "errors": [],
+  "generated_at": "2025-09-30T04:22:54Z",
+  "metrics": {
+    "Network_analyzer/Aggregator.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 122,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/Logging.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 39,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/captura.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 115,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/cli.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 52,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/emissao.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 83,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/main.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 95,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/tests\\test_aggregator.py": {
+      "CONFIDENCE.HIGH": 30,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 30,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 80,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/tests\\test_emissao.py": {
+      "CONFIDENCE.HIGH": 8,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 8,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 75,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "Network_analyzer/util.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 66,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 39,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 38,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 727,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "68         try:\n69             with request.urlopen(req, timeout=timeout) as resp:\n70                 body = resp.read().decode(\"utf-8\", errors=\"ignore\")\n",
+      "col_offset": 17,
+      "end_col_offset": 54,
+      "filename": "Network_analyzer/emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 69,
+      "line_range": [
+        69
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "38     # Acessa o dicion\u00e1rio interno para verificar o estado inicial\n39     assert aggregator._current[\"clients\"] == {}\n40     assert aggregator._current[\"pkt_count\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 39,
+      "line_range": [
+        39
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "39     assert aggregator._current[\"clients\"] == {}\n40     assert aggregator._current[\"pkt_count\"] == 0\n41     assert aggregator._current[\"byte_count\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 40,
+      "line_range": [
+        40
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "40     assert aggregator._current[\"pkt_count\"] == 0\n41     assert aggregator._current[\"byte_count\"] == 0\n42 \n",
+      "col_offset": 4,
+      "end_col_offset": 49,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 41,
+      "line_range": [
+        41
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "51     clients_data = aggregator._current[\"clients\"]\n52     assert len(clients_data) == 1\n53     \n",
+      "col_offset": 4,
+      "end_col_offset": 33,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 52,
+      "line_range": [
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "54     client = clients_data[\"192.168.1.10\"]\n55     assert client[\"in\"] == 512\n56     assert client[\"out\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 30,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 55,
+      "line_range": [
+        55
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "55     assert client[\"in\"] == 512\n56     assert client[\"out\"] == 0\n57     assert client[\"proto\"][\"TCP\"][\"in\"] == 512\n",
+      "col_offset": 4,
+      "end_col_offset": 29,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 56,
+      "line_range": [
+        56
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "56     assert client[\"out\"] == 0\n57     assert client[\"proto\"][\"TCP\"][\"in\"] == 512\n58     assert client[\"proto\"][\"TCP\"][\"out\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 46,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 57,
+      "line_range": [
+        57
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "57     assert client[\"proto\"][\"TCP\"][\"in\"] == 512\n58     assert client[\"proto\"][\"TCP\"][\"out\"] == 0\n59     assert aggregator._current[\"pkt_count\"] == 1\n",
+      "col_offset": 4,
+      "end_col_offset": 45,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 58,
+      "line_range": [
+        58
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "58     assert client[\"proto\"][\"TCP\"][\"out\"] == 0\n59     assert aggregator._current[\"pkt_count\"] == 1\n60     assert aggregator._current[\"byte_count\"] == 512\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 59,
+      "line_range": [
+        59
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "59     assert aggregator._current[\"pkt_count\"] == 1\n60     assert aggregator._current[\"byte_count\"] == 512\n61 \n",
+      "col_offset": 4,
+      "end_col_offset": 51,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 60,
+      "line_range": [
+        60
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "74     clients_data = aggregator._current[\"clients\"]\n75     assert len(clients_data) == 2\n76 \n",
+      "col_offset": 4,
+      "end_col_offset": 33,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 75,
+      "line_range": [
+        75
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "78     client1 = clients_data[\"192.168.1.10\"]\n79     assert client1[\"in\"] == 1200  # 1000 (TCP) + 200 (UDP)\n80     assert client1[\"out\"] == 500   # 500 (TCP)\n",
+      "col_offset": 4,
+      "end_col_offset": 32,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 79,
+      "line_range": [
+        79
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "79     assert client1[\"in\"] == 1200  # 1000 (TCP) + 200 (UDP)\n80     assert client1[\"out\"] == 500   # 500 (TCP)\n81     assert client1[\"proto\"][\"TCP\"][\"in\"] == 1000\n",
+      "col_offset": 4,
+      "end_col_offset": 32,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 80,
+      "line_range": [
+        80
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "80     assert client1[\"out\"] == 500   # 500 (TCP)\n81     assert client1[\"proto\"][\"TCP\"][\"in\"] == 1000\n82     assert client1[\"proto\"][\"TCP\"][\"out\"] == 500\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 81,
+      "line_range": [
+        81
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "81     assert client1[\"proto\"][\"TCP\"][\"in\"] == 1000\n82     assert client1[\"proto\"][\"TCP\"][\"out\"] == 500\n83     assert client1[\"proto\"][\"UDP\"][\"in\"] == 200\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 82,
+      "line_range": [
+        82
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "82     assert client1[\"proto\"][\"TCP\"][\"out\"] == 500\n83     assert client1[\"proto\"][\"UDP\"][\"in\"] == 200\n84 \n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 83,
+      "line_range": [
+        83
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "86     client2 = clients_data[\"192.168.1.20\"]\n87     assert client2[\"in\"] == 250 # 250 (UDP)\n88     assert client2[\"out\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 31,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 87,
+      "line_range": [
+        87
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "87     assert client2[\"in\"] == 250 # 250 (UDP)\n88     assert client2[\"out\"] == 0\n89     assert client2[\"proto\"][\"UDP\"][\"in\"] == 250\n",
+      "col_offset": 4,
+      "end_col_offset": 30,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 88,
+      "line_range": [
+        88
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "88     assert client2[\"out\"] == 0\n89     assert client2[\"proto\"][\"UDP\"][\"in\"] == 250\n90     \n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 89,
+      "line_range": [
+        89
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "90     \n91     assert aggregator._current[\"pkt_count\"] == 4\n92     assert aggregator._current[\"byte_count\"] == 1950 # 1000 + 500 + 250 + 200\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 91,
+      "line_range": [
+        91
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "91     assert aggregator._current[\"pkt_count\"] == 4\n92     assert aggregator._current[\"byte_count\"] == 1950 # 1000 + 500 + 250 + 200\n93 \n",
+      "col_offset": 4,
+      "end_col_offset": 52,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 92,
+      "line_range": [
+        92
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "99     aggregator.add(ts=now_ts(), client_ip=\"192.168.1.10\", direction=\"in\", nbytes=100, proto=\"TCP\")\n100     assert len(aggregator._current[\"clients\"]) == 1\n101     \n",
+      "col_offset": 4,
+      "end_col_offset": 51,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 100,
+      "line_range": [
+        100
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "107     # 3. VERIFICA\u00c7\u00c3O DO PAYLOAD:\n108     assert payload[\"server_ip\"] == \"10.0.0.1\"\n109     assert len(payload[\"clients\"]) == 1\n",
+      "col_offset": 4,
+      "end_col_offset": 45,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 108,
+      "line_range": [
+        108
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "108     assert payload[\"server_ip\"] == \"10.0.0.1\"\n109     assert len(payload[\"clients\"]) == 1\n110     assert payload[\"clients\"][\"192.168.1.10\"][\"in_bytes\"] == 100\n",
+      "col_offset": 4,
+      "end_col_offset": 39,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 109,
+      "line_range": [
+        109
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "109     assert len(payload[\"clients\"]) == 1\n110     assert payload[\"clients\"][\"192.168.1.10\"][\"in_bytes\"] == 100\n111     \n",
+      "col_offset": 4,
+      "end_col_offset": 64,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 110,
+      "line_range": [
+        110
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "112     # 4. VERIFICA\u00c7\u00c3O DA LIMPEZA: O estado interno deve ter sido resetado.\n113     assert aggregator._current[\"clients\"] == {}\n114     assert aggregator._current[\"pkt_count\"] == 0\n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 113,
+      "line_range": [
+        113
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "113     assert aggregator._current[\"clients\"] == {}\n114     assert aggregator._current[\"pkt_count\"] == 0\n115 \n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 114,
+      "line_range": [
+        114
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "131     # 3. VERIFICA\u00c7\u00c3O:\n132     assert len(payload[\"clients\"]) == 1\n133     # Garante que o cliente retornado \u00e9 o \"top talker\"\n",
+      "col_offset": 4,
+      "end_col_offset": 39,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 132,
+      "line_range": [
+        132
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "133     # Garante que o cliente retornado \u00e9 o \"top talker\"\n134     assert \"192.168.1.20\" in payload[\"clients\"]\n135     assert \"192.168.1.10\" not in payload[\"clients\"]\n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 134,
+      "line_range": [
+        134
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "134     assert \"192.168.1.20\" in payload[\"clients\"]\n135     assert \"192.168.1.10\" not in payload[\"clients\"]\n136 \n",
+      "col_offset": 4,
+      "end_col_offset": 51,
+      "filename": "Network_analyzer/tests\\test_aggregator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 135,
+      "line_range": [
+        135
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "51     mock_urlopen.assert_called_once() # Garante que a chamada HTTP foi feita\n52     assert result == 0 # Espera 0, que significa sucesso total\n53 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 52,
+      "line_range": [
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "69     # A fun\u00e7\u00e3o deve ter sido chamada 3 vezes (1 tentativa original + 2 retentativas)\n70     assert mock_urlopen.call_count == post_retries + 1\n71     # A fun\u00e7\u00e3o de espera deve ter sido chamada 2 vezes\n",
+      "col_offset": 4,
+      "end_col_offset": 54,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 70,
+      "line_range": [
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "71     # A fun\u00e7\u00e3o de espera deve ter sido chamada 2 vezes\n72     assert mock_sleep.call_count == post_retries\n73     assert result == 1 # Espera 1, que significa falha\n",
+      "col_offset": 4,
+      "end_col_offset": 48,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 72,
+      "line_range": [
+        72
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "72     assert mock_sleep.call_count == post_retries\n73     assert result == 1 # Espera 1, que significa falha\n74 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 73,
+      "line_range": [
+        73
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "88     mock_sleep.assert_not_called()    # N\u00e3o deve haver retentativas\n89     assert result == 1 # Espera 1 (falha)\n90 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 89,
+      "line_range": [
+        89
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "105     handle.write.assert_called_once() # Verifica se algo foi escrito\n106     assert result == 0 # Espera 0 (sucesso)\n107 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 106,
+      "line_range": [
+        106
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "128     \n129     assert result == 0\n130 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 129,
+      "line_range": [
+        129
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "139     \n140     assert result == 1 # Espera 1 (falha)\n141 \n",
+      "col_offset": 4,
+      "end_col_offset": 22,
+      "filename": "Network_analyzer/tests\\test_emissao.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 140,
+      "line_range": [
+        140
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    }
+  ]
+}

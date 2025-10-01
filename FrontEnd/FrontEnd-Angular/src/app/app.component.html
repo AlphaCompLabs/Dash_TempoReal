@@ -1,0 +1,36 @@
+<!--
+ # =====================================================================================
+ # SERVIDOR FRONTEND - DASHBOARD DE ANÁLISE DE TRÁFEGO
+ # Versão: 3.0.0 (Padronização do Código)
+ # Autor(es): Equipe UX/UI - Elisa Nunes
+ # Data: 2025-09-29
+ # Descrição: Componente raiz da aplicação, responsável por organizar a
+ #            estrutura principal e carregar os demais componentes.
+ # =====================================================================================
+-->
+
+<!-- Início do Componente Principal da Aplicação -->
+<div class="app-container">
+
+  <!--
+    O `app-welcome` é chamado aqui para funcionar como um painel flutuante
+    e persistente em todas as rotas da aplicação.
+  -->
+  <app-welcome></app-welcome>
+
+  <!--
+    A tag `<main>` agrupa o conteúdo principal. Sua finalidade aqui é semântica
+    e também para permitir que seu layout seja ajustado em relação ao painel.
+  -->
+  <main class="main-content">
+
+    <!-- O cabeçalho é inserido dentro do conteúdo principal. -->
+    <app-header></app-header>
+
+    <!-- O `router-outlet` é o espaço onde as diferentes páginas (rotas) serão carregadas. -->
+    <router-outlet></router-outlet>
+
+  </main>
+
+</div>
+<!-- Fim do Componente Principal da Aplicação -->
