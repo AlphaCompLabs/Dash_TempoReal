@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 📊 Dashboard Análise de Tráfego em Tempo Real 
 
 O presente trabalho tem como objetivo realizar a captura de tráfego em um servidor. Ele servirá para processar os dados, que poderão ser vizualizados dinamicamente, da seguinte forma:
@@ -28,6 +27,7 @@ O presente trabalho tem como objetivo realizar a captura de tráfego em um servi
    - `refactor:` para refatoração de código;
    - `chore:` para manutenção;
    - `test:` para testes.
+
 =======
 # 📊 Dashboard de Análise de Tráfego em Tempo Real
 
@@ -386,4 +386,3 @@ Acesse **[http://localhost:4200/](http://localhost:4200/)** no seu navegador par
 * **GitHub:** [github.com/AlphaCompLabs](https://github.com/AlphaCompLabs)
 
 [🔼 Voltar ao topo](#-sumário)
->>>>>>> feature/testes-diogo-com-erro
