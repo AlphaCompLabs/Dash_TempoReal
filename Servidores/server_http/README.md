@@ -1,12 +1,5 @@
 # Servidor HTTP
 
-## Versão
-1.1.0
-
-## Autor
-Equipe DevOps/QA - Caio Silveira
-
-## Descrição
 Este script inicia um **servidor HTTP simples** para o cenário de teste do projeto.  
 Ele serve um `index.html` de teste e permite executar **comandos CLI via query string**, gerando tráfego de rede que pode ser monitorado pelo dashboard.
 
