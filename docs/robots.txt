@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alphacomplabs.github.io/Dash_TempoReal/sitemap.xml

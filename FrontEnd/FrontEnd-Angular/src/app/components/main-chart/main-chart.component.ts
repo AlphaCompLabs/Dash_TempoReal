@@ -13,26 +13,17 @@
 
 // --- SEÇÃO 1: IMPORTAÇÕES ---
 
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TrafficDataService } from '../../services/traffic-data';
 import { ClientTrafficSummary, ProtocolDrilldown, HistoricalDataPoint } from '../../models/traffic.model';
 import { UiStateService } from '../../services/ui-state.service';
-import { BaseChartDirective } from 'ng2-charts';
-import {
-  Chart,
-  ChartConfiguration,
-  ChartType,
-  LineController,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Filler,
-  Legend,
-  Tooltip
-} from 'chart.js';
+// Só tipos: o Chart.js e o ng2-charts ficam no HistoryChartComponent, carregado sob demanda (@defer)
+// quando o painel de histórico abre. Isso tira ~200 kB do bundle inicial.
+import type { BaseChartDirective } from 'ng2-charts';
+import type { ChartConfiguration, ChartType } from 'chart.js';
+import { HistoryChartComponent } from './history-chart.component';
 
 // --- SEÇÃO 2: TIPOS E CONSTANTES LOCAIS ---
 
@@ -42,7 +33,7 @@ import {
   styleUrls: ['./main-chart.component.css'],
   standalone: true,
   imports: [CommonModule,
-    BaseChartDirective,
+    HistoryChartComponent,
   ]
 })
 export class MainChartComponent implements OnInit, OnDestroy {
@@ -162,7 +153,8 @@ export class MainChartComponent implements OnInit, OnDestroy {
     }
   };
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  /** Instância do gráfico de histórico, entregue pelo HistoryChartComponent quando o painel abre. */
+  chart?: BaseChartDirective;
   private historyChartSelection: 'download' | 'upload' | 'both' = 'both';
 
   // --- SEÇÃO 4: PROPRIEDADES E ESTADO DA CLASSE ---
@@ -171,11 +163,13 @@ export class MainChartComponent implements OnInit, OnDestroy {
     private trafficService: TrafficDataService,
     public uiStateService: UiStateService
   ) {
-    Chart.register(
-      LineController, LineElement, PointElement, LinearScale, CategoryScale,
-      Filler, Legend, Tooltip
-    );
     this.initializeHistoryChartData();
+  }
+
+  /** Chamado quando o gráfico de histórico (carregado sob demanda) termina de montar. */
+  public onHistoryChartReady(chart: BaseChartDirective | undefined): void {
+    this.chart = chart;
+    this.syncHistoryChartState();
   }
 
    // --- SEÇÃO 5: CONSTRUTOR E MÉTODOS DE CICLO DE VIDA ---

@@ -10,7 +10,15 @@
 -->
 
 <!-- Início do Componente Principal da Aplicação -->
-<div class="app-container">
+<div class="app-container" [class.demo]="demo">
+
+  <!-- Faixa da demo estática (só no build do GitHub Pages). A altura entra em --demo-bar (styles.css). -->
+  @if (demo) {
+  <p class="demo-bar bg-primary-bar font-sans text-[11px] sm:text-xs text-secondary text-center px-4 flex items-center justify-center m-0">
+    <span>Demo estática para portfólio: dados simulados no navegador.
+      <a [href]="portfolioUrl" class="ml-1 text-accent-light font-bold underline-offset-2 hover:underline">Ver no portfólio</a></span>
+  </p>
+  }
 
   <!--
     O `app-welcome` é chamado aqui para funcionar como um painel flutuante
@@ -31,6 +39,23 @@
     <router-outlet></router-outlet>
 
   </main>
+
+  <!-- Créditos da equipe -->
+  <footer class="credits bg-primary-bar font-sans text-xs text-secondary text-center px-4 py-3">
+    <p class="m-0">
+      Projeto da equipe <a href="https://github.com/AlphaCompLabs" class="text-accent-light font-bold underline-offset-2 hover:underline">AlphaCompLabs</a>:
+      @for (member of team; track member.name; let last = $last) {
+        @if (member.github) {
+        <a [href]="'https://github.com/' + member.github" class="text-accent-light underline-offset-2 hover:underline">{{ member.name }}</a>
+        } @else {
+        <span class="text-accent-light">{{ member.name }}</span>
+        }{{ last ? '.' : ', ' }}
+      }
+    </p>
+    <p class="m-0 mt-1">
+      <a [href]="repoUrl" class="text-accent-light underline-offset-2 hover:underline">Código no GitHub</a>
+    </p>
+  </footer>
 
 </div>
 <!-- Fim do Componente Principal da Aplicação -->

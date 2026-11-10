@@ -252,8 +252,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   private updateSidebarStyles(isLightMode: boolean): void {
     const baseStyles = {
-      'width': '250px',
-      'height': 'calc(100vh - 90px)',
+      // Largura e altura ficam no sidebar.component.css (responsivo: no celular a sidebar vira um bloco acima do gráfico).
       'background-repeat': 'no-repeat',
       'background-size': 'contain',
       'background-position': 'center top'

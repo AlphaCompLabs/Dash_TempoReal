@@ -15,11 +15,14 @@
 
 // Importações do Framework Angular
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideRouter, UrlSerializer } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 // Importação das rotas da aplicação
 import { routes } from './app.routes';
+import { TrailingSlashSerializer } from './shared/trailing-slash';
+import { DEMO } from './demo/demo';
+import { trafficSimInterceptor } from './demo/traffic-sim.interceptor';
 
 // --- SEÇÃO 1: CONFIGURAÇÃO DA APLICAÇÃO (appConfig) ---
 
@@ -39,8 +42,12 @@ export const appConfig: ApplicationConfig = {
     // definidas no arquivo 'app.routes.ts'.
     provideRouter(routes),
 
+    // Links gerados pelo router terminam em "/" (o GitHub Pages responde /caminho com 301).
+    { provide: UrlSerializer, useClass: TrailingSlashSerializer },
+
     // Disponibiliza o serviço HttpClient para toda a aplicação,
     // permitindo a comunicação com APIs externas via requisições HTTP.
-    provideHttpClient()
+    // Na demo do GitHub Pages (DEMO = true) o interceptor responde as rotas /api/ com dados simulados no navegador.
+    provideHttpClient(withInterceptors(DEMO ? [trafficSimInterceptor] : []))
   ]
 };

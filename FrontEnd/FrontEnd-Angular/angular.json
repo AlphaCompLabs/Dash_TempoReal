@@ -20,7 +20,7 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
-              "src/favicon.ico"
+              { "glob": "**/*", "input": "public" }
             ],
             "styles": [
               "src/styles.css"
@@ -42,6 +42,12 @@
               ],
               "outputHashing": "all"
             },
+            "pages": {
+              "baseHref": "/Dash_TempoReal/",
+              "fileReplacements": [
+                { "replace": "src/app/demo/demo.ts", "with": "src/app/demo/demo.pages.ts" }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -58,6 +64,9 @@
             },
             "development": {
               "buildTarget": "FrontEnd-Angular:build:development"
+            },
+            "pages": {
+              "buildTarget": "FrontEnd-Angular:build:development,pages"
             }
           },
           "defaultConfiguration": "development"

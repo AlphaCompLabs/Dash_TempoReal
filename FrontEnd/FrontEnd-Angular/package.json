@@ -4,7 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:demo": "ng serve --configuration pages",
     "build": "ng build",
+    "build:demo": "ng build --configuration production,pages",
+    "check": "node scripts/check.mjs",
+    "build:pages": "npm run build:demo && npm run check && node scripts/pages.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -21,6 +25,7 @@
     ]
   },
   "private": true,
+  "type": "module",
   "dependencies": {
     "@angular/common": "^20.3.2",
     "@angular/compiler": "^20.3.2",

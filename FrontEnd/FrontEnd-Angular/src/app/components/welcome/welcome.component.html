@@ -18,7 +18,7 @@
   }
 
   <!-- Painel Lateral de Boas-Vindas -->
-  <aside class="fixed top-0 left-0 h-full w-96 bg-gradient-to-b from-primary to-black text-white z-40 transition-transform duration-300 ease-in-out flex flex-col p-8" [ngClass]="{ '-translate-x-full': !isPanelOpen }">
+  <aside class="fixed top-0 left-0 h-full w-[min(24rem,100vw)] bg-gradient-to-b from-primary to-black text-white z-40 transition-transform duration-300 ease-in-out flex flex-col p-8" [ngClass]="{ '-translate-x-full': !isPanelOpen }">
 
     <div class="relative z-10 flex flex-col h-full mt-12 justify-center">
 
@@ -57,18 +57,14 @@
         </li>
       </ul>
     </div>
-
-    <!-- Imagem de Fundo Decorativa -->
-    <div class="absolute inset-0 z-0 bg-cover bg-center opacity-10" style="background-image: url('assets/images/background_effect.png');">
-    </div>
   </aside>
 
-  <!-- Botão para Abrir/Fechar o Painel -->
-  <button (click)="togglePanel()" class="welcome-toggle-button fixed top-14 z-50 rounded-r-xl px-3 py-4 cursor-pointer transition-all duration-300 ease-in-out group" [ngClass]="isPanelOpen ? 'left-96 -translate-x-6' : 'left-0'" [style.background-color]="isLightMode ? '#caedf1' : '#01003c'">
+  <!-- Botão para Abrir/Fechar o Painel (abaixo do cabeçalho e da faixa da demo, se houver) -->
+  <button (click)="togglePanel()" [attr.aria-expanded]="isPanelOpen" class="welcome-toggle-button fixed top-[calc(3.5rem+var(--demo-bar,0px))] z-50 rounded-r-xl px-3 py-4 cursor-pointer transition-all duration-300 ease-in-out group" [ngClass]="isPanelOpen ? 'left-[min(24rem,calc(100vw-3rem))] -translate-x-6' : 'left-0'" [style.background-color]="isLightMode ? '#caedf1' : '#01003c'">
     @if(isPanelOpen) {
-    <img alt="Fechar Painel" class="h-6 w-6 transition-all group-hover:brightness-150" [src]="isLightMode ? '/assets/icons/arrow_left_dark.svg' : 'assets/icons/arrow_left.svg'">
+    <img alt="Fechar Painel" class="h-6 w-6 transition-all group-hover:brightness-150" [src]="isLightMode ? 'assets/icons/arrow_left_dark.svg' : 'assets/icons/arrow_left.svg'">
     } @else {
-    <img alt="Abrir Painel" class="h-6 w-6 transition-all group-hover:brightness-150" [src]="isLightMode ? '/assets/icons/arrow_right_dark.svg' : 'assets/icons/arrow_right.svg'">
+    <img alt="Abrir Painel" class="h-6 w-6 transition-all group-hover:brightness-150" [src]="isLightMode ? 'assets/icons/arrow_right_dark.svg' : 'assets/icons/arrow_right.svg'">
     }
   </button>
 

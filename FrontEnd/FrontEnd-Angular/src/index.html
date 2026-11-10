@@ -1,11 +1,78 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>NetVision</title>
+  <title>NetVision: Dashboard de Tráfego de Rede em Tempo Real</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Demo do NetVision, dashboard Angular da AlphaCompLabs que mostra o tráfego de rede por cliente e por protocolo em tempo real, com dados simulados.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#020132">
+  <link rel="canonical" href="https://alphacomplabs.github.io/Dash_TempoReal/">
   <link rel="icon" type="image/x-icon" href="assets/favicon2.ico">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="NetVision">
+  <meta property="og:title" content="NetVision: Dashboard de Tráfego de Rede em Tempo Real">
+  <meta property="og:description" content="Tráfego de rede por cliente (IP) e por protocolo, histórico de 60 s e drill-down. Projeto da equipe AlphaCompLabs; demo com dados simulados no navegador.">
+  <meta property="og:url" content="https://alphacomplabs.github.io/Dash_TempoReal/">
+  <meta property="og:image" content="https://alphacomplabs.github.io/Dash_TempoReal/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dashboard NetVision com o gráfico de tráfego por cliente e a barra lateral de download e upload">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://alphacomplabs.github.io/Dash_TempoReal/#app",
+        "name": "NetVision: Dashboard de Tráfego de Rede em Tempo Real",
+        "url": "https://alphacomplabs.github.io/Dash_TempoReal/",
+        "description": "Dashboard que mostra o tráfego de rede por cliente e por protocolo em tempo real. Demo estática com dados simulados no navegador.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "pt-BR",
+        "isAccessibleForFree": true,
+        "publisher": { "@type": "Organization", "name": "AlphaCompLabs", "url": "https://github.com/AlphaCompLabs" },
+        "creator": [
+          { "@type": "Person", "name": "Caio Silveira" },
+          { "@type": "Person", "name": "Diogo Freitas" },
+          { "@type": "Person", "name": "Elisa Nunes de Freitas" },
+          { "@type": "Person", "name": "Giovanna" },
+          { "@type": "Person", "@id": "https://g2portfolio.grovicdata.com/#person", "name": "Gustavo Martins Gripaldi", "url": "https://g2portfolio.grovicdata.com/" },
+          { "@type": "Person", "name": "Mariana Monteiro" },
+          { "@type": "Person", "name": "Mayron Malaquias" },
+          { "@type": "Person", "name": "Pedrobrgss" }
+        ]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "Dash_TempoReal",
+        "codeRepository": "https://github.com/AlphaCompLabs/Dash_TempoReal",
+        "programmingLanguage": ["Python", "TypeScript"],
+        "runtimePlatform": "FastAPI, Angular",
+        "targetProduct": { "@id": "https://alphacomplabs.github.io/Dash_TempoReal/#app" },
+        "creator": [
+          { "@type": "Person", "name": "Caio Silveira" },
+          { "@type": "Person", "name": "Diogo Freitas" },
+          { "@type": "Person", "name": "Elisa Nunes de Freitas" },
+          { "@type": "Person", "name": "Giovanna" },
+          { "@type": "Person", "@id": "https://g2portfolio.grovicdata.com/#person", "name": "Gustavo Martins Gripaldi", "url": "https://g2portfolio.grovicdata.com/" },
+          { "@type": "Person", "name": "Mariana Monteiro" },
+          { "@type": "Person", "name": "Mayron Malaquias" },
+          { "@type": "Person", "name": "Pedrobrgss" }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>
