@@ -19,7 +19,7 @@
 
 /* --- 1. IMPORTAÇÕES E DEFINIÇÕES DE FONTE --- */
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;700&display=swap');
+/* Montserrat vem do <link> no index.html (o build do Angular embute esse CSS no HTML; @import aqui encadeava requisições). */
 @import "tailwindcss";
 
 @font-face {
@@ -42,7 +42,7 @@
 @theme {
   --color-primary-bar: #020132;
   --color-primary: #020047;
-  --color-secondary: #79A9BB;
+  --color-secondary: #84B3C4; /* era #79A9BB: clareado um tom para contraste AA (4.5:1) sobre os cinzas do gráfico */
   --color-accent-light: #ACE5E9;
   --color-primary-dark: #79A9BB;
 
@@ -154,10 +154,27 @@ body.light .traffic-history-icon {
   background-repeat: no-repeat;
   background-size: 130%;
   background-position: center;
-  background-image: url('/assets/images/footer_image.svg'); /* Padrão (Dark Mode) */
+  background-image: url('assets/images/footer_image.svg'); /* Padrão (Dark Mode) */
 }
 body.light .footer-decoration {
-  background-image: url('/assets/images/footer_image_dark.svg'); /* Tema Claro */
+  background-image: url('assets/images/footer_image_dark.svg'); /* Tema Claro */
+}
+
+/**
+ * Faixa da demo estática (GitHub Pages). --demo-bar guarda a altura dela para o layout
+ * (sidebar, altura mínima da home e botão do painel de boas-vindas) continuar cabendo na tela.
+ */
+.app-container.demo {
+  --demo-bar: 2.5rem; /* duas linhas no celular */
+}
+.demo-bar {
+  height: var(--demo-bar);
+  line-height: 1.25;
+}
+@media (min-width: 640px) {
+  .app-container.demo {
+    --demo-bar: 1.75rem;
+  }
 }
 
 

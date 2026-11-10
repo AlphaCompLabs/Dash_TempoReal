@@ -29,9 +29,8 @@
 }
 
 .sidebar-component {
-  width: 250px;
-  /* Altura total da tela menos a altura do cabeçalho (provavelmente 90px) */
-  height: calc(100vh - 90px);
+  /* Celular/tablet: bloco de largura total acima do gráfico. */
+  width: 100%;
   background-color: var(--color-dark);
   background-image:
     linear-gradient(rgba(25, 25, 27, 0.8), rgba(25, 25, 27, 0.8)),
@@ -40,6 +39,15 @@
   background-size: contain;
   background-position: top;
   transition: background-color 0.3s ease;
+}
+
+/* Desktop: coluna fixa à esquerda, altura da tela menos o cabeçalho (90px) e a faixa da demo. */
+@media (min-width: 1024px) {
+  .sidebar-component {
+    width: 250px;
+    /* min-height (antes height): em telas baixas o conteúdo não vaza da caixa, a página rola. */
+    min-height: calc(100vh - 90px - var(--demo-bar, 0px));
+  }
 }
 
 

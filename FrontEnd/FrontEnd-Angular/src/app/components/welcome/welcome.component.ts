@@ -14,7 +14,7 @@
 // --- SEÇÃO 1: IMPORTAÇÕES ---
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../../services/theme.service';
 
@@ -31,7 +31,8 @@ interface ServerInfo {
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  // HttpClientModule saiu daqui: ele criava um HttpClient separado do app.config (sem o interceptor da demo).
+  imports: [CommonModule],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css'
 })

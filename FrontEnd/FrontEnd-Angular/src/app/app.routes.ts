@@ -35,8 +35,11 @@ export const routes: Routes = [
     component: HomeComponent,
 
     // title: '...' -> O título que será exibido na aba do navegador para esta rota.
-    title: 'Netvision - Dashboard'
-  }
+    title: 'NetVision: Dashboard de Tráfego de Rede em Tempo Real'
+  },
+
+  // Qualquer outro caminho (ex.: link antigo servido pelo 404.html do GitHub Pages) volta para o dashboard.
+  { path: '**', redirectTo: '' }
 
   // Futuras rotas podem ser adicionadas aqui. Ex:
   // { path: 'settings', component: SettingsComponent, title: 'Netvision - Configurações' },

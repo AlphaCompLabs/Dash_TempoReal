@@ -8,10 +8,10 @@
 -->
 
 <!-- Início do Componente de Rodapé -->
-<footer class="footer-component bg-dark flex items-center justify-between rounded-md">
+<footer class="footer-component bg-dark flex flex-wrap items-center justify-between gap-y-2 rounded-md">
 
-  <!-- Seção Esquerda: Links e Decoração -->
-  <div class="footer-decorations flex items-center gap-6 pl-0">
+  <!-- Seção Esquerda: Links e Decoração (no celular os servidores descem para a linha de baixo) -->
+  <div class="footer-decorations flex items-center gap-6 pl-0 max-sm:pl-4 max-sm:pt-2">
 
     <div class="themed-image footer-decoration" aria-hidden="true"></div>
 
@@ -26,16 +26,16 @@
   </div>
 
   <!-- Seção Direita: Informações dos Servidores -->
-  <div class="footer-info flex items-center divide-x divide-secondary mr-4">
+  <div class="footer-info flex items-center divide-x divide-secondary mr-4 max-sm:mr-0 max-sm:w-full max-sm:pb-3">
 
-    <div class="info-box text-left px-4">
-      <h4 class="font-sans text-xs text-secondary">Servidor FTP:</h4>
-      <p class="font-sans text-base font-bold text-white truncate" title="{{ ftpAddress }}">{{ ftpAddress }}</p>
+    <div class="info-box text-left px-4 min-w-0 max-sm:flex-1">
+      <p class="font-sans text-xs text-secondary">Servidor FTP:</p>
+      <p class="font-sans text-base max-sm:text-sm font-bold text-white truncate" title="{{ ftpAddress }}">{{ ftpAddress }}</p>
     </div>
 
-    <div class="info-box text-left px-4">
-      <h4 class="font-sans text-xs text-secondary">Servidor HTTP:</h4>
-      <p class="font-sans text-base font-bold text-white truncate" title="{{ httpAddress }}">{{ httpAddress }}</p>
+    <div class="info-box text-left px-4 min-w-0 max-sm:flex-1">
+      <p class="font-sans text-xs text-secondary">Servidor HTTP:</p>
+      <p class="font-sans text-base max-sm:text-sm font-bold text-white truncate" title="{{ httpAddress }}">{{ httpAddress }}</p>
     </div>
 
   </div>

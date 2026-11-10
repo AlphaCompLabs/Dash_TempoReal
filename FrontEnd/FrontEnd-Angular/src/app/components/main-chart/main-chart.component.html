@@ -1,25 +1,33 @@
 <div class="mainchart-component flex flex-col gap-1 w-full h-full relative">
 
   @if (showHistoryChart) {
-  <div class="absolute inset-0 bg-dark/90 backdrop-blur-sm z-25 flex flex-col p-4 items-center justify-center">
+  <!-- No celular o gráfico fica abaixo da sidebar: o painel vira fixed para aparecer na tela ao tocar no botão do cabeçalho. -->
+  <div class="absolute max-lg:fixed inset-0 bg-dark/90 backdrop-blur-sm z-25 max-lg:z-40 flex flex-col p-4 items-center justify-center">
     <div class="w-full max-w-4xl h-auto bg-dark-deep p-6 rounded-lg border border-accent-light/20 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <div class="flex flex-col">
           <h3 class="font-sans text-xl font-bold text-white">Histórico de Tráfego</h3>
           <span class="text-sm text-secondary">Últimos 60 segundos</span>
         </div>
-        <button (click)="uiStateService.toggleHistoryChart()" class="text-white hover:text-accent-light text-2xl">&times;</button>
+        <button (click)="uiStateService.toggleHistoryChart()" aria-label="Fechar histórico" class="text-white hover:text-accent-light text-2xl">&times;</button>
       </div>
 
       <div class="w-full h-64 bg-white/5 rounded-md p-4">
         <div class="flex items-center justify-center h-full text-white">
           <div class="w-full h-64">
           @if (lineChartData.labels && lineChartData.labels.length > 0) {
-            <canvas baseChart class="chart"
+            <!-- Chart.js só é baixado quando o painel abre (fora do carregamento inicial da página). -->
+            @defer (on immediate) {
+            <app-history-chart
               [data]="lineChartData"
               [options]="lineChartOptions"
-              [type]="lineChartType">
-            </canvas>
+              [type]="lineChartType"
+              (ready)="onHistoryChartReady($event)" />
+            } @placeholder {
+            <div class="flex items-center justify-center h-full text-white/50">
+              <p>Carregando gráfico...</p>
+            </div>
+            }
           } @else {
             <div class="flex items-center justify-center h-full text-white/50">
               <p>Aguardando dados do servidor...</p>
@@ -49,7 +57,7 @@
 
   @if (!selectedClientForDetail) {
 
-  <div class="mainchart-header flex items-center justify-between">
+  <div class="mainchart-header flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 ml-4">
       <div class="flex flex-col">
         <h2 class="font-sans text-xl font-bold text-white leading-tight">Tráfego de</h2>
@@ -63,14 +71,14 @@
         <button (click)="setMainFilter('download')" [ngClass]="{'active-filter': activeMainFilter === 'download'}" class="filter-button bg-chart-blue-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
           Download
         </button>
-        <button (click)="setMainFilter('upload')" [ngClass]="{'active-filter': activeMainFilter === 'upload'}" class="filter-button bg-chart-blue-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+        <button (click)="setMainFilter('upload')" [ngClass]="{'active-filter': activeMainFilter === 'upload'}" class="filter-button bg-chart-blue-light text-[#020132] px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
           Upload
         </button>
       </div>
     </div>
   </div>
 
-  <section class="mainchart-container bg-dark p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
+  <section class="mainchart-container bg-dark p-3 sm:p-6 rounded-lg flex flex-col gap-4 w-full flex-grow relative" style="height: 500px;">
     <div class="mainchart-live-indicator absolute top-4 right-4 flex h-5 w-5 z-20">
       <span [ngClass]="{
                 'ping-green': pingState === 'green',
@@ -105,7 +113,7 @@
               <div class="absolute left-0 h-px w-2 bg-white/30 -translate-x-full" [style.bottom.%]="(label / maxChartValue) * 100"></div>
               }
             </div>
-            <div class="w-full h-full flex gap-x-6 px-4" style="position: relative; z-index: 10;">
+            <div class="w-full h-full flex gap-x-2 sm:gap-x-6 px-1 sm:px-4" style="position: relative; z-index: 10;">
               @for (client of networkClients; track client.ip) {
               <div class="grow w-0 flex flex-col justify-end">
                 <div class="w-full mx-auto flex flex-col rounded-t-md overflow-hidden transition-all duration-200 ease-in-out cursor-pointer hover:brightness-125" [style.height.%]="calculateTotalHeight(client)" (click)="selectClientForDetail(client)" (mouseenter)="showTooltip($event, client)" (mouseleave)="hideTooltip()" (mousemove)="moveTooltip($event)">
@@ -117,15 +125,17 @@
             </div>
           </div>
 
-          <div class="h-8 w-full flex flex-col gap-1 px-4 pt-2">
-            <div class="flex gap-x-4">
+          <div class="h-8 w-full flex flex-col gap-1 px-1 sm:px-4 pt-2">
+            <div class="flex gap-x-2 sm:gap-x-4">
               @for (client of networkClients; track client.ip) {
               <div class="grow w-0 text-center">
-                <span 
-                  class="inline-block text-white text-xs truncate cursor-pointer hover:font-bold hover:text-accent-light transition-colors"
+                <!-- Botão (e não span) para o drill-down funcionar também pelo teclado. No celular mostra só o fim do IP. -->
+                <button type="button"
+                  class="inline-block max-w-full text-white text-xs truncate cursor-pointer hover:font-bold hover:text-accent-light transition-colors"
+                  [attr.aria-label]="'Ver protocolos do cliente ' + client.ip" [title]="client.ip"
                   (click)="selectClientForDetail(client)">
-                  {{ client.ip }}
-                </span>
+                  <span class="sm:hidden">.{{ client.ip.split('.').pop() }}</span><span class="max-sm:hidden">{{ client.ip }}</span>
+                </button>
               </div>
               }
             </div>
@@ -173,7 +183,7 @@
           <button (click)="setDetailFilter('download')" [ngClass]="{'active-filter': activeDetailFilter === 'download'}" class="filter-button bg-chart-teal-dark text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
             Download
           </button>
-          <button (click)="setDetailFilter('upload')" [ngClass]="{'active-filter': activeDetailFilter === 'upload'}" class="filter-button bg-chart-teal-light text-white px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
+          <button (click)="setDetailFilter('upload')" [ngClass]="{'active-filter': activeDetailFilter === 'upload'}" class="filter-button bg-chart-teal-light text-[#020132] px-4 py-1 rounded-md text-sm hover:opacity-80 transition-opacity">
             Upload
           </button>
         </div>

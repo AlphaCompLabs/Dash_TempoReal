@@ -20,6 +20,8 @@ import { RouterOutlet } from '@angular/router';
 // Importações dos componentes principais da aplicação
 import { HeaderComponent } from './components/header/header.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
+import { DEMO } from './demo/demo';
+import { PORTFOLIO_URL, REPO_URL, TEAM } from './team';
 
 // --- SEÇÃO 1: METADADOS DO COMPONENTE ---
 /**
@@ -52,4 +54,10 @@ export class AppComponent {
    * Pode ser utilizado no template para fins de exibição ou metadados.
    */
   title = 'Netvision';
+
+  /** Faixa "demo estática" e créditos da equipe (app.component.html). */
+  readonly demo = DEMO;
+  readonly team = TEAM;
+  readonly repoUrl = REPO_URL;
+  readonly portfolioUrl = PORTFOLIO_URL;
 }

@@ -1,14 +1,21 @@
 # Ambientes Virtuais
 venv/
 .venv/
-.env
+.env*
 
 # Arquivos compilados do Python
 __pycache__/
 *.pyc
 .pytest_cache/
 
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Screenshots locais (Playwright)
+.shots/
+
 # Outros
 .vscode/
 *.zip
-node_modules

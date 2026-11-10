@@ -10,7 +10,29 @@ Sistema para captura e análise de tráfego em servidores, permitindo a visualiz
 
 ---
 
+## 🌐 Demo ao vivo
+
+**[alphacomplabs.github.io/Dash_TempoReal](https://alphacomplabs.github.io/Dash_TempoReal/)** (demo estática para portfólio: dados simulados no navegador).
+
+A demo é o mesmo frontend Angular, com o mesmo visual, publicado no GitHub Pages sem backend. No build da demo, um interceptor HTTP responde às rotas `/api/` com um simulador que roda no navegador:
+
+- `FrontEnd/FrontEnd-Angular/src/app/demo/traffic-sim.ts` imita o `Network_analyzer` + `BackEnd_RESTful`: mesmos formatos JSON dos endpoints (`/api/traffic`, `/api/traffic/history`, `/api/traffic/{ip}/protocols`, `/api/traffic/protocols/summary`, `/api/server-info`).
+- Cada consulta do dashboard (a cada 5 s, como no sistema real) avança uma janela de agregação: de 3 a 10 clientes `10.0.0.x` entram e saem, o volume de cada um sobe e desce, de vez em quando há um pico de download por FTP, e os bytes por protocolo (`HTTP_ALT`, `FTP_ALT`, `FTP-DATA`, `HTTPS`, `DNS`, `ICMP`, os rótulos do `util.py`) somam o total do cliente. O histórico guarda 12 janelas (60 s), como o backend.
+- Nada sai do navegador. Os serviços e componentes continuam chamando as URLs reais; sem o build da demo (`DEMO = false` em `src/app/demo/demo.ts`) o frontend fala com a API FastAPI normalmente.
+
+```bash
+cd FrontEnd/FrontEnd-Angular
+npm install
+npm run start:demo    # demo local: http://localhost:4200/Dash_TempoReal/
+npm run build:pages   # build da demo + checagens (SEO, travessão, simulador) + cópia para ../../docs
+```
+
+O GitHub Pages publica a pasta `docs/` da branch `main` (gerada pelo `build:pages`, não editar à mão). A versão anterior à demo está na tag `v1-pre-demo`.
+
+---
+
 ## 📑 Sumário
+- [Demo ao vivo](#-demo-ao-vivo)
 - [Tecnologias Utilizadas](#%EF%B8%8F-tecnologias-utilizadas)
 - [Padrões e Configuração](#%EF%B8%8F-padrões-e-configuração)
 - [Como Construir o Projeto](#%EF%B8%8F-como-construir-o-projeto)
@@ -353,6 +375,17 @@ Acesse **[http://localhost:4200/](http://localhost:4200/)** no seu navegador par
 
 * **Autor:** Compania AlphaCompLabs  
 * **GitHub:** [github.com/AlphaCompLabs](https://github.com/AlphaCompLabs)
+
+**Equipe** (nomes dos cabeçalhos do código e autores dos commits):
+
+* Caio Silveira ([@Caiorem](https://github.com/Caiorem))
+* Diogo Freitas ([@DX1ONE](https://github.com/DX1ONE))
+* Elisa Nunes de Freitas ([@elisanuness](https://github.com/elisanuness))
+* Giovanna
+* Gustavo Martins Gripaldi ([@G2Martins](https://github.com/G2Martins), [portfólio](https://g2portfolio.grovicdata.com/projetos/dash-tempo-real/))
+* Mariana Monteiro ([@marianambb](https://github.com/marianambb))
+* Mayron Malaquias
+* [@Pedrobrgss](https://github.com/Pedrobrgss)
 
 [🔼 Voltar ao topo](#-dashboard-de-análise-de-tráfego-em-tempo-real)
 
